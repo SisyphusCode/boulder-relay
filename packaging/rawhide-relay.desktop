@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Rawhide Relay
+Comment=GTK4 IRC client for Libera.Chat
+Exec=rawhide-relay
+Icon=rawhide-relay
+Terminal=false
+Type=Application
+Categories=Network;Chat;GTK;
+Keywords=IRC;Libera;Chat;Rust;GTK;
+StartupNotify=true

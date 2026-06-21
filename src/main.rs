@@ -50,8 +50,23 @@ const GRUVBOX_CSS: &str = "
         color: #fbf1c7; 
     }
 
+    .mute-btn {
+        background-color: transparent;
+        color: #928374;
+        border: 1px solid transparent; 
+        box-shadow: none;
+        padding: 4px 8px; 
+        font-family: monospace;
+    }
+    .mute-btn:hover { 
+        background-color: #3c3836; 
+        border: 1px solid #504945; 
+        color: #ebdbb2; 
+    }
+
     .muted-user {
         color: #928374;
+        text-decoration: line-through;
     }
 ";
 
@@ -166,29 +181,46 @@ impl AppModel {
                 let clean_user = Self::normalized_nick(user);
                 let muted = self.is_muted(&self.active_channel, user);
 
-                let label = if muted {
-                    format!("🔇 {}", user)
-                } else {
-                    user.clone()
-                };
+                let row = gtk::Box::builder()
+                    .orientation(gtk::Orientation::Horizontal)
+                    .spacing(4)
+                    .build();
 
-                let btn = gtk::Button::with_label(&label);
-                btn.set_halign(gtk::Align::Start);
-                btn.add_css_class("user-btn");
+                // Button to initiate Private Message
+                let dm_btn = gtk::Button::with_label(user);
+                dm_btn.set_hexpand(true);
+                dm_btn.set_halign(gtk::Align::Fill);
+                dm_btn.add_css_class("user-btn");
                 if muted {
-                    btn.add_css_class("muted-user");
+                    dm_btn.add_css_class("muted-user");
                 }
 
-                let s = sender.clone();
-                let channel = self.active_channel.clone();
-                btn.connect_clicked(move |_| {
-                    s.input(AppInput::ToggleMute {
-                        channel: channel.clone(),
-                        user: clean_user.clone(),
+                let s1 = sender.clone();
+                let u1 = clean_user.clone();
+                dm_btn.connect_clicked(move |_| {
+                    // Reusing JoinChannel since our logic handles targets without '#' as DMs
+                    s1.input(AppInput::JoinChannel(u1.clone()));
+                });
+
+                // Button to toggle mute state
+                let mute_icon = if muted { "🔇" } else { "🔊" };
+                let mute_btn = gtk::Button::with_label(mute_icon);
+                mute_btn.add_css_class("mute-btn");
+
+                let s2 = sender.clone();
+                let c2 = self.active_channel.clone();
+                let u2 = clean_user.clone();
+                mute_btn.connect_clicked(move |_| {
+                    s2.input(AppInput::ToggleMute {
+                        channel: c2.clone(),
+                        user: u2.clone(),
                     });
                 });
 
-                self.user_box.append(&btn);
+                row.append(&dm_btn);
+                row.append(&mute_btn);
+
+                self.user_box.append(&row);
             }
         }
     }

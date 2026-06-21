@@ -1,6 +1,6 @@
 Name:           rawhide-relay
 Version:        0.1.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        GTK4 IRC client written in Rust using relm4
 
 License:        GPL-2.0-or-later
@@ -45,6 +45,9 @@ appstream-util validate-relax --nonet packaging/org.Sisyphus.RawhideRelay.metain
 %{_metainfodir}/org.Sisyphus.RawhideRelay.metainfo.xml
 
 %changelog
+* Sun Jun 21 2026 Kenny Glowner <sisyphuscode@fedoraproject.org> - 0.1.0-6
+- Add side-by-side UI buttons for user DM and mute toggles
+
 * Sun Jun 21 2026 Kenny Glowner <sisyphuscode@fedoraproject.org> - 0.1.0-5
 - Swap appstream for libappstream-glib to fix validation
 - Restore %%check phase for Copr builds

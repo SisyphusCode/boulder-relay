@@ -329,6 +329,7 @@ impl SimpleComponent for AppModel {
     view! {
         gtk::Window {
             set_default_size: (1200, 700),
+            add_css_class: "boulder-relay",
 
             connect_close_request[sender] => move |_| {
                 sender.input(AppInput::SaveSettings);
@@ -1091,7 +1092,7 @@ impl SimpleComponent for AppModel {
 }
 
 fn main() {
-    theme::install();
     let app = RelmApp::new("org.Sisyphus.BoulderRelay");
+    theme::load_css();
     app.run::<AppModel>(());
 }

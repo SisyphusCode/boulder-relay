@@ -1,33 +1,30 @@
 use gtk::prelude::*;
-use gtk::{gdk, CssProvider, Settings, STYLE_PROVIDER_PRIORITY_APPLICATION};
+use gtk::{gdk, CssProvider, Settings, STYLE_PROVIDER_PRIORITY_USER, WindowControls};
 
 pub const GRUVBOX_CSS: &str = r#"
-.boulder-relay {
+window.boulder-relay {
     background-color: #282828;
     color: #ebdbb2;
 }
 
-.boulder-relay headerbar,
-.boulder-header {
+headerbar.boulder-header {
     background-color: #1d2021;
     background-image: none;
     color: #ebdbb2;
     border-bottom: 1px solid #504945;
     box-shadow: none;
+    min-height: 46px;
 }
 
-.boulder-relay headerbar label,
-.boulder-header label,
-.boulder-header .title {
+headerbar.boulder-header label,
+headerbar.boulder-header .title {
     color: #10B981;
     font-family: monospace;
     font-weight: bold;
 }
 
-.boulder-relay headerbar button,
-.boulder-relay headerbar windowcontrols button,
-.boulder-header button,
-.boulder-header windowcontrols button {
+headerbar.boulder-header windowcontrols button,
+headerbar.boulder-header button {
     color: #ebdbb2;
     background-color: transparent;
     background-image: none;
@@ -35,9 +32,14 @@ pub const GRUVBOX_CSS: &str = r#"
     box-shadow: none;
 }
 
-.boulder-relay headerbar button:hover,
-.boulder-header button:hover {
+headerbar.boulder-header windowcontrols button:hover,
+headerbar.boulder-header button:hover {
     background-color: #3c3836;
+}
+
+.boulder-relay {
+    background-color: #282828;
+    color: #ebdbb2;
 }
 
 .boulder-relay .sidebar {
@@ -181,29 +183,32 @@ pub const GRUVBOX_CSS: &str = r#"
 }
 "#;
 
-pub fn install() {
+pub fn apply_gtk_settings() {
     if let Some(settings) = Settings::default() {
         settings.set_gtk_application_prefer_dark_theme(true);
-        settings.set_gtk_theme_name(Some("Adwaita-dark"));
-    }
-
-    let provider = CssProvider::new();
-    provider.load_from_data(GRUVBOX_CSS);
-    if let Some(display) = gdk::Display::default() {
-        gtk::style_context_add_provider_for_display(
-            &display,
-            &provider,
-            STYLE_PROVIDER_PRIORITY_APPLICATION,
-        );
     }
 }
 
-pub fn attach_window(window: &gtk::Window) {
-    window.add_css_class("boulder-relay");
+pub fn load_css() {
+    apply_gtk_settings();
 
+    let provider = CssProvider::new();
+    provider.load_from_data(GRUVBOX_CSS);
+
+    let display = gdk::Display::default().expect("GTK display must be initialized before loading CSS");
+    gtk::style_context_add_provider_for_display(&display, &provider, STYLE_PROVIDER_PRIORITY_USER);
+}
+
+pub fn build_titlebar() -> gtk::HeaderBar {
     let header = gtk::HeaderBar::new();
     header.add_css_class("boulder-header");
-    header.set_show_title_buttons(true);
+    // Avoid Adwaita's light `default-decoration` styling on GNOME.
+    header.set_show_title_buttons(false);
+
+    let controls = WindowControls::builder()
+        .side(gtk::PackType::End)
+        .build();
+    header.pack_end(&controls);
 
     let title = gtk::Label::builder()
         .label("Boulder Relay — Rocky Linux IRC")
@@ -211,6 +216,11 @@ pub fn attach_window(window: &gtk::Window) {
         .build();
     header.set_title_widget(Some(&title));
 
-    window.set_titlebar(Some(&header));
+    header
+}
+
+pub fn attach_window(window: &gtk::Window) {
+    window.add_css_class("boulder-relay");
+    window.set_titlebar(Some(&build_titlebar()));
     window.set_title(Some(""));
 }

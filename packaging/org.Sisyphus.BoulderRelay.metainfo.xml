@@ -46,6 +46,11 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
+    <release version="0.2.2" date="2026-06-24">
+      <description>
+        <p>Fix white GNOME title bar by loading theme CSS after GTK init and replacing default window decorations.</p>
+      </description>
+    </release>
     <release version="0.2.1" date="2026-06-24">
       <description>
         <p>Dark custom title bar, Gruvbox theme polish, nick highlights, /clear /part /help, and last channel restore.</p>

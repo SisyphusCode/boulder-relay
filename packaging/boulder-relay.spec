@@ -1,5 +1,5 @@
 Name:           boulder-relay
-Version:        0.2.1
+Version:        0.2.2
 Release:        1%{?dist}
 Summary:        GTK4 IRC client for Rocky Linux community channels on Libera.Chat
 
@@ -54,6 +54,10 @@ appstream-util validate-relax --nonet packaging/org.Sisyphus.BoulderRelay.metain
 %{_metainfodir}/org.Sisyphus.BoulderRelay.metainfo.xml
 
 %changelog
+* Wed Jun 24 2026 Kenny Glowner <sisyphuscode@fedoraproject.org> - 0.2.2-1
+- Fix white GNOME title bar: load CSS after GTK init and use custom WindowControls
+- Override Adwaita default-decoration header styling with higher-priority Gruvbox CSS
+
 * Wed Jun 24 2026 Kenny Glowner <sisyphuscode@fedoraproject.org> - 0.2.1-1
 - Fix white GNOME title bar with custom dark HeaderBar and scoped Gruvbox CSS
 - Add nick highlights, /clear, /part, /help, channel leave button, last channel restore

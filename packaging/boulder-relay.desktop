@@ -1,11 +1,11 @@
 [Desktop Entry]
 Name=Boulder Relay
-Comment=GTK4 IRC client for Fedora, RHEL, and Rocky Linux on Libera.Chat
+Comment=GTK4 IRC client for any network and channel
 Exec=boulder-relay
 Icon=boulder-relay
 Terminal=false
 Type=Application
 Categories=Network;Chat;GTK;
-Keywords=IRC;Fedora;RHEL;Rocky;Libera;Chat;Rust;GTK;Development;
+Keywords=IRC;Chat;Libera;OFTC;Rust;GTK;GTK4;Messenger;
 StartupNotify=true
 StartupWMClass=org.Sisyphus.BoulderRelay

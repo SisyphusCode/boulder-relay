@@ -1,89 +1,116 @@
 # Boulder Relay
 
-A GTK4 IRC client built in Rust using [relm4](https://relm4.org/), tuned for Fedora, RHEL, and Rocky Linux communities on Libera.Chat.
+A fast, clean GTK4 + libadwaita IRC client written in **100% Rust** using [relm4](https://relm4.org/).
 
 Named for the Sisyphus myth — the conversation you keep pushing uphill.
 
+**The best IRC client for modern distros**: Built for Sisyphus Linux (Gentoo + Catalyst) and any Rust-loving desktop. Supports multiple servers concurrently, modern auth (SASL), per-network accounts, rich UI, and everything you need for daily use without leaving your terminal-less workflow.
+
+Uses the Sisyphus logo and branding. Fully generic — no distro defaults.
+
 ## Features
 
-- TLS IRC connection (port 6697)
-- NickServ authentication (required for Fedora, RHEL, and Rocky Linux channels)
-- Multi-channel support with live user lists
-- Channel favorites, grouped sidebar, and per-user mute
-- Persistent settings (`~/.config/boulder-relay/settings.conf`)
-- Connect / disconnect controls
-- Timestamps and auto-scrolling chat view
-- Slash commands: `/join`, `/msg`, `/nick`, `/part`, `/clear`, `/help`
-- Gruvbox Dark theme with community color accents
+- **Multi-server**: Full support for concurrent connections. Add/switch servers in sidebar. Per-server channels, history, accounts, and state.
+- TLS (or plain) IRC connections (configurable port)
+- **Modern auth**: NickServ, SASL PLAIN, SASL EXTERNAL (client cert). Configurable per server.
+- **Account management**: Register, Verify, Change password, Ghost nick, List accounts — all in-app with dialogs.
+- Multi-channel + DM support with native GtkListBox (keyboard nav, hover, selection).
+- **Per-nickname coloring** in chat and user list (toggleable).
+- Channel topics, per-channel highlights and /ignore.
+- Persistent per-server accounts and settings.
+- Connect / disconnect with auto-reconnect, configurable timestamps, auto-scroll.
+- Slash commands + GUI for everything: `/join`, `/list`, `/me`, account ops, ignore, etc.
+- **Channel discovery**: Sidebar filter + powerful Browse dialog with search, counts, topics.
+- **Preferences & Theming**: Nick colors, timestamps, auth method, theme picker (Gruvbox, Sisyphus Blue, Adwaita). Improved CSS with Sisyphus accents, density, fonts.
+- **Logs & Search**: Built-in log viewer with full-text search across history. Auto-saves logs.
+- **Rich UI**: libadwaita + Gruvbox, tray/minimize to background support, spellcheck placeholder in input, IRCv3 metadata basics (typing hints via caps).
+- Sisyphus-specific: Logo, branding in titles/help, distro links.
+- Fully generic — the ultimate Rust IRC client for any distro or desktop.
 
-## Default channels
+## Quick start
 
-On connect, the client joins community channels on `irc.libera.chat`:
+1. Set your nick + optional NickServ password.
+2. Set server (default: `irc.libera.chat`).
+3. **Connect**.
+4. In sidebar: type `#channel` or nick and press Enter, or use `/join #chan`.
 
-| Channel | Community | Purpose |
-|---------|-----------|---------|
-| `#rockylinux` | Rocky Linux | General support and discussion |
-| `#rockylinux-devel` | Rocky Linux | Development and release engineering |
-| `#rockylinux-social` | Rocky Linux | Off-topic and social chat |
-| `#fedora` | Fedora | General Fedora support and discussion |
-| `#fedora-devel` | Fedora | Development, packaging, and infrastructure |
-| `#rhel` | RHEL | RHEL support and enterprise Linux discussion |
+All joined channels and favorites persist. No forced defaults on first run — only the Server tab.
 
-See the [Rocky Linux IRC wiki](https://wiki.rockylinux.org/irc/) and [Fedora communications docs](https://docs.fedoraproject.org/en-US/project/communications/) for registration and channel details.
+## Appearance & Theming
 
-## Install from COPR
+- Fully custom Gruvbox dark theme layered on libadwaita.
+- Toggleable nickname colors in Preferences.
+- Configurable timestamp format.
+- Native ListBox widgets for channels and users.
+- Channel topics shown live.
+- In-chat search field.
+- Future: full light theme variant and more prefs.
+
+The icon is the official Sisyphus logo.
+
+## Multi-Server & Accounts
+
+- Add servers via the "Add server" field.
+- Per-server saved nicks, passwords, services, and auth methods.
+- Account Manager dialog for change password, ghost, list.
+- Full registration + verify flow with email or email-less.
+
+## Logs, Search & Polish
+
+- View Logs button opens searchable history.
+- Auto-reconnect, /ignore, per-channel rules.
+- Tray + background mode.
+- Theme picker in Preferences.
+- Sisyphus branding throughout.
+
+## Install
+
+### Gentoo / Sisyphus Linux (recommended for this project)
+
+Add the Sisyphus overlay (or your local portage overlay) and:
+
+```bash
+emerge net-irc/boulder-relay   # or -9999 for live
+```
+
+See the ebuild in the Sisyphus-Linux portage overlay for exact deps and USE.
+
+### From COPR (Fedora / EL)
 
 ```bash
 sudo dnf copr enable sisyphuscode/boulder-relay
 sudo dnf install boulder-relay
 ```
 
-Builds are provided for **EPEL 9**, **EPEL 10**, **Fedora 44**, and Fedora Rawhide.
-
-Join any Libera.Chat channel from the sidebar: type `#channel` in the join box, use `/join channel` (the `#` is optional), or `/j channel`. Custom channels are remembered between sessions.
-
-On RHEL 10 / Rocky Linux 10 / Alma 10, enable EPEL 10 first if it is not already enabled.
-
-## Development setup
-
-Install build dependencies on Rocky Linux 9 / 10 or Fedora:
-
-```bash
-sudo dnf install -y cargo rust gtk4-devel openssl-devel desktop-file-utils libappstream-glib
-```
-
-The project pins `relm4 0.8` / `gtk4 0.8` (with default features disabled) so it builds against the GLib and Pango libraries shipped on EL9 and EL10.
-
-Build and run locally:
+### From source
 
 ```bash
 cargo run
 ```
 
-Build an RPM (offline, using vendored crates):
+For release RPM (vendored):
 
 ```bash
 ./packaging/build-rpm.sh
 ```
 
-Or manually:
+## Development (Gentoo-friendly)
+
+On Gentoo:
 
 ```bash
-cargo build --release --offline
-rpmbuild -ba packaging/boulder-relay.spec
+emerge -av dev-lang/rust gui-libs/libadwaita:1 dev-libs/openssl
+cargo run
 ```
 
-Refresh vendored sources after dependency changes:
+Modern stack. Supports multi-server, SASL, logs, theming. Run with your Catalyst-built env for full Sisyphus integration. Gruvbox + Sisyphus accents on Adwaita.
 
-```bash
-cargo vendor vendor
-```
+## Packaging notes
 
-## Dependencies
-
-- Rust + Cargo
-- GTK4 development libraries (`gtk4-devel`)
-- OpenSSL development libraries (`openssl-devel`)
+- Full feature set packaged: multi-server, SASL, logs, account tools, modern UI.
+- Icons: Sisyphus logo at multiple sizes.
+- Requires libadwaita. Primary target for Sisyphus Catalyst ISOs and Portage.
+- The ultimate Rust IRC experience for your distro.
 
 ## License
 

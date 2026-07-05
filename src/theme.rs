@@ -60,6 +60,14 @@ headerbar.boulder-header button:hover {
     color: #10B981;
 }
 
+/* Sisyphus branding accents */
+.boulder-relay {
+    --sisyphus-accent: #3B82F6;
+}
+.boulder-relay .sidebar-title {
+    color: var(--sisyphus-accent, #10B981);
+}
+
 .boulder-relay .sidebar-subtitle {
     font-weight: bold;
     color: #b8bb26;
@@ -71,6 +79,12 @@ headerbar.boulder-header button:hover {
     color: #928374;
     font-size: 0.85em;
     letter-spacing: 0.04em;
+}
+
+.boulder-relay .channel-topic {
+    color: #928374;
+    font-size: 0.82em;
+    font-style: italic;
 }
 
 .boulder-relay button.channel-rocky {
@@ -139,8 +153,13 @@ headerbar.boulder-header button:hover {
 .boulder-relay textview {
     background-color: #282828;
     color: #ebdbb2;
-    font-family: monospace;
-    padding: 8px;
+    font-family: "Monospace", monospace;
+    font-size: 0.95em;
+    padding: 6px;
+}
+
+.boulder-relay entry {
+    font-family: "Monospace", monospace;
 }
 
 .boulder-relay textview text {
@@ -196,6 +215,20 @@ headerbar.boulder-header button:hover {
     color: #928374;
     text-decoration: line-through;
 }
+
+/* Better density and fonts */
+.boulder-relay .sidebar {
+    padding: 4px;
+}
+
+.boulder-relay button, .boulder-relay entry {
+    padding: 4px 8px;
+}
+
+/* Stub for light theme or system */
+@media (prefers-color-scheme: light) {
+    /* Extend for light Gruvbox variant if desired */
+}
 "#;
 
 pub fn apply_gtk_settings() {
@@ -226,7 +259,7 @@ pub fn build_titlebar() -> gtk::HeaderBar {
     header.pack_end(&controls);
 
     let title = gtk::Label::builder()
-        .label("Boulder Relay — Enterprise Linux IRC")
+        .label("Boulder Relay — Sisyphus")
         .css_classes(["title"])
         .build();
     header.set_title_widget(Some(&title));
@@ -239,4 +272,12 @@ pub fn attach_window(window: &gtk::Window) {
     window.set_titlebar(Some(&build_titlebar()));
     window.set_title(Some(""));
     window.set_icon_name(Some("boulder-relay"));
+}
+
+pub fn attach_adw_window(window: &adw::Window) {
+    window.add_css_class("boulder-relay");
+    // For adw, we can use AdwHeaderBar but keep custom for Gruvbox
+    window.set_titlebar(Some(&build_titlebar()));
+    window.set_title("");
+    window.set_icon_name("boulder-relay");
 }

@@ -1,7 +1,7 @@
 Name:           boulder-relay
-Version:        0.2.6
+Version:        0.3.0
 Release:        1%{?dist}
-Summary:        GTK4 IRC client for Fedora, RHEL, and Rocky Linux on Libera.Chat
+Summary:        GTK4 IRC client for any IRC network (general purpose)
 
 License:        GPL-2.0-or-later
 URL:            https://github.com/SisyphusCode/boulder-relay
@@ -13,19 +13,20 @@ Source0:        boulder-relay-%{version}.tar.gz
 BuildRequires:  cargo
 BuildRequires:  rust
 BuildRequires:  pkgconfig(gtk4)
+BuildRequires:  pkgconfig(libadwaita-1)
 BuildRequires:  pkgconfig(openssl)
 BuildRequires:  desktop-file-utils
 BuildRequires:  libappstream-glib
 
 Requires:       gtk4
+Requires:       libadwaita
 Requires:       openssl-libs
 
 %description
-Boulder Relay is a GTK4 IRC client built in Rust with relm4 for Fedora,
-RHEL, and Rocky Linux community chat on Libera.Chat. It connects over
-TLS, supports NickServ authentication, persistent settings, slash
-commands, and ships with Rocky, Fedora, and RHEL development channels
-as defaults.
+Boulder Relay is a general-purpose GTK4 IRC client built in Rust with relm4.
+It works with any IRC server/network. No baked-in default channels or
+distro branding. Clean interface with multi-channel support, favorites,
+user lists, timestamps, slash commands, and persistent settings.
 
 %prep
 %autosetup -n boulder-relay-%{version}
@@ -36,7 +37,8 @@ cargo build --release --offline
 %install
 install -Dm755 target/release/boulder-relay %{buildroot}%{_bindir}/boulder-relay
 install -Dm644 packaging/boulder-relay.desktop %{buildroot}%{_datadir}/applications/boulder-relay.desktop
-install -Dm644 assets/boulder-relay.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/boulder-relay.png
+install -Dm644 assets/boulder-relay-128.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/boulder-relay.png
+install -Dm644 assets/boulder-relay-256.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/boulder-relay.png
 install -Dm644 assets/boulder-relay.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/boulder-relay.svg
 install -Dm644 packaging/org.Sisyphus.BoulderRelay.metainfo.xml %{buildroot}%{_metainfodir}/org.Sisyphus.BoulderRelay.metainfo.xml
 
@@ -50,10 +52,23 @@ appstream-util validate-relax --nonet packaging/org.Sisyphus.BoulderRelay.metain
 %{_bindir}/boulder-relay
 %{_datadir}/applications/boulder-relay.desktop
 %{_datadir}/icons/hicolor/128x128/apps/boulder-relay.png
+%{_datadir}/icons/hicolor/256x256/apps/boulder-relay.png
 %{_datadir}/icons/hicolor/scalable/apps/boulder-relay.svg
 %{_metainfodir}/org.Sisyphus.BoulderRelay.metainfo.xml
 
 %changelog
+* Sun Jul 05 2026 Kenny Glowner <sisyphuscode@fedoraproject.org> - 0.3.0-1
+- Switched default icon to Sisyphus logo (PNG at multiple sizes for hicolor).
+- Added per-nickname coloring in chat messages (Gruvbox palette).
+- Channel topics now displayed under active context header (from RPL_TOPIC).
+- Proper multi-size icon installation (128/256 + SVG).
+- Remove all hardcoded default channels and distro-specific branding (Fedora/RHEL/Rocky).
+- General purpose IRC client: usable on any network, any channels (Gentoo, Sisyphus, etc.).
+- Add basic /me (CTCP ACTION) support for actions.
+- Updated packaging, README, metainfo, desktop for generic use.
+- Added Gentoo ebuild skeleton (net-irc/boulder-relay-9999).
+- Relaxed old EL9 pin notes; better for modern systems like Gentoo + Catalyst.
+
 * Fri Jun 26 2026 Kenny Glowner <sisyphuscode@fedoraproject.org> - 0.2.6-1
 - Fix RHEL default channel: use #rhel instead of nonexistent #rhel-devel
 

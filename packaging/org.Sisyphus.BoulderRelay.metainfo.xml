@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>org.Sisyphus.BoulderRelay</id>
   <name>Boulder Relay</name>
-  <summary>GTK4 IRC client for Fedora, RHEL, and Rocky Linux communities</summary>
+  <summary>GTK4 IRC client — any server, any channels</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
@@ -10,14 +10,15 @@
   <description>
     <p>
       Boulder Relay is a GTK4 IRC client written in Rust using relm4.
-      It provides a clean desktop interface for connecting to Libera.Chat
-      with TLS, NickServ authentication, multi-channel chat, and live user lists.
+      It provides a clean desktop interface for connecting to any IRC
+      network (Libera, OFTC, etc.) with TLS, authentication, multi-channel
+      chat, and live user lists.
     </p>
     <p>
-      Default channels include Rocky Linux (#rockylinux*), Fedora (#fedora,
-      #fedora-devel), and RHEL (#rhel). Settings are saved between
-      sessions, chat includes timestamps and nick highlights, and slash
-      commands such as /join, /part, /clear, and /msg are supported.
+      No default channels are provided — you choose what to join. Settings
+      are saved between sessions, chat includes timestamps and nick
+      highlights, and slash commands (/join, /part, /clear, /msg, /me etc.)
+      are supported. Ideal as a lightweight client or for custom distros.
     </p>
   </description>
 
@@ -30,14 +31,12 @@
 
   <keywords>
     <keyword>IRC</keyword>
-    <keyword>Fedora</keyword>
-    <keyword>RHEL</keyword>
-    <keyword>Rocky Linux</keyword>
     <keyword>Chat</keyword>
     <keyword>Libera</keyword>
-    <keyword>Rust</keyword>
+    <keyword>OFTC</keyword>
     <keyword>GTK</keyword>
-    <keyword>Development</keyword>
+    <keyword>Rust</keyword>
+    <keyword>GTK4</keyword>
   </keywords>
 
   <developer id="org.sisyphuscode">

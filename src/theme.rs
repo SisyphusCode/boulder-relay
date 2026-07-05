@@ -247,17 +247,10 @@ pub fn load_css() {
     gtk::style_context_add_provider_for_display(&display, &provider, STYLE_PROVIDER_PRIORITY_USER);
 }
 
-pub fn build_titlebar() -> gtk::HeaderBar {
-    let header = gtk::HeaderBar::new();
+pub fn build_titlebar() -> adw::HeaderBar {
+    let header = adw::HeaderBar::new();
     header.add_css_class("boulder-header");
-    // Avoid Adwaita's light `default-decoration` styling on GNOME.
-    header.set_show_title_buttons(false);
-
-    let controls = WindowControls::builder()
-        .side(gtk::PackType::End)
-        .build();
-    header.pack_end(&controls);
-
+    
     let title = gtk::Label::builder()
         .label("Boulder Relay — Sisyphus")
         .css_classes(["title"])

@@ -547,7 +547,7 @@ impl AppModel {
             }
         } else if !filter.is_empty() && favorites.is_empty() {
             let hint = gtk::Label::builder()
-                .label(format!("No matches for “{}”", self.channel_filter))
+                .label(format!("No matches for \u{201c}{}\u{201d}", self.channel_filter))
                 .halign(gtk::Align::Start)
                 .margin_start(12)
                 .margin_top(4)
@@ -1132,6 +1132,7 @@ impl SimpleComponent for AppModel {
         adw::Window {
             set_default_size: (1200, 700),
             set_size_request: (800, 500),
+            set_resizable: true,
             set_hexpand: true,
             set_vexpand: true,
             add_css_class: "boulder-relay",
@@ -1157,6 +1158,8 @@ impl SimpleComponent for AppModel {
                     set_hexpand: true, set_vexpand: true,
                     set_orientation: gtk::Orientation::Horizontal,
                     set_position: 240,
+                    set_shrink_start_child: false,
+                    set_shrink_end_child: false,
 
                     #[wrap(Some)]
                     set_start_child = &gtk::Box {
@@ -1350,6 +1353,8 @@ impl SimpleComponent for AppModel {
                     set_orientation: gtk::Orientation::Horizontal,
                     set_position: 680,
                     set_hexpand: true, set_vexpand: true,
+                    set_shrink_start_child: false,
+                    set_shrink_end_child: false,
 
                     #[wrap(Some)]
                     set_start_child = &gtk::Box {
@@ -1909,7 +1914,7 @@ impl SimpleComponent for AppModel {
                                         join_channels(&irc_tx);
                                     }
                                     // Auto-detect registration success for better UX
-                                    if body.contains("has been successfully registered") 
+                                    if body.contains("has been successfully registered")
                                         || body.contains("account has been verified")
                                         || body.contains("Account registered") {
                                         sender_clone.input(AppInput::ReceiveServerMessage(
@@ -2299,131 +2304,4 @@ impl SimpleComponent for AppModel {
                             return;
                         }
                         "/msg" | "/query" => {
-                            if let Some(target) = parts.next() {
-                                let body = parts.next().unwrap_or("");
-                                if !body.is_empty() {
-                                    let tx_opt = self.irc_sender.clone();
-                                    if let Some(irc_tx) = tx_opt {
-                                        let _ = irc_tx.send_privmsg(target, body);
-                                        let my_nick = self.nickname.clone();
-                                        self.append_message(target, &my_nick, body, LineStyle::SelfMsg);
-                                    }
-                                } else {
-                                    sender.input(AppInput::JoinChannel(target.to_string()));
-                                }
-                            }
-                            return;
-                        }
-                        "/nick" => {
-                            if let Some(nick) = parts.next() {
-                                self.nickname = nick.to_string();
-                                self.persist_settings();
-                                self.append_line(
-                                    SERVER_TAB,
-                                    self.timestamp_prefix(),
-                                    None,
-                                    format!("Nickname updated locally to {}. Reconnect to apply.", self.nickname),
-                                    LineStyle::System,
-                                );
-                            }
-                            return;
-                        }
-                        "/part" => {
-                            let target = parts
-                                .next()
-                                .map(str::to_string)
-                                .unwrap_or_else(|| self.active_channel.clone());
-                            sender.input(AppInput::PartChannel(target));
-                            return;
-                        }
-                        "/clear" => {
-                            sender.input(AppInput::ClearChannel(self.active_channel.clone()));
-                            return;
-                        }
-                        "/help" => {
-                            let channel = self.active_channel.clone();
-                            self.append_line(&channel, self.timestamp_prefix(), None, HELP_TEXT.to_string(), LineStyle::System);
-                            return;
-                        }
-                        "/me" => {
-                            let action = parts.next().unwrap_or("").to_string();
-                            if !action.is_empty() {
-                                let full = format!("\x01ACTION {}\x01", action);
-                                if let Some(irc_tx) = &self.irc_sender {
-                                    let _ = irc_tx.send_privmsg(&self.active_channel, &full);
-                                }
-                                let me_user = format!("* {}", self.nickname);
-                                let chan = self.active_channel.clone();
-                                self.append_message(&chan, &me_user, &action, LineStyle::SelfMsg);
-                            }
-                            return;
-                        }
-                        "/list" => {
-                            sender.input(AppInput::BrowseChannels);
-                            return;
-                        }
-                        "/ignore" => {
-                            if let Some(target) = parts.next() {
-                                let clean = Self::normalized_nick(target);
-                                self.ignored_users.insert(clean.clone());
-                                let chan = self.active_channel.clone();
-                                self.append_message(&chan, "System", &format!("Ignoring {}", clean), LineStyle::System);
-                            }
-                            return;
-                        }
-                        "/unignore" => {
-                            if let Some(target) = parts.next() {
-                                let clean = Self::normalized_nick(target);
-                                self.ignored_users.remove(&clean);
-                                let chan = self.active_channel.clone();
-                                self.append_message(&chan, "System", &format!("Unignored {}", clean), LineStyle::System);
-                            }
-                            return;
-                        }
-                        _ => {}
-                    }
-                }
-
-                if self.active_channel == SERVER_TAB {
-                    self.append_line(
-                        SERVER_TAB,
-                        self.timestamp_prefix(),
-                        None,
-                        "Select a channel or DM before sending.".to_string(),
-                        LineStyle::System,
-                    );
-                    return;
-                }
-
-                let tx_opt = self.irc_sender.clone();
-                if let Some(irc_tx) = tx_opt {
-                    if irc_tx.send_privmsg(&self.active_channel, text).is_ok() {
-                        let channel = self.active_channel.clone();
-                        let my_nick = self.nickname.clone();
-                        self.append_message(&channel, &my_nick, text, LineStyle::SelfMsg);
-                    }
-                } else {
-                    let channel = self.active_channel.clone();
-                    self.append_line(
-                        &channel,
-                        self.timestamp_prefix(),
-                        None,
-                        "Cannot send message, not connected.".to_string(),
-                        LineStyle::System,
-                    );
-                }
-            }
-        }
-    }
-}
-
-fn main() {
-    gtk::init().expect("Failed to initialize GTK");
-    let app = adw::Application::new(Some(notify::APP_ID), Default::default());
-    app.connect_startup(|_| {
-        theme::load_css();
-        notify::setup_application_icon();
-    });
-    let relm_app = relm4::RelmApp::from_app(app);
-    relm_app.run::<AppModel>(());
-}
+                            if let Some(target) = parts.n

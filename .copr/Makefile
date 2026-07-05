@@ -2,7 +2,7 @@
 #   make -f .copr/Makefile srpm outdir="<outdir>" spec="<spec_path>"
 srpm:
 	@set -euo pipefail; \
-	VERSION=$$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/'); \
+	VERSION=$$(grep '^ *version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/'); \
 	STAGING=$$(mktemp -d); \
 	SRC_DIR="$$STAGING/boulder-relay-$$VERSION"; \
 	mkdir -p "$$SRC_DIR"; \

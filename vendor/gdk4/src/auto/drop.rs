@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{ContentFormats, Device, Display, Drag, DragAction, Surface};
+use crate::{ffi, ContentFormats, Device, Display, Drag, DragAction, Surface};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -154,7 +154,7 @@ impl Drop {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::display\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_display_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

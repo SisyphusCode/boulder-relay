@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::Window;
+use crate::{ffi, Window};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -138,6 +138,7 @@ impl MountOperationBuilder {
     /// Build the [`MountOperation`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> MountOperation {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }
@@ -169,6 +170,7 @@ pub trait GtkMountOperationExt: IsA<MountOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_mount_operation_is_showing")]
+    #[doc(alias = "is-showing")]
     fn is_showing(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_mount_operation_is_showing(
@@ -178,6 +180,7 @@ pub trait GtkMountOperationExt: IsA<MountOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_mount_operation_set_display")]
+    #[doc(alias = "display")]
     fn set_display(&self, display: &impl IsA<gdk::Display>) {
         unsafe {
             ffi::gtk_mount_operation_set_display(
@@ -188,6 +191,7 @@ pub trait GtkMountOperationExt: IsA<MountOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_mount_operation_set_parent")]
+    #[doc(alias = "parent")]
     fn set_parent(&self, parent: Option<&impl IsA<Window>>) {
         unsafe {
             ffi::gtk_mount_operation_set_parent(
@@ -215,7 +219,7 @@ pub trait GtkMountOperationExt: IsA<MountOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::display\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_display_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -241,7 +245,7 @@ pub trait GtkMountOperationExt: IsA<MountOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::is-showing\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_is_showing_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -267,7 +271,7 @@ pub trait GtkMountOperationExt: IsA<MountOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::parent\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_parent_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

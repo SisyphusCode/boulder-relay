@@ -3,8 +3,8 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, MediaStream,
-    Overflow, Widget,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager,
+    MediaStream, Overflow, Widget,
 };
 use glib::{
     prelude::*,
@@ -44,6 +44,7 @@ impl MediaControls {
 
     #[doc(alias = "gtk_media_controls_get_media_stream")]
     #[doc(alias = "get_media_stream")]
+    #[doc(alias = "media-stream")]
     pub fn media_stream(&self) -> Option<MediaStream> {
         unsafe {
             from_glib_none(ffi::gtk_media_controls_get_media_stream(
@@ -53,6 +54,7 @@ impl MediaControls {
     }
 
     #[doc(alias = "gtk_media_controls_set_media_stream")]
+    #[doc(alias = "media-stream")]
     pub fn set_media_stream(&self, stream: Option<&impl IsA<MediaStream>>) {
         unsafe {
             ffi::gtk_media_controls_set_media_stream(
@@ -77,7 +79,7 @@ impl MediaControls {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::media-stream\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_media_stream_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -196,6 +198,14 @@ impl MediaControlsBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -304,6 +314,7 @@ impl MediaControlsBuilder {
     /// Build the [`MediaControls`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> MediaControls {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

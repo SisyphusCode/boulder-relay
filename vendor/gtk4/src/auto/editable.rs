@@ -5,8 +5,9 @@
 #[cfg(feature = "v4_10")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
 use crate::AccessiblePlatformState;
-use crate::{Accessible, Buildable, ConstraintTarget, Widget};
+use crate::{ffi, Accessible, Buildable, ConstraintTarget, Widget};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -67,6 +68,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_editable_get_alignment")]
     #[doc(alias = "get_alignment")]
+    #[doc(alias = "xalign")]
     fn alignment(&self) -> f32 {
         unsafe { ffi::gtk_editable_get_alignment(self.as_ref().to_glib_none().0) }
     }
@@ -96,6 +98,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_editable_get_editable")]
     #[doc(alias = "get_editable")]
+    #[doc(alias = "editable")]
     fn is_editable(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_editable_get_editable(
@@ -106,6 +109,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_editable_get_enable_undo")]
     #[doc(alias = "get_enable_undo")]
+    #[doc(alias = "enable-undo")]
     fn enables_undo(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_editable_get_enable_undo(
@@ -116,12 +120,14 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_editable_get_max_width_chars")]
     #[doc(alias = "get_max_width_chars")]
+    #[doc(alias = "max-width-chars")]
     fn max_width_chars(&self) -> i32 {
         unsafe { ffi::gtk_editable_get_max_width_chars(self.as_ref().to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_editable_get_position")]
     #[doc(alias = "get_position")]
+    #[doc(alias = "cursor-position")]
     fn position(&self) -> i32 {
         unsafe { ffi::gtk_editable_get_position(self.as_ref().to_glib_none().0) }
     }
@@ -153,6 +159,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_editable_get_width_chars")]
     #[doc(alias = "get_width_chars")]
+    #[doc(alias = "width-chars")]
     fn width_chars(&self) -> i32 {
         unsafe { ffi::gtk_editable_get_width_chars(self.as_ref().to_glib_none().0) }
     }
@@ -185,6 +192,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_editable_set_alignment")]
+    #[doc(alias = "xalign")]
     fn set_alignment(&self, xalign: f32) {
         unsafe {
             ffi::gtk_editable_set_alignment(self.as_ref().to_glib_none().0, xalign);
@@ -192,6 +200,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_editable_set_editable")]
+    #[doc(alias = "editable")]
     fn set_editable(&self, is_editable: bool) {
         unsafe {
             ffi::gtk_editable_set_editable(self.as_ref().to_glib_none().0, is_editable.into_glib());
@@ -199,6 +208,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_editable_set_enable_undo")]
+    #[doc(alias = "enable-undo")]
     fn set_enable_undo(&self, enable_undo: bool) {
         unsafe {
             ffi::gtk_editable_set_enable_undo(
@@ -209,6 +219,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_editable_set_max_width_chars")]
+    #[doc(alias = "max-width-chars")]
     fn set_max_width_chars(&self, n_chars: i32) {
         unsafe {
             ffi::gtk_editable_set_max_width_chars(self.as_ref().to_glib_none().0, n_chars);
@@ -216,6 +227,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_editable_set_position")]
+    #[doc(alias = "cursor-position")]
     fn set_position(&self, position: i32) {
         unsafe {
             ffi::gtk_editable_set_position(self.as_ref().to_glib_none().0, position);
@@ -223,6 +235,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_editable_set_text")]
+    #[doc(alias = "text")]
     fn set_text(&self, text: &str) {
         unsafe {
             ffi::gtk_editable_set_text(self.as_ref().to_glib_none().0, text.to_glib_none().0);
@@ -230,28 +243,16 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_editable_set_width_chars")]
+    #[doc(alias = "width-chars")]
     fn set_width_chars(&self, n_chars: i32) {
         unsafe {
             ffi::gtk_editable_set_width_chars(self.as_ref().to_glib_none().0, n_chars);
         }
     }
 
-    #[doc(alias = "cursor-position")]
-    fn cursor_position(&self) -> i32 {
-        ObjectExt::property(self.as_ref(), "cursor-position")
-    }
-
     #[doc(alias = "selection-bound")]
     fn selection_bound(&self) -> i32 {
         ObjectExt::property(self.as_ref(), "selection-bound")
-    }
-
-    fn xalign(&self) -> f32 {
-        ObjectExt::property(self.as_ref(), "xalign")
-    }
-
-    fn set_xalign(&self, xalign: f32) {
-        ObjectExt::set_property(self.as_ref(), "xalign", xalign)
     }
 
     #[doc(alias = "changed")]
@@ -268,7 +269,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     changed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -283,8 +284,8 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             F: Fn(&P, i32, i32) + 'static,
         >(
             this: *mut ffi::GtkEditable,
-            start_pos: libc::c_int,
-            end_pos: libc::c_int,
+            start_pos: std::ffi::c_int,
+            end_pos: std::ffi::c_int,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -299,7 +300,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"delete-text\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     delete_text_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -325,7 +326,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::cursor-position\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_cursor_position_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -348,7 +349,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::editable\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_editable_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -374,7 +375,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::enable-undo\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_enable_undo_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -400,7 +401,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::max-width-chars\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_max_width_chars_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -426,7 +427,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::selection-bound\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_selection_bound_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -449,7 +450,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::text\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_text_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -475,7 +476,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::width-chars\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_width_chars_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -498,7 +499,7 @@ pub trait EditableExt: IsA<Editable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::xalign\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_xalign_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::LayoutChild;
+use crate::{ffi, LayoutChild};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -31,6 +31,7 @@ impl FixedLayoutChild {
     }
 
     #[doc(alias = "gtk_fixed_layout_child_set_transform")]
+    #[doc(alias = "transform")]
     pub fn set_transform(&self, transform: &gsk::Transform) {
         unsafe {
             ffi::gtk_fixed_layout_child_set_transform(
@@ -55,7 +56,7 @@ impl FixedLayoutChild {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::transform\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_transform_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

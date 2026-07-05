@@ -2,7 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use crate::ffi;
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -177,7 +179,7 @@ pub trait ActionGroupExt: IsA<ActionGroup> + sealed::Sealed + 'static {
             F: Fn(&P, &str) + 'static,
         >(
             this: *mut ffi::GActionGroup,
-            action_name: *mut libc::c_char,
+            action_name: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -214,7 +216,7 @@ pub trait ActionGroupExt: IsA<ActionGroup> + sealed::Sealed + 'static {
             F: Fn(&P, &str, bool) + 'static,
         >(
             this: *mut ffi::GActionGroup,
-            action_name: *mut libc::c_char,
+            action_name: *mut std::ffi::c_char,
             enabled: glib::ffi::gboolean,
             f: glib::ffi::gpointer,
         ) {
@@ -254,7 +256,7 @@ pub trait ActionGroupExt: IsA<ActionGroup> + sealed::Sealed + 'static {
             F: Fn(&P, &str) + 'static,
         >(
             this: *mut ffi::GActionGroup,
-            action_name: *mut libc::c_char,
+            action_name: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -291,7 +293,7 @@ pub trait ActionGroupExt: IsA<ActionGroup> + sealed::Sealed + 'static {
             F: Fn(&P, &str, &glib::Variant) + 'static,
         >(
             this: *mut ffi::GActionGroup,
-            action_name: *mut libc::c_char,
+            action_name: *mut std::ffi::c_char,
             value: *mut glib::ffi::GVariant,
             f: glib::ffi::gpointer,
         ) {

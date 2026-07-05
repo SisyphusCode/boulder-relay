@@ -3,8 +3,9 @@
 // DO NOT EDIT
 #![allow(deprecated)]
 
-use crate::{Accessible, Buildable, ConstraintTarget, Widget};
+use crate::{ffi, Accessible, Buildable, ConstraintTarget, Widget};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -82,7 +83,7 @@ pub trait CellEditableExt: IsA<CellEditable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"editing-done\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     editing_done_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -104,7 +105,7 @@ pub trait CellEditableExt: IsA<CellEditable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"remove-widget\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     remove_widget_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -130,7 +131,7 @@ pub trait CellEditableExt: IsA<CellEditable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::editing-canceled\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_editing_canceled_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

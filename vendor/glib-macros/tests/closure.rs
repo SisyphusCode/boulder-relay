@@ -1,6 +1,5 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-#[cfg(feature = "unstable-clone-syntax")]
 const TESTS: &[(&str, &str)] = &[
     ("closure!()", "expected a closure"),
     (
@@ -158,7 +157,6 @@ const TESTS: &[(&str, &str)] = &[
 ];
 
 #[test]
-#[cfg(feature = "unstable-clone-syntax")]
 fn closure_failures() {
     let t = trybuild2::TestCases::new();
 

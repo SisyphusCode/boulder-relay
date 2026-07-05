@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::Widget;
+use crate::{ffi, Widget};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -37,6 +37,7 @@ impl WidgetPaintable {
     }
 
     #[doc(alias = "gtk_widget_paintable_set_widget")]
+    #[doc(alias = "widget")]
     pub fn set_widget(&self, widget: Option<&impl IsA<Widget>>) {
         unsafe {
             ffi::gtk_widget_paintable_set_widget(
@@ -61,7 +62,7 @@ impl WidgetPaintable {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::widget\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_widget_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

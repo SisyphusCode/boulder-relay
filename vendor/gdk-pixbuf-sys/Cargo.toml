@@ -13,12 +13,18 @@
 edition = "2021"
 rust-version = "1.70"
 name = "gdk-pixbuf-sys"
-version = "0.19.8"
+version = "0.20.10"
 authors = ["The gtk-rs Project Developers"]
 build = "build.rs"
 exclude = ["gir-files/*"]
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "FFI bindings to libgdk_pixbuf-2.0"
 homepage = "https://gtk-rs.org/"
+readme = false
 keywords = [
     "gdk-pixbuf",
     "ffi",
@@ -50,17 +56,26 @@ version = "2.40"
 [package.metadata.system-deps.gdk_pixbuf_2_0.v2_42]
 version = "2.42"
 
+[features]
+v2_40 = []
+v2_42 = ["v2_40"]
+
 [lib]
 name = "gdk_pixbuf_sys"
+path = "src/lib.rs"
+
+[[test]]
+name = "abi"
+path = "tests/abi.rs"
 
 [dependencies.gio-sys]
-version = "0.19"
+version = "0.20.6"
 
 [dependencies.glib-sys]
-version = "0.19"
+version = "0.20.6"
 
 [dependencies.gobject-sys]
-version = "0.19"
+version = "0.20"
 
 [dependencies.libc]
 version = "0.2"
@@ -72,8 +87,4 @@ version = "1.0.0"
 version = "3"
 
 [build-dependencies.system-deps]
-version = "6"
-
-[features]
-v2_40 = []
-v2_42 = ["v2_40"]
+version = "7"

@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Pixbuf, PixbufAnimation, PixbufFormat};
+use crate::{ffi, Pixbuf, PixbufAnimation, PixbufFormat};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -190,10 +191,10 @@ pub trait PixbufLoaderExt: IsA<PixbufLoader> + sealed::Sealed + 'static {
             F: Fn(&P, i32, i32, i32, i32) + 'static,
         >(
             this: *mut ffi::GdkPixbufLoader,
-            x: libc::c_int,
-            y: libc::c_int,
-            width: libc::c_int,
-            height: libc::c_int,
+            x: std::ffi::c_int,
+            y: std::ffi::c_int,
+            width: std::ffi::c_int,
+            height: std::ffi::c_int,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -247,8 +248,8 @@ pub trait PixbufLoaderExt: IsA<PixbufLoader> + sealed::Sealed + 'static {
             F: Fn(&P, i32, i32) + 'static,
         >(
             this: *mut ffi::GdkPixbufLoader,
-            width: libc::c_int,
-            height: libc::c_int,
+            width: std::ffi::c_int,
+            height: std::ffi::c_int,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);

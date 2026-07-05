@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
     SelectionModel, StackPage, StackTransitionType, Widget,
 };
 use glib::{
@@ -88,12 +88,14 @@ impl Stack {
 
     #[doc(alias = "gtk_stack_get_hhomogeneous")]
     #[doc(alias = "get_hhomogeneous")]
+    #[doc(alias = "hhomogeneous")]
     pub fn is_hhomogeneous(&self) -> bool {
         unsafe { from_glib(ffi::gtk_stack_get_hhomogeneous(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_stack_get_interpolate_size")]
     #[doc(alias = "get_interpolate_size")]
+    #[doc(alias = "interpolate-size")]
     pub fn interpolates_size(&self) -> bool {
         unsafe { from_glib(ffi::gtk_stack_get_interpolate_size(self.to_glib_none().0)) }
     }
@@ -117,36 +119,42 @@ impl Stack {
 
     #[doc(alias = "gtk_stack_get_transition_duration")]
     #[doc(alias = "get_transition_duration")]
+    #[doc(alias = "transition-duration")]
     pub fn transition_duration(&self) -> u32 {
         unsafe { ffi::gtk_stack_get_transition_duration(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_stack_get_transition_running")]
     #[doc(alias = "get_transition_running")]
+    #[doc(alias = "transition-running")]
     pub fn is_transition_running(&self) -> bool {
         unsafe { from_glib(ffi::gtk_stack_get_transition_running(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_stack_get_transition_type")]
     #[doc(alias = "get_transition_type")]
+    #[doc(alias = "transition-type")]
     pub fn transition_type(&self) -> StackTransitionType {
         unsafe { from_glib(ffi::gtk_stack_get_transition_type(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_stack_get_vhomogeneous")]
     #[doc(alias = "get_vhomogeneous")]
+    #[doc(alias = "vhomogeneous")]
     pub fn is_vhomogeneous(&self) -> bool {
         unsafe { from_glib(ffi::gtk_stack_get_vhomogeneous(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_stack_get_visible_child")]
     #[doc(alias = "get_visible_child")]
+    #[doc(alias = "visible-child")]
     pub fn visible_child(&self) -> Option<Widget> {
         unsafe { from_glib_none(ffi::gtk_stack_get_visible_child(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_stack_get_visible_child_name")]
     #[doc(alias = "get_visible_child_name")]
+    #[doc(alias = "visible-child-name")]
     pub fn visible_child_name(&self) -> Option<glib::GString> {
         unsafe { from_glib_none(ffi::gtk_stack_get_visible_child_name(self.to_glib_none().0)) }
     }
@@ -159,6 +167,7 @@ impl Stack {
     }
 
     #[doc(alias = "gtk_stack_set_hhomogeneous")]
+    #[doc(alias = "hhomogeneous")]
     pub fn set_hhomogeneous(&self, hhomogeneous: bool) {
         unsafe {
             ffi::gtk_stack_set_hhomogeneous(self.to_glib_none().0, hhomogeneous.into_glib());
@@ -166,6 +175,7 @@ impl Stack {
     }
 
     #[doc(alias = "gtk_stack_set_interpolate_size")]
+    #[doc(alias = "interpolate-size")]
     pub fn set_interpolate_size(&self, interpolate_size: bool) {
         unsafe {
             ffi::gtk_stack_set_interpolate_size(
@@ -176,6 +186,7 @@ impl Stack {
     }
 
     #[doc(alias = "gtk_stack_set_transition_duration")]
+    #[doc(alias = "transition-duration")]
     pub fn set_transition_duration(&self, duration: u32) {
         unsafe {
             ffi::gtk_stack_set_transition_duration(self.to_glib_none().0, duration);
@@ -183,6 +194,7 @@ impl Stack {
     }
 
     #[doc(alias = "gtk_stack_set_transition_type")]
+    #[doc(alias = "transition-type")]
     pub fn set_transition_type(&self, transition: StackTransitionType) {
         unsafe {
             ffi::gtk_stack_set_transition_type(self.to_glib_none().0, transition.into_glib());
@@ -190,6 +202,7 @@ impl Stack {
     }
 
     #[doc(alias = "gtk_stack_set_vhomogeneous")]
+    #[doc(alias = "vhomogeneous")]
     pub fn set_vhomogeneous(&self, vhomogeneous: bool) {
         unsafe {
             ffi::gtk_stack_set_vhomogeneous(self.to_glib_none().0, vhomogeneous.into_glib());
@@ -197,6 +210,7 @@ impl Stack {
     }
 
     #[doc(alias = "gtk_stack_set_visible_child")]
+    #[doc(alias = "visible-child")]
     pub fn set_visible_child(&self, child: &impl IsA<Widget>) {
         unsafe {
             ffi::gtk_stack_set_visible_child(
@@ -218,6 +232,7 @@ impl Stack {
     }
 
     #[doc(alias = "gtk_stack_set_visible_child_name")]
+    #[doc(alias = "visible-child-name")]
     pub fn set_visible_child_name(&self, name: &str) {
         unsafe {
             ffi::gtk_stack_set_visible_child_name(self.to_glib_none().0, name.to_glib_none().0);
@@ -239,7 +254,7 @@ impl Stack {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::hhomogeneous\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_hhomogeneous_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -262,7 +277,7 @@ impl Stack {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::interpolate-size\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_interpolate_size_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -285,7 +300,7 @@ impl Stack {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::pages\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_pages_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -311,7 +326,7 @@ impl Stack {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::transition-duration\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_transition_duration_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -337,7 +352,7 @@ impl Stack {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::transition-running\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_transition_running_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -360,7 +375,7 @@ impl Stack {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::transition-type\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_transition_type_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -383,7 +398,7 @@ impl Stack {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::vhomogeneous\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_vhomogeneous_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -406,7 +421,7 @@ impl Stack {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::visible-child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_visible_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -432,7 +447,7 @@ impl Stack {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::visible-child-name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_visible_child_name_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -591,6 +606,14 @@ impl StackBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -699,6 +722,7 @@ impl StackBuilder {
     /// Build the [`Stack`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Stack {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

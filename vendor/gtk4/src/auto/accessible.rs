@@ -5,10 +5,10 @@
 #[cfg(feature = "v4_14")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
 use crate::AccessibleAnnouncementPriority;
+use crate::{ffi, AccessibleProperty, AccessibleRelation, AccessibleRole, AccessibleState};
 #[cfg(feature = "v4_10")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
 use crate::{ATContext, AccessiblePlatformState};
-use crate::{AccessibleProperty, AccessibleRelation, AccessibleRole, AccessibleState};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -63,6 +63,7 @@ pub trait AccessibleExt: IsA<Accessible> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_accessible_get_accessible_role")]
     #[doc(alias = "get_accessible_role")]
+    #[doc(alias = "accessible-role")]
     fn accessible_role(&self) -> AccessibleRole {
         unsafe {
             from_glib(ffi::gtk_accessible_get_accessible_role(
@@ -208,6 +209,18 @@ pub trait AccessibleExt: IsA<Accessible> + sealed::Sealed + 'static {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "gtk_accessible_update_platform_state")]
+    fn update_platform_state(&self, state: AccessiblePlatformState) {
+        unsafe {
+            ffi::gtk_accessible_update_platform_state(
+                self.as_ref().to_glib_none().0,
+                state.into_glib(),
+            );
+        }
+    }
+
     #[doc(alias = "accessible-role")]
     fn set_accessible_role(&self, accessible_role: AccessibleRole) {
         ObjectExt::set_property(self.as_ref(), "accessible-role", accessible_role)
@@ -231,7 +244,7 @@ pub trait AccessibleExt: IsA<Accessible> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::accessible-role\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_accessible_role_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

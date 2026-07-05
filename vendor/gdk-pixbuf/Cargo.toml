@@ -13,9 +13,15 @@
 edition = "2021"
 rust-version = "1.70"
 name = "gdk-pixbuf"
-version = "0.19.8"
+version = "0.20.10"
 authors = ["The gtk-rs Project Developers"]
+build = false
 exclude = ["gir-files/*"]
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "Rust bindings for the GdkPixbuf library"
 homepage = "https://gtk-rs.org/"
 documentation = "https://gtk-rs.org/gtk-rs-core/stable/latest/docs/gdk_pixbuf/"
@@ -40,28 +46,36 @@ rustdoc-args = [
     "--generate-link-to-definition",
 ]
 
+[features]
+v2_40 = ["gdk-pixbuf-sys/v2_40"]
+v2_42 = [
+    "v2_40",
+    "gdk-pixbuf-sys/v2_42",
+]
+
 [lib]
 name = "gdk_pixbuf"
+path = "src/lib.rs"
 
-[dependencies.ffi]
-version = "0.19"
-package = "gdk-pixbuf-sys"
+[[test]]
+name = "check_gir"
+path = "tests/check_gir.rs"
+
+[[test]]
+name = "overflow"
+path = "tests/overflow.rs"
+
+[dependencies.gdk-pixbuf-sys]
+version = "0.20"
 
 [dependencies.gio]
-version = "0.19"
+version = "0.20"
 
 [dependencies.glib]
-version = "0.19"
+version = "0.20.3"
 
 [dependencies.libc]
 version = "0.2"
 
 [dev-dependencies.gir-format-check]
 version = "^0.1"
-
-[features]
-v2_40 = ["ffi/v2_40"]
-v2_42 = [
-    "v2_40",
-    "ffi/v2_42",
-]

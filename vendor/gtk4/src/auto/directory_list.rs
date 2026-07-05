@@ -2,6 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use crate::ffi;
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -54,16 +55,19 @@ impl DirectoryList {
 
     #[doc(alias = "gtk_directory_list_get_monitored")]
     #[doc(alias = "get_monitored")]
+    #[doc(alias = "monitored")]
     pub fn is_monitored(&self) -> bool {
         unsafe { from_glib(ffi::gtk_directory_list_get_monitored(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_directory_list_is_loading")]
+    #[doc(alias = "loading")]
     pub fn is_loading(&self) -> bool {
         unsafe { from_glib(ffi::gtk_directory_list_is_loading(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_directory_list_set_attributes")]
+    #[doc(alias = "attributes")]
     pub fn set_attributes(&self, attributes: Option<&str>) {
         unsafe {
             ffi::gtk_directory_list_set_attributes(
@@ -74,6 +78,7 @@ impl DirectoryList {
     }
 
     #[doc(alias = "gtk_directory_list_set_file")]
+    #[doc(alias = "file")]
     pub fn set_file(&self, file: Option<&impl IsA<gio::File>>) {
         unsafe {
             ffi::gtk_directory_list_set_file(
@@ -84,6 +89,7 @@ impl DirectoryList {
     }
 
     #[doc(alias = "gtk_directory_list_set_monitored")]
+    #[doc(alias = "monitored")]
     pub fn set_monitored(&self, monitored: bool) {
         unsafe {
             ffi::gtk_directory_list_set_monitored(self.to_glib_none().0, monitored.into_glib());
@@ -105,7 +111,7 @@ impl DirectoryList {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::attributes\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_attributes_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -128,7 +134,7 @@ impl DirectoryList {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::error\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_error_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -151,7 +157,7 @@ impl DirectoryList {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::file\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_file_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -174,7 +180,7 @@ impl DirectoryList {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::io-priority\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_io_priority_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -197,7 +203,7 @@ impl DirectoryList {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::loading\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_loading_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -220,7 +226,7 @@ impl DirectoryList {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::monitored\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_monitored_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

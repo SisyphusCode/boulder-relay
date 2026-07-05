@@ -3,10 +3,11 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, CornerType,
+    ffi, Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, CornerType,
     DirectionType, LayoutManager, Overflow, PolicyType, PositionType, ScrollType, Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -55,6 +56,7 @@ impl ScrolledWindow {
 
     #[doc(alias = "gtk_scrolled_window_get_has_frame")]
     #[doc(alias = "get_has_frame")]
+    #[doc(alias = "has-frame")]
     pub fn has_frame(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_scrolled_window_get_has_frame(
@@ -75,6 +77,7 @@ impl ScrolledWindow {
 
     #[doc(alias = "gtk_scrolled_window_get_kinetic_scrolling")]
     #[doc(alias = "get_kinetic_scrolling")]
+    #[doc(alias = "kinetic-scrolling")]
     pub fn is_kinetic_scrolling(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_scrolled_window_get_kinetic_scrolling(
@@ -85,30 +88,35 @@ impl ScrolledWindow {
 
     #[doc(alias = "gtk_scrolled_window_get_max_content_height")]
     #[doc(alias = "get_max_content_height")]
+    #[doc(alias = "max-content-height")]
     pub fn max_content_height(&self) -> i32 {
         unsafe { ffi::gtk_scrolled_window_get_max_content_height(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_scrolled_window_get_max_content_width")]
     #[doc(alias = "get_max_content_width")]
+    #[doc(alias = "max-content-width")]
     pub fn max_content_width(&self) -> i32 {
         unsafe { ffi::gtk_scrolled_window_get_max_content_width(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_scrolled_window_get_min_content_height")]
     #[doc(alias = "get_min_content_height")]
+    #[doc(alias = "min-content-height")]
     pub fn min_content_height(&self) -> i32 {
         unsafe { ffi::gtk_scrolled_window_get_min_content_height(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_scrolled_window_get_min_content_width")]
     #[doc(alias = "get_min_content_width")]
+    #[doc(alias = "min-content-width")]
     pub fn min_content_width(&self) -> i32 {
         unsafe { ffi::gtk_scrolled_window_get_min_content_width(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_scrolled_window_get_overlay_scrolling")]
     #[doc(alias = "get_overlay_scrolling")]
+    #[doc(alias = "overlay-scrolling")]
     pub fn is_overlay_scrolling(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_scrolled_window_get_overlay_scrolling(
@@ -119,6 +127,7 @@ impl ScrolledWindow {
 
     #[doc(alias = "gtk_scrolled_window_get_placement")]
     #[doc(alias = "get_placement")]
+    #[doc(alias = "window-placement")]
     pub fn placement(&self) -> CornerType {
         unsafe {
             from_glib(ffi::gtk_scrolled_window_get_placement(
@@ -147,6 +156,7 @@ impl ScrolledWindow {
 
     #[doc(alias = "gtk_scrolled_window_get_propagate_natural_height")]
     #[doc(alias = "get_propagate_natural_height")]
+    #[doc(alias = "propagate-natural-height")]
     pub fn propagates_natural_height(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_scrolled_window_get_propagate_natural_height(
@@ -157,6 +167,7 @@ impl ScrolledWindow {
 
     #[doc(alias = "gtk_scrolled_window_get_propagate_natural_width")]
     #[doc(alias = "get_propagate_natural_width")]
+    #[doc(alias = "propagate-natural-width")]
     pub fn propagates_natural_width(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_scrolled_window_get_propagate_natural_width(
@@ -186,6 +197,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_child")]
+    #[doc(alias = "child")]
     pub fn set_child(&self, child: Option<&impl IsA<Widget>>) {
         unsafe {
             ffi::gtk_scrolled_window_set_child(
@@ -196,6 +208,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_hadjustment")]
+    #[doc(alias = "hadjustment")]
     pub fn set_hadjustment(&self, hadjustment: Option<&impl IsA<Adjustment>>) {
         unsafe {
             ffi::gtk_scrolled_window_set_hadjustment(
@@ -206,6 +219,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_has_frame")]
+    #[doc(alias = "has-frame")]
     pub fn set_has_frame(&self, has_frame: bool) {
         unsafe {
             ffi::gtk_scrolled_window_set_has_frame(self.to_glib_none().0, has_frame.into_glib());
@@ -213,6 +227,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_kinetic_scrolling")]
+    #[doc(alias = "kinetic-scrolling")]
     pub fn set_kinetic_scrolling(&self, kinetic_scrolling: bool) {
         unsafe {
             ffi::gtk_scrolled_window_set_kinetic_scrolling(
@@ -223,6 +238,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_max_content_height")]
+    #[doc(alias = "max-content-height")]
     pub fn set_max_content_height(&self, height: i32) {
         unsafe {
             ffi::gtk_scrolled_window_set_max_content_height(self.to_glib_none().0, height);
@@ -230,6 +246,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_max_content_width")]
+    #[doc(alias = "max-content-width")]
     pub fn set_max_content_width(&self, width: i32) {
         unsafe {
             ffi::gtk_scrolled_window_set_max_content_width(self.to_glib_none().0, width);
@@ -237,6 +254,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_min_content_height")]
+    #[doc(alias = "min-content-height")]
     pub fn set_min_content_height(&self, height: i32) {
         unsafe {
             ffi::gtk_scrolled_window_set_min_content_height(self.to_glib_none().0, height);
@@ -244,6 +262,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_min_content_width")]
+    #[doc(alias = "min-content-width")]
     pub fn set_min_content_width(&self, width: i32) {
         unsafe {
             ffi::gtk_scrolled_window_set_min_content_width(self.to_glib_none().0, width);
@@ -251,6 +270,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_overlay_scrolling")]
+    #[doc(alias = "overlay-scrolling")]
     pub fn set_overlay_scrolling(&self, overlay_scrolling: bool) {
         unsafe {
             ffi::gtk_scrolled_window_set_overlay_scrolling(
@@ -261,6 +281,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_placement")]
+    #[doc(alias = "window-placement")]
     pub fn set_placement(&self, window_placement: CornerType) {
         unsafe {
             ffi::gtk_scrolled_window_set_placement(
@@ -282,6 +303,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_propagate_natural_height")]
+    #[doc(alias = "propagate-natural-height")]
     pub fn set_propagate_natural_height(&self, propagate: bool) {
         unsafe {
             ffi::gtk_scrolled_window_set_propagate_natural_height(
@@ -292,6 +314,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_propagate_natural_width")]
+    #[doc(alias = "propagate-natural-width")]
     pub fn set_propagate_natural_width(&self, propagate: bool) {
         unsafe {
             ffi::gtk_scrolled_window_set_propagate_natural_width(
@@ -302,6 +325,7 @@ impl ScrolledWindow {
     }
 
     #[doc(alias = "gtk_scrolled_window_set_vadjustment")]
+    #[doc(alias = "vadjustment")]
     pub fn set_vadjustment(&self, vadjustment: Option<&impl IsA<Adjustment>>) {
         unsafe {
             ffi::gtk_scrolled_window_set_vadjustment(
@@ -338,16 +362,6 @@ impl ScrolledWindow {
         ObjectExt::set_property(self, "vscrollbar-policy", vscrollbar_policy)
     }
 
-    #[doc(alias = "window-placement")]
-    pub fn window_placement(&self) -> CornerType {
-        ObjectExt::property(self, "window-placement")
-    }
-
-    #[doc(alias = "window-placement")]
-    pub fn set_window_placement(&self, window_placement: CornerType) {
-        ObjectExt::set_property(self, "window-placement", window_placement)
-    }
-
     #[doc(alias = "edge-overshot")]
     pub fn connect_edge_overshot<F: Fn(&Self, PositionType) + 'static>(
         &self,
@@ -368,7 +382,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"edge-overshot\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     edge_overshot_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -396,7 +410,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"edge-reached\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     edge_reached_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -424,7 +438,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"move-focus-out\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     move_focus_out_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -462,7 +476,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"scroll-child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     scroll_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -489,7 +503,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -512,7 +526,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::hadjustment\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_hadjustment_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -535,7 +549,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::has-frame\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_has_frame_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -563,7 +577,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::hscrollbar-policy\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_hscrollbar_policy_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -591,7 +605,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::kinetic-scrolling\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_kinetic_scrolling_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -619,7 +633,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::max-content-height\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_max_content_height_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -647,7 +661,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::max-content-width\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_max_content_width_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -675,7 +689,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::min-content-height\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_min_content_height_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -703,7 +717,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::min-content-width\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_min_content_width_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -731,7 +745,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::overlay-scrolling\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_overlay_scrolling_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -759,7 +773,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::propagate-natural-height\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_propagate_natural_height_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -787,7 +801,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::propagate-natural-width\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_propagate_natural_width_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -810,7 +824,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::vadjustment\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_vadjustment_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -838,7 +852,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::vscrollbar-policy\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_vscrollbar_policy_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -863,7 +877,7 @@ impl ScrolledWindow {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::window-placement\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_window_placement_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1088,6 +1102,14 @@ impl ScrolledWindowBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -1196,6 +1218,7 @@ impl ScrolledWindowBuilder {
     /// Build the [`ScrolledWindow`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> ScrolledWindow {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{PaintableFlags, Snapshot};
+use crate::{ffi, PaintableFlags, Snapshot};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -142,7 +143,7 @@ pub trait PaintableExt: IsA<Paintable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"invalidate-contents\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     invalidate_contents_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -164,7 +165,7 @@ pub trait PaintableExt: IsA<Paintable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"invalidate-size\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     invalidate_size_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::Window;
+use crate::{ffi, Window};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -105,6 +105,7 @@ impl UriLauncher {
     }
 
     #[doc(alias = "gtk_uri_launcher_set_uri")]
+    #[doc(alias = "uri")]
     pub fn set_uri(&self, uri: Option<&str>) {
         unsafe {
             ffi::gtk_uri_launcher_set_uri(self.to_glib_none().0, uri.to_glib_none().0);
@@ -128,7 +129,7 @@ impl UriLauncher {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::uri\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_uri_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -173,6 +174,7 @@ impl UriLauncherBuilder {
     /// Build the [`UriLauncher`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> UriLauncher {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

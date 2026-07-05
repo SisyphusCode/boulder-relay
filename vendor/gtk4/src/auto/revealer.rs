@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
     RevealerTransitionType, Widget,
 };
 use glib::{
@@ -45,29 +45,34 @@ impl Revealer {
 
     #[doc(alias = "gtk_revealer_get_child_revealed")]
     #[doc(alias = "get_child_revealed")]
+    #[doc(alias = "child-revealed")]
     pub fn is_child_revealed(&self) -> bool {
         unsafe { from_glib(ffi::gtk_revealer_get_child_revealed(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_revealer_get_reveal_child")]
     #[doc(alias = "get_reveal_child")]
+    #[doc(alias = "reveal-child")]
     pub fn reveals_child(&self) -> bool {
         unsafe { from_glib(ffi::gtk_revealer_get_reveal_child(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_revealer_get_transition_duration")]
     #[doc(alias = "get_transition_duration")]
+    #[doc(alias = "transition-duration")]
     pub fn transition_duration(&self) -> u32 {
         unsafe { ffi::gtk_revealer_get_transition_duration(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_revealer_get_transition_type")]
     #[doc(alias = "get_transition_type")]
+    #[doc(alias = "transition-type")]
     pub fn transition_type(&self) -> RevealerTransitionType {
         unsafe { from_glib(ffi::gtk_revealer_get_transition_type(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_revealer_set_child")]
+    #[doc(alias = "child")]
     pub fn set_child(&self, child: Option<&impl IsA<Widget>>) {
         unsafe {
             ffi::gtk_revealer_set_child(
@@ -78,6 +83,7 @@ impl Revealer {
     }
 
     #[doc(alias = "gtk_revealer_set_reveal_child")]
+    #[doc(alias = "reveal-child")]
     pub fn set_reveal_child(&self, reveal_child: bool) {
         unsafe {
             ffi::gtk_revealer_set_reveal_child(self.to_glib_none().0, reveal_child.into_glib());
@@ -85,6 +91,7 @@ impl Revealer {
     }
 
     #[doc(alias = "gtk_revealer_set_transition_duration")]
+    #[doc(alias = "transition-duration")]
     pub fn set_transition_duration(&self, duration: u32) {
         unsafe {
             ffi::gtk_revealer_set_transition_duration(self.to_glib_none().0, duration);
@@ -92,6 +99,7 @@ impl Revealer {
     }
 
     #[doc(alias = "gtk_revealer_set_transition_type")]
+    #[doc(alias = "transition-type")]
     pub fn set_transition_type(&self, transition: RevealerTransitionType) {
         unsafe {
             ffi::gtk_revealer_set_transition_type(self.to_glib_none().0, transition.into_glib());
@@ -113,7 +121,7 @@ impl Revealer {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -136,7 +144,7 @@ impl Revealer {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::child-revealed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_child_revealed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -159,7 +167,7 @@ impl Revealer {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::reveal-child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_reveal_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -185,7 +193,7 @@ impl Revealer {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::transition-duration\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_transition_duration_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -208,7 +216,7 @@ impl Revealer {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::transition-type\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_transition_type_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -345,6 +353,14 @@ impl RevealerBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -453,6 +469,7 @@ impl RevealerBuilder {
     /// Build the [`Revealer`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Revealer {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

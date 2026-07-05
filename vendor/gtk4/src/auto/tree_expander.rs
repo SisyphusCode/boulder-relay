@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
     TreeListRow, Widget,
 };
 use glib::{
@@ -47,6 +47,7 @@ impl TreeExpander {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
     #[doc(alias = "gtk_tree_expander_get_hide_expander")]
     #[doc(alias = "get_hide_expander")]
+    #[doc(alias = "hide-expander")]
     pub fn hides_expander(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_tree_expander_get_hide_expander(
@@ -59,6 +60,7 @@ impl TreeExpander {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
     #[doc(alias = "gtk_tree_expander_get_indent_for_depth")]
     #[doc(alias = "get_indent_for_depth")]
+    #[doc(alias = "indent-for-depth")]
     pub fn is_indent_for_depth(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_tree_expander_get_indent_for_depth(
@@ -71,6 +73,7 @@ impl TreeExpander {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_6")))]
     #[doc(alias = "gtk_tree_expander_get_indent_for_icon")]
     #[doc(alias = "get_indent_for_icon")]
+    #[doc(alias = "indent-for-icon")]
     pub fn is_indent_for_icon(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_tree_expander_get_indent_for_icon(
@@ -87,11 +90,13 @@ impl TreeExpander {
 
     #[doc(alias = "gtk_tree_expander_get_list_row")]
     #[doc(alias = "get_list_row")]
+    #[doc(alias = "list-row")]
     pub fn list_row(&self) -> Option<TreeListRow> {
         unsafe { from_glib_none(ffi::gtk_tree_expander_get_list_row(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_tree_expander_set_child")]
+    #[doc(alias = "child")]
     pub fn set_child(&self, child: Option<&impl IsA<Widget>>) {
         unsafe {
             ffi::gtk_tree_expander_set_child(
@@ -104,6 +109,7 @@ impl TreeExpander {
     #[cfg(feature = "v4_10")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
     #[doc(alias = "gtk_tree_expander_set_hide_expander")]
+    #[doc(alias = "hide-expander")]
     pub fn set_hide_expander(&self, hide_expander: bool) {
         unsafe {
             ffi::gtk_tree_expander_set_hide_expander(
@@ -116,6 +122,7 @@ impl TreeExpander {
     #[cfg(feature = "v4_10")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
     #[doc(alias = "gtk_tree_expander_set_indent_for_depth")]
+    #[doc(alias = "indent-for-depth")]
     pub fn set_indent_for_depth(&self, indent_for_depth: bool) {
         unsafe {
             ffi::gtk_tree_expander_set_indent_for_depth(
@@ -128,6 +135,7 @@ impl TreeExpander {
     #[cfg(feature = "v4_6")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_6")))]
     #[doc(alias = "gtk_tree_expander_set_indent_for_icon")]
+    #[doc(alias = "indent-for-icon")]
     pub fn set_indent_for_icon(&self, indent_for_icon: bool) {
         unsafe {
             ffi::gtk_tree_expander_set_indent_for_icon(
@@ -138,6 +146,7 @@ impl TreeExpander {
     }
 
     #[doc(alias = "gtk_tree_expander_set_list_row")]
+    #[doc(alias = "list-row")]
     pub fn set_list_row(&self, list_row: Option<&TreeListRow>) {
         unsafe {
             ffi::gtk_tree_expander_set_list_row(self.to_glib_none().0, list_row.to_glib_none().0);
@@ -159,7 +168,7 @@ impl TreeExpander {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -184,7 +193,7 @@ impl TreeExpander {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::hide-expander\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_hide_expander_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -209,7 +218,7 @@ impl TreeExpander {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::indent-for-depth\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_indent_for_depth_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -234,7 +243,7 @@ impl TreeExpander {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::indent-for-icon\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_indent_for_icon_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -257,7 +266,7 @@ impl TreeExpander {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::item\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_item_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -280,7 +289,7 @@ impl TreeExpander {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::list-row\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_list_row_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -427,6 +436,14 @@ impl TreeExpanderBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -535,6 +552,7 @@ impl TreeExpanderBuilder {
     /// Build the [`TreeExpander`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> TreeExpander {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

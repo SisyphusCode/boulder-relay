@@ -3,10 +3,11 @@
 // DO NOT EDIT
 
 use crate::{
-    AsyncResult, Cancellable, Socket, SocketAddress, SocketConnection, SocketListenerEvent,
+    ffi, AsyncResult, Cancellable, Socket, SocketAddress, SocketConnection, SocketListenerEvent,
     SocketProtocol, SocketType,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,

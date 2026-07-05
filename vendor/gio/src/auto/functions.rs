@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    AsyncResult, BusType, Cancellable, DBusConnection, File, IOErrorEnum, IOStream, Icon,
+    ffi, AsyncResult, BusType, Cancellable, DBusConnection, File, IOErrorEnum, IOStream, Icon,
     InputStream, Resource, ResourceLookupFlags, SettingsBackend,
 };
 use glib::{prelude::*, translate::*};
@@ -545,6 +545,13 @@ pub fn resources_get_info(
             Err(from_glib_full(error))
         }
     }
+}
+
+#[cfg(feature = "v2_84")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v2_84")))]
+#[doc(alias = "g_resources_has_children")]
+pub fn resources_has_children(path: &str) -> bool {
+    unsafe { from_glib(ffi::g_resources_has_children(path.to_glib_none().0)) }
 }
 
 #[doc(alias = "g_resources_lookup_data")]

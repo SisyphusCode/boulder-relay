@@ -119,16 +119,15 @@ The [`gtk`](mod@crate) and [`gdk`][`mod@gdk`] crates have some run-time safety a
 checks.
 
 - Any constructor or free function will panic if called before [`init`][`fn@init`] or on
-a non-main thread.
+  a non-main thread.
 
-- Any [`&str`] or [`&Path`](std::path::Path) parameter with an interior null (`\0`) character will
-cause a panic.
+- Any [`&str`] or [`&Path`](std::path::Path) parameter with an interior null (`\0`) character will cause a panic.
 
 - Some functions will panic if supplied out-of-range integer parameters. All
-such cases will be documented individually but they are not yet.
+  such cases will be documented individually but they are not yet.
 
 - A panic in a closure that handles signals or in any other closure passed
-to a [`gtk`](mod@crate) function will abort the process.
+  to a [`gtk`](mod@crate) function will abort the process.
 
 ## Features
 
@@ -154,7 +153,7 @@ users will have it installed.
 
 - The Rust API [Stable](https://gtk-rs.org/gtk4-rs/stable/latest/docs/gtk4)/[Development](https://gtk-rs.org/gtk4-rs/git/docs/gtk4/)
 - Book [Stable](https://gtk-rs.org/gtk4-rs/stable/latest/book)/[Development](https://gtk-rs.org/gtk4-rs/git/book)
-- [Examples](https://github.com/gtk-rs/gtk4-rs/tree/master/examples)
+- [Examples](https://github.com/gtk-rs/gtk4-rs/tree/main/examples)
 - [The C API](https://docs.gtk.org/gtk4/)
 - [GTK Installation Instructions](https://www.gtk.org/docs/installations/)
 
@@ -183,6 +182,7 @@ gtk = { git = "https://github.com/gtk-rs/gtk4-rs.git", package = "gtk4" }
 
 | Feature | Description |
 | ---     | ----------- |
+| `v4_18` | Enable the new APIs part of GTK 4.18 |
 | `v4_16` | Enable the new APIs part of GTK 4.16 |
 | `v4_14` | Enable the new APIs part of GTK 4.14 |
 | `v4_12` | Enable the new APIs part of GTK 4.12 |
@@ -191,6 +191,7 @@ gtk = { git = "https://github.com/gtk-rs/gtk4-rs.git", package = "gtk4" }
 | `v4_6` | Enable the new APIs part of GTK 4.6 |
 | `v4_4` | Enable the new APIs part of GTK 4.4 |
 | `v4_2` | Enable the new APIs part of GTK 4.2 |
+| `gnome_47` | Enable all version feature flags of this crate and its dependencies to match the GNOME 47 SDK |
 | `gnome_46` | Enable all version feature flags of this crate and its dependencies to match the GNOME 46 SDK |
 | `gnome_45` | Enable all version feature flags of this crate and its dependencies to match the GNOME 45 SDK |
 | `gnome_44` | Enable all version feature flags of this crate and its dependencies to match the GNOME 44 SDK |

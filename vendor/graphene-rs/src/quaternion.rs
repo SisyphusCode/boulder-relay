@@ -1,10 +1,10 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
-use std::fmt;
+use std::{fmt, ops};
 
 use glib::translate::*;
 
-use crate::{Euler, Matrix, Quaternion, Vec3, Vec4};
+use crate::{ffi, Euler, Matrix, Quaternion, Vec3, Vec4};
 
 impl Quaternion {
     #[doc(alias = "graphene_quaternion_init")]
@@ -143,5 +143,33 @@ impl fmt::Debug for Quaternion {
             .field("z", &self.z())
             .field("w", &self.w())
             .finish()
+    }
+}
+
+impl ops::Add<Quaternion> for Quaternion {
+    type Output = Quaternion;
+
+    fn add(self, rhs: Quaternion) -> Self::Output {
+        Quaternion::add(&self, &rhs)
+    }
+}
+
+impl ops::AddAssign<Quaternion> for Quaternion {
+    fn add_assign(&mut self, rhs: Quaternion) {
+        *self = *self + rhs;
+    }
+}
+
+impl ops::Mul<Quaternion> for Quaternion {
+    type Output = Quaternion;
+
+    fn mul(self, rhs: Quaternion) -> Self::Output {
+        Quaternion::multiply(&self, &rhs)
+    }
+}
+
+impl ops::MulAssign<Quaternion> for Quaternion {
+    fn mul_assign(&mut self, rhs: Quaternion) {
+        *self = *self * rhs;
     }
 }

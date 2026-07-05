@@ -4,10 +4,12 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AccessibleRole, Align, Application, AssistantPage, AssistantPageType, Buildable,
-    ConstraintTarget, LayoutManager, Native, Overflow, Root, ShortcutManager, Widget, Window,
+    ffi, Accessible, AccessibleRole, Align, Application, AssistantPage, AssistantPageType,
+    Buildable, ConstraintTarget, LayoutManager, Native, Overflow, Root, ShortcutManager, Widget,
+    Window,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -235,9 +237,9 @@ impl Assistant {
     pub fn set_forward_page_func<P: Fn(i32) -> i32 + 'static>(&self, page_func: P) {
         let page_func_data: Box_<P> = Box_::new(page_func);
         unsafe extern "C" fn page_func_func<P: Fn(i32) -> i32 + 'static>(
-            current_page: libc::c_int,
+            current_page: std::ffi::c_int,
             data: glib::ffi::gpointer,
-        ) -> libc::c_int {
+        ) -> std::ffi::c_int {
             let callback = &*(data as *mut P);
             (*callback)(current_page)
         }
@@ -326,7 +328,7 @@ impl Assistant {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"apply\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     apply_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -349,7 +351,7 @@ impl Assistant {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"cancel\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     cancel_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -372,7 +374,7 @@ impl Assistant {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"close\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     close_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -395,7 +397,7 @@ impl Assistant {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"escape\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     escape_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -424,7 +426,7 @@ impl Assistant {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"prepare\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     prepare_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -447,7 +449,7 @@ impl Assistant {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::pages\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_pages_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -721,6 +723,14 @@ impl AssistantBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -829,6 +839,7 @@ impl AssistantBuilder {
     /// Build the [`Assistant`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Assistant {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Credentials, IOStream};
+use crate::{ffi, Credentials, IOStream};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -59,7 +60,7 @@ impl DBusAuthObserver {
             F: Fn(&DBusAuthObserver, &str) -> bool + 'static,
         >(
             this: *mut ffi::GDBusAuthObserver,
-            mechanism: *mut libc::c_char,
+            mechanism: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) -> glib::ffi::gboolean {
             let f: &F = &*(f as *const F);

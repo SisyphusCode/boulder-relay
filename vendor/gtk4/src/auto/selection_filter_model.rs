@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::SelectionModel;
+use crate::{ffi, SelectionModel};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -41,6 +41,7 @@ impl SelectionFilterModel {
     }
 
     #[doc(alias = "gtk_selection_filter_model_set_model")]
+    #[doc(alias = "model")]
     pub fn set_model(&self, model: Option<&impl IsA<SelectionModel>>) {
         unsafe {
             ffi::gtk_selection_filter_model_set_model(
@@ -65,7 +66,7 @@ impl SelectionFilterModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::model\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_model_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

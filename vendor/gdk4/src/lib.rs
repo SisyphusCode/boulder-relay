@@ -2,10 +2,11 @@
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![allow(deprecated)]
+#![allow(clippy::manual_c_str_literals)]
 #![doc = include_str!("../README.md")]
 
 pub use cairo;
-pub use ffi;
+pub use gdk4_sys as ffi;
 pub use gdk_pixbuf;
 pub use gio;
 #[cfg(feature = "gl")]
@@ -53,6 +54,7 @@ macro_rules! skip_assert_initialized {
 
 #[allow(clippy::derived_hash_with_manual_eq)]
 #[allow(clippy::type_complexity)]
+#[allow(unused_imports)]
 mod auto;
 
 #[macro_use]

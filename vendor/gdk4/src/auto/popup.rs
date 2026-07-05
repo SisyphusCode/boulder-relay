@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Gravity, PopupLayout, Surface};
+use crate::{ffi, Gravity, PopupLayout, Surface};
 use glib::{prelude::*, translate::*};
 
 glib::wrapper! {
@@ -26,6 +26,7 @@ mod sealed {
 pub trait PopupExt: IsA<Popup> + sealed::Sealed + 'static {
     #[doc(alias = "gdk_popup_get_autohide")]
     #[doc(alias = "get_autohide")]
+    #[doc(alias = "autohide")]
     fn is_autohide(&self) -> bool {
         unsafe { from_glib(ffi::gdk_popup_get_autohide(self.as_ref().to_glib_none().0)) }
     }

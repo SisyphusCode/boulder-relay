@@ -10,14 +10,20 @@
 # See Cargo.toml.orig for the original contents.
 
 [package]
-edition = "2021"
-rust-version = "1.70.0"
+edition = "2024"
+rust-version = "1.85.0"
 name = "cfg-expr"
-version = "0.15.8"
+version = "0.20.8"
 authors = [
     "Embark <opensource@embark-studios.com>",
     "Jake Shadle <jake.shadle@embark-studios.com>",
 ]
+build = false
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "A parser and evaluator for Rust `cfg()` expressions."
 homepage = "https://github.com/EmbarkStudios/cfg-expr"
 documentation = "https://docs.rs/cfg-expr"
@@ -31,16 +37,36 @@ categories = ["parser-implementations"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/EmbarkStudios/cfg-expr"
 
-[dependencies.smallvec]
-version = "1.8"
-
-[dependencies.target-lexicon]
-version = "0.12.11"
-optional = true
-
-[dev-dependencies.similar-asserts]
-version = "1.1"
-
 [features]
 default = []
 targets = ["target-lexicon"]
+
+[lib]
+name = "cfg_expr"
+path = "src/lib.rs"
+
+[[example]]
+name = "eval"
+path = "examples/eval.rs"
+
+[[test]]
+name = "eval"
+path = "tests/eval.rs"
+
+[[test]]
+name = "lexer"
+path = "tests/lexer.rs"
+
+[[test]]
+name = "parser"
+path = "tests/parser.rs"
+
+[dependencies.smallvec]
+version = "1.15"
+
+[dependencies.target-lexicon]
+version = "=0.13.5"
+optional = true
+
+[dev-dependencies.similar-asserts]
+version = "1.7"

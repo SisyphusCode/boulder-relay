@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{ConstraintStrength, ConstraintTarget};
+use crate::{ffi, ConstraintStrength, ConstraintTarget};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -65,6 +65,7 @@ impl ConstraintGuide {
     }
 
     #[doc(alias = "gtk_constraint_guide_set_name")]
+    #[doc(alias = "name")]
     pub fn set_name(&self, name: Option<&str>) {
         unsafe {
             ffi::gtk_constraint_guide_set_name(self.to_glib_none().0, name.to_glib_none().0);
@@ -79,6 +80,7 @@ impl ConstraintGuide {
     }
 
     #[doc(alias = "gtk_constraint_guide_set_strength")]
+    #[doc(alias = "strength")]
     pub fn set_strength(&self, strength: ConstraintStrength) {
         unsafe {
             ffi::gtk_constraint_guide_set_strength(self.to_glib_none().0, strength.into_glib());
@@ -160,7 +162,7 @@ impl ConstraintGuide {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::max-height\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_max_height_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -183,7 +185,7 @@ impl ConstraintGuide {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::max-width\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_max_width_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -206,7 +208,7 @@ impl ConstraintGuide {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::min-height\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_min_height_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -229,7 +231,7 @@ impl ConstraintGuide {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::min-width\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_min_width_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -252,7 +254,7 @@ impl ConstraintGuide {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_name_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -275,7 +277,7 @@ impl ConstraintGuide {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::nat-height\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_nat_height_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -298,7 +300,7 @@ impl ConstraintGuide {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::nat-width\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_nat_width_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -321,7 +323,7 @@ impl ConstraintGuide {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::strength\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_strength_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -404,6 +406,7 @@ impl ConstraintGuideBuilder {
     /// Build the [`ConstraintGuide`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> ConstraintGuide {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

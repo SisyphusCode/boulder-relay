@@ -5,7 +5,7 @@
 #[cfg(feature = "v4_12")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
 use crate::SectionModel;
-use crate::Sorter;
+use crate::{ffi, Sorter};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -59,6 +59,7 @@ impl SortListModel {
 
     #[doc(alias = "gtk_sort_list_model_get_incremental")]
     #[doc(alias = "get_incremental")]
+    #[doc(alias = "incremental")]
     pub fn is_incremental(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_sort_list_model_get_incremental(
@@ -83,6 +84,7 @@ impl SortListModel {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_sort_list_model_get_section_sorter")]
     #[doc(alias = "get_section_sorter")]
+    #[doc(alias = "section-sorter")]
     pub fn section_sorter(&self) -> Option<Sorter> {
         unsafe {
             from_glib_none(ffi::gtk_sort_list_model_get_section_sorter(
@@ -98,6 +100,7 @@ impl SortListModel {
     }
 
     #[doc(alias = "gtk_sort_list_model_set_incremental")]
+    #[doc(alias = "incremental")]
     pub fn set_incremental(&self, incremental: bool) {
         unsafe {
             ffi::gtk_sort_list_model_set_incremental(
@@ -108,6 +111,7 @@ impl SortListModel {
     }
 
     #[doc(alias = "gtk_sort_list_model_set_model")]
+    #[doc(alias = "model")]
     pub fn set_model(&self, model: Option<&impl IsA<gio::ListModel>>) {
         unsafe {
             ffi::gtk_sort_list_model_set_model(
@@ -120,6 +124,7 @@ impl SortListModel {
     #[cfg(feature = "v4_12")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_sort_list_model_set_section_sorter")]
+    #[doc(alias = "section-sorter")]
     pub fn set_section_sorter(&self, sorter: Option<&impl IsA<Sorter>>) {
         unsafe {
             ffi::gtk_sort_list_model_set_section_sorter(
@@ -130,6 +135,7 @@ impl SortListModel {
     }
 
     #[doc(alias = "gtk_sort_list_model_set_sorter")]
+    #[doc(alias = "sorter")]
     pub fn set_sorter(&self, sorter: Option<&impl IsA<Sorter>>) {
         unsafe {
             ffi::gtk_sort_list_model_set_sorter(
@@ -154,7 +160,7 @@ impl SortListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::incremental\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_incremental_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -177,7 +183,7 @@ impl SortListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::model\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_model_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -200,7 +206,7 @@ impl SortListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::pending\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_pending_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -225,7 +231,7 @@ impl SortListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::section-sorter\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_section_sorter_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -248,7 +254,7 @@ impl SortListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::sorter\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_sorter_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -311,6 +317,7 @@ impl SortListModelBuilder {
     /// Build the [`SortListModel`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> SortListModel {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

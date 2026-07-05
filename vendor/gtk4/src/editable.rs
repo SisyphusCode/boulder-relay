@@ -27,7 +27,9 @@ pub trait EditableExtManual: sealed::Sealed + IsA<Editable> + 'static {
             connect_raw(
                 self.to_glib_none().0 as *mut _,
                 b"insert-text\0".as_ptr() as *mut _,
-                Some(transmute(insert_text_trampoline::<Self, F> as usize)),
+                Some(transmute::<usize, unsafe extern "C" fn()>(
+                    insert_text_trampoline::<Self, F> as usize,
+                )),
                 Box::into_raw(f),
             )
         }
@@ -37,7 +39,7 @@ pub trait EditableExtManual: sealed::Sealed + IsA<Editable> + 'static {
 impl<O: IsA<Editable>> EditableExtManual for O {}
 
 unsafe extern "C" fn insert_text_trampoline<T, F: Fn(&T, &str, &mut i32) + 'static>(
-    this: *mut ffi::GtkEditable,
+    this: *mut crate::ffi::GtkEditable,
     new_text: *mut c_char,
     new_text_length: c_int,
     position: *mut c_int,

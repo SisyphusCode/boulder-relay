@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Filter, Window};
+use crate::{ffi, Filter, Window};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -267,6 +267,7 @@ impl FontDialog {
 
     #[doc(alias = "gtk_font_dialog_get_font_map")]
     #[doc(alias = "get_font_map")]
+    #[doc(alias = "font-map")]
     pub fn font_map(&self) -> Option<pango::FontMap> {
         unsafe { from_glib_none(ffi::gtk_font_dialog_get_font_map(self.to_glib_none().0)) }
     }
@@ -279,6 +280,7 @@ impl FontDialog {
 
     #[doc(alias = "gtk_font_dialog_get_modal")]
     #[doc(alias = "get_modal")]
+    #[doc(alias = "modal")]
     pub fn is_modal(&self) -> bool {
         unsafe { from_glib(ffi::gtk_font_dialog_get_modal(self.to_glib_none().0)) }
     }
@@ -290,6 +292,7 @@ impl FontDialog {
     }
 
     #[doc(alias = "gtk_font_dialog_set_filter")]
+    #[doc(alias = "filter")]
     pub fn set_filter(&self, filter: Option<&impl IsA<Filter>>) {
         unsafe {
             ffi::gtk_font_dialog_set_filter(
@@ -300,6 +303,7 @@ impl FontDialog {
     }
 
     #[doc(alias = "gtk_font_dialog_set_font_map")]
+    #[doc(alias = "font-map")]
     pub fn set_font_map(&self, fontmap: Option<&impl IsA<pango::FontMap>>) {
         unsafe {
             ffi::gtk_font_dialog_set_font_map(
@@ -310,6 +314,7 @@ impl FontDialog {
     }
 
     #[doc(alias = "gtk_font_dialog_set_language")]
+    #[doc(alias = "language")]
     pub fn set_language(&self, language: &pango::Language) {
         unsafe {
             ffi::gtk_font_dialog_set_language(
@@ -320,6 +325,7 @@ impl FontDialog {
     }
 
     #[doc(alias = "gtk_font_dialog_set_modal")]
+    #[doc(alias = "modal")]
     pub fn set_modal(&self, modal: bool) {
         unsafe {
             ffi::gtk_font_dialog_set_modal(self.to_glib_none().0, modal.into_glib());
@@ -327,6 +333,7 @@ impl FontDialog {
     }
 
     #[doc(alias = "gtk_font_dialog_set_title")]
+    #[doc(alias = "title")]
     pub fn set_title(&self, title: &str) {
         unsafe {
             ffi::gtk_font_dialog_set_title(self.to_glib_none().0, title.to_glib_none().0);
@@ -350,7 +357,7 @@ impl FontDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::filter\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_filter_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -375,7 +382,7 @@ impl FontDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::font-map\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_font_map_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -400,7 +407,7 @@ impl FontDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::language\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_language_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -425,7 +432,7 @@ impl FontDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::modal\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_modal_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -450,7 +457,7 @@ impl FontDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::title\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_title_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -527,6 +534,7 @@ impl FontDialogBuilder {
     /// Build the [`FontDialog`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> FontDialog {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

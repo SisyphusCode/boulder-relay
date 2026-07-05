@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{EventController, PropagationLimit, PropagationPhase};
+use crate::{ffi, EventController, PropagationLimit, PropagationPhase};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -37,6 +38,7 @@ impl DropControllerMotion {
     }
 
     #[doc(alias = "gtk_drop_controller_motion_contains_pointer")]
+    #[doc(alias = "contains-pointer")]
     pub fn contains_pointer(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_drop_controller_motion_contains_pointer(
@@ -56,6 +58,7 @@ impl DropControllerMotion {
     }
 
     #[doc(alias = "gtk_drop_controller_motion_is_pointer")]
+    #[doc(alias = "is-pointer")]
     pub fn is_pointer(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_drop_controller_motion_is_pointer(
@@ -68,8 +71,8 @@ impl DropControllerMotion {
     pub fn connect_enter<F: Fn(&Self, f64, f64) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn enter_trampoline<F: Fn(&DropControllerMotion, f64, f64) + 'static>(
             this: *mut ffi::GtkDropControllerMotion,
-            x: libc::c_double,
-            y: libc::c_double,
+            x: std::ffi::c_double,
+            y: std::ffi::c_double,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -80,7 +83,7 @@ impl DropControllerMotion {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"enter\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     enter_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -102,7 +105,7 @@ impl DropControllerMotion {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"leave\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     leave_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -114,8 +117,8 @@ impl DropControllerMotion {
     pub fn connect_motion<F: Fn(&Self, f64, f64) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn motion_trampoline<F: Fn(&DropControllerMotion, f64, f64) + 'static>(
             this: *mut ffi::GtkDropControllerMotion,
-            x: libc::c_double,
-            y: libc::c_double,
+            x: std::ffi::c_double,
+            y: std::ffi::c_double,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -126,7 +129,7 @@ impl DropControllerMotion {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"motion\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     motion_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -151,7 +154,7 @@ impl DropControllerMotion {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::contains-pointer\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_contains_pointer_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -174,7 +177,7 @@ impl DropControllerMotion {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::drop\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_drop_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -199,7 +202,7 @@ impl DropControllerMotion {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::is-pointer\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_is_pointer_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -256,6 +259,7 @@ impl DropControllerMotionBuilder {
     /// Build the [`DropControllerMotion`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> DropControllerMotion {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

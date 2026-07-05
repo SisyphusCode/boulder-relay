@@ -5,10 +5,16 @@
 
 use std::{boxed::Box as Box_, collections::HashMap, fmt, future::Future};
 
-use glib::{subclass::SignalId, translate::*, GString, Variant};
+use glib::{
+    clone::Downgrade,
+    property::{Property, PropertyGet},
+    subclass::SignalId,
+    translate::*,
+    GString, Variant,
+};
 
 use crate::{
-    prelude::*, subclass::prelude::*, AccessibleRole, BuilderRustScope, BuilderScope,
+    ffi, prelude::*, subclass::prelude::*, AccessibleRole, BuilderRustScope, BuilderScope,
     DirectionType, LayoutManager, Orientation, Shortcut, SizeRequestMode, Snapshot, StateFlags,
     SystemSetting, TextDirection, Tooltip, Widget,
 };
@@ -913,9 +919,19 @@ pub unsafe trait WidgetClassExt: ClassStruct {
                 let ctx = glib::MainContext::default();
                 let action_name = action_name.to_owned();
                 let parameter_type = parameter_type.map(ToOwned::to_owned);
-                ctx.spawn_local(glib::clone!(@strong this, @strong action_name, @strong parameter_type, @strong activate => async move {
-                    activate(this, action_name, parameter_type).await;
-                }));
+                ctx.spawn_local(glib::clone!(
+                    #[strong]
+                    this,
+                    #[strong]
+                    action_name,
+                    #[strong]
+                    parameter_type,
+                    #[strong]
+                    activate,
+                    async move {
+                        activate(this, action_name, parameter_type).await;
+                    }
+                ));
             },
         );
     }
@@ -1214,6 +1230,13 @@ where
     ptr: *mut <T as ObjectType>::GlibType,
 }
 
+impl<T: Property> Property for TemplateChild<T>
+where
+    T: ObjectType + FromGlibPtrNone<*mut <T as ObjectType>::GlibType>,
+{
+    type Value = T::Value;
+}
+
 impl<T> Default for TemplateChild<T>
 where
     T: ObjectType + FromGlibPtrNone<*mut <T as ObjectType>::GlibType>,
@@ -1227,16 +1250,14 @@ where
     }
 }
 
-impl<T> glib::HasParamSpec for TemplateChild<T>
+impl<T> PropertyGet for TemplateChild<T>
 where
-    T: ObjectType + IsA<glib::Object> + FromGlibPtrNone<*mut <T as ObjectType>::GlibType>,
+    T: Property + ObjectType + FromGlibPtrNone<*mut <T as ObjectType>::GlibType>,
 {
-    type ParamSpec = glib::ParamSpecObject;
-    type SetValue = T;
-    type BuilderFn = fn(&str) -> glib::ParamSpecObjectBuilder<T>;
+    type Value = T;
 
-    fn param_spec_builder() -> Self::BuilderFn {
-        Self::ParamSpec::builder
+    fn get<R, F: Fn(&Self::Value) -> R>(&self, f: F) -> R {
+        f(&self.get())
     }
 }
 
@@ -1255,6 +1276,17 @@ where
             }
             &*(&self.ptr as *const _ as *const T)
         }
+    }
+}
+
+impl<T> Downgrade for TemplateChild<T>
+where
+    T: ObjectType + FromGlibPtrNone<*mut <T as ObjectType>::GlibType> + Downgrade,
+{
+    type Weak = T::Weak;
+
+    fn downgrade(&self) -> Self::Weak {
+        T::downgrade(&self.get())
     }
 }
 

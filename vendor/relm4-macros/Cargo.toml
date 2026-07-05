@@ -13,8 +13,20 @@
 edition = "2021"
 rust-version = "1.75"
 name = "relm4-macros"
-version = "0.8.1"
+version = "0.9.1"
 authors = ["Aaron Erhardt <aaron.erhardt@t-online.de>"]
+build = false
+include = [
+    "src/",
+    "tests/",
+    "README.md",
+    "LICENSE-MIT",
+    "LICENSE-APACHE",
+]
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "An idiomatic GUI library inspired by Elm and based on gtk4-rs"
 homepage = "https://relm4.org"
 documentation = "https://docs.rs/relm4_macros/"
@@ -31,7 +43,61 @@ license = "Apache-2.0 OR MIT"
 repository = "https://github.com/Relm4/Relm4"
 
 [lib]
+name = "relm4_macros"
+path = "src/lib.rs"
 proc-macro = true
+
+[[test]]
+name = "builder"
+path = "tests/builder.rs"
+
+[[test]]
+name = "codegen_order"
+path = "tests/codegen_order.rs"
+
+[[test]]
+name = "complex_func_path"
+path = "tests/complex_func_path.rs"
+
+[[test]]
+name = "component_missing_widgets"
+path = "tests/component_missing_widgets.rs"
+
+[[test]]
+name = "iife"
+path = "tests/iife.rs"
+
+[[test]]
+name = "local_ref_container"
+path = "tests/local_ref_container.rs"
+
+[[test]]
+name = "pub_widget_templates"
+path = "tests/pub_widget_templates.rs"
+
+[[test]]
+name = "redundant_clone"
+path = "tests/redundant_clone.rs"
+
+[[test]]
+name = "returned_widgets"
+path = "tests/returned_widgets.rs"
+
+[[test]]
+name = "simple"
+path = "tests/simple.rs"
+
+[[test]]
+name = "skip_init"
+path = "tests/skip_init.rs"
+
+[[test]]
+name = "widget_template"
+path = "tests/widget_template.rs"
+
+[[test]]
+name = "widget_template_nested_child"
+path = "tests/widget_template_nested_child.rs"
 
 [dependencies.proc-macro2]
 version = "1.0"
@@ -52,7 +118,7 @@ features = [
 version = "1"
 
 [dev-dependencies.trybuild]
-version = "1.0.89"
+version = "1.0.97"
 
 [features]
 default = ["relm4"]

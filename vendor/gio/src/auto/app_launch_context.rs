@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{AppInfo, File};
+use crate::{ffi, AppInfo, File};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -64,11 +65,15 @@ pub trait AppLaunchContextExt: IsA<AppLaunchContext> + sealed::Sealed + 'static 
 
     #[doc(alias = "g_app_launch_context_get_startup_notify_id")]
     #[doc(alias = "get_startup_notify_id")]
-    fn startup_notify_id(&self, info: &impl IsA<AppInfo>, files: &[File]) -> Option<glib::GString> {
+    fn startup_notify_id(
+        &self,
+        info: Option<&impl IsA<AppInfo>>,
+        files: &[File],
+    ) -> Option<glib::GString> {
         unsafe {
             from_glib_full(ffi::g_app_launch_context_get_startup_notify_id(
                 self.as_ref().to_glib_none().0,
-                info.as_ref().to_glib_none().0,
+                info.map(|p| p.as_ref()).to_glib_none().0,
                 files.to_glib_none().0,
             ))
         }
@@ -112,7 +117,7 @@ pub trait AppLaunchContextExt: IsA<AppLaunchContext> + sealed::Sealed + 'static 
             F: Fn(&P, &str) + 'static,
         >(
             this: *mut ffi::GAppLaunchContext,
-            startup_notify_id: *mut libc::c_char,
+            startup_notify_id: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);

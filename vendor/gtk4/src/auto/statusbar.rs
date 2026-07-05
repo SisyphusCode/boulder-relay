@@ -4,9 +4,11 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow, Widget,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
+    Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -91,8 +93,8 @@ impl Statusbar {
     pub fn connect_text_popped<F: Fn(&Self, u32, &str) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn text_popped_trampoline<F: Fn(&Statusbar, u32, &str) + 'static>(
             this: *mut ffi::GtkStatusbar,
-            context_id: libc::c_uint,
-            text: *mut libc::c_char,
+            context_id: std::ffi::c_uint,
+            text: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -107,7 +109,7 @@ impl Statusbar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"text-popped\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     text_popped_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -120,8 +122,8 @@ impl Statusbar {
     pub fn connect_text_pushed<F: Fn(&Self, u32, &str) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn text_pushed_trampoline<F: Fn(&Statusbar, u32, &str) + 'static>(
             this: *mut ffi::GtkStatusbar,
-            context_id: libc::c_uint,
-            text: *mut libc::c_char,
+            context_id: std::ffi::c_uint,
+            text: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -136,7 +138,7 @@ impl Statusbar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"text-pushed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     text_pushed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -244,6 +246,14 @@ impl StatusbarBuilder {
             builder: self
                 .builder
                 .property("layout-manager", layout_manager.clone().upcast()),
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
         }
     }
 
@@ -355,6 +365,7 @@ impl StatusbarBuilder {
     /// Build the [`Statusbar`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Statusbar {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

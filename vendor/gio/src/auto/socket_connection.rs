@@ -2,7 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{AsyncResult, Cancellable, IOStream, Socket, SocketAddress, SocketFamily, SocketType};
+use crate::{
+    ffi, AsyncResult, Cancellable, IOStream, Socket, SocketAddress, SocketFamily, SocketType,
+};
 use glib::{prelude::*, translate::*};
 use std::{boxed::Box as Box_, pin::Pin};
 
@@ -107,8 +109,7 @@ pub trait SocketConnectionExt: IsA<SocketConnection> + sealed::Sealed + 'static 
             user_data: glib::ffi::gpointer,
         ) {
             let mut error = std::ptr::null_mut();
-            let _ =
-                ffi::g_socket_connection_connect_finish(_source_object as *mut _, res, &mut error);
+            ffi::g_socket_connection_connect_finish(_source_object as *mut _, res, &mut error);
             let result = if error.is_null() {
                 Ok(())
             } else {

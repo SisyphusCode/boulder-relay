@@ -3,9 +3,12 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, FontDialog, FontLevel,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, FontDialog, FontLevel,
     LayoutManager, Overflow, Widget,
 };
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+use glib::object::ObjectType as _;
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -52,6 +55,7 @@ impl FontDialogButton {
 
     #[doc(alias = "gtk_font_dialog_button_get_font_desc")]
     #[doc(alias = "get_font_desc")]
+    #[doc(alias = "font-desc")]
     pub fn font_desc(&self) -> Option<pango::FontDescription> {
         unsafe {
             from_glib_none(ffi::gtk_font_dialog_button_get_font_desc(
@@ -62,6 +66,7 @@ impl FontDialogButton {
 
     #[doc(alias = "gtk_font_dialog_button_get_font_features")]
     #[doc(alias = "get_font_features")]
+    #[doc(alias = "font-features")]
     pub fn font_features(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_font_dialog_button_get_font_features(
@@ -88,6 +93,7 @@ impl FontDialogButton {
 
     #[doc(alias = "gtk_font_dialog_button_get_use_font")]
     #[doc(alias = "get_use_font")]
+    #[doc(alias = "use-font")]
     pub fn uses_font(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_font_dialog_button_get_use_font(
@@ -98,6 +104,7 @@ impl FontDialogButton {
 
     #[doc(alias = "gtk_font_dialog_button_get_use_size")]
     #[doc(alias = "get_use_size")]
+    #[doc(alias = "use-size")]
     pub fn uses_size(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_font_dialog_button_get_use_size(
@@ -107,6 +114,7 @@ impl FontDialogButton {
     }
 
     #[doc(alias = "gtk_font_dialog_button_set_dialog")]
+    #[doc(alias = "dialog")]
     pub fn set_dialog(&self, dialog: &FontDialog) {
         unsafe {
             ffi::gtk_font_dialog_button_set_dialog(self.to_glib_none().0, dialog.to_glib_none().0);
@@ -114,6 +122,7 @@ impl FontDialogButton {
     }
 
     #[doc(alias = "gtk_font_dialog_button_set_font_desc")]
+    #[doc(alias = "font-desc")]
     pub fn set_font_desc(&self, font_desc: &pango::FontDescription) {
         unsafe {
             ffi::gtk_font_dialog_button_set_font_desc(
@@ -124,6 +133,7 @@ impl FontDialogButton {
     }
 
     #[doc(alias = "gtk_font_dialog_button_set_font_features")]
+    #[doc(alias = "font-features")]
     pub fn set_font_features(&self, font_features: Option<&str>) {
         unsafe {
             ffi::gtk_font_dialog_button_set_font_features(
@@ -134,6 +144,7 @@ impl FontDialogButton {
     }
 
     #[doc(alias = "gtk_font_dialog_button_set_language")]
+    #[doc(alias = "language")]
     pub fn set_language(&self, language: Option<&pango::Language>) {
         unsafe {
             ffi::gtk_font_dialog_button_set_language(
@@ -144,6 +155,7 @@ impl FontDialogButton {
     }
 
     #[doc(alias = "gtk_font_dialog_button_set_level")]
+    #[doc(alias = "level")]
     pub fn set_level(&self, level: FontLevel) {
         unsafe {
             ffi::gtk_font_dialog_button_set_level(self.to_glib_none().0, level.into_glib());
@@ -151,6 +163,7 @@ impl FontDialogButton {
     }
 
     #[doc(alias = "gtk_font_dialog_button_set_use_font")]
+    #[doc(alias = "use-font")]
     pub fn set_use_font(&self, use_font: bool) {
         unsafe {
             ffi::gtk_font_dialog_button_set_use_font(self.to_glib_none().0, use_font.into_glib());
@@ -158,37 +171,50 @@ impl FontDialogButton {
     }
 
     #[doc(alias = "gtk_font_dialog_button_set_use_size")]
+    #[doc(alias = "use-size")]
     pub fn set_use_size(&self, use_size: bool) {
         unsafe {
             ffi::gtk_font_dialog_button_set_use_size(self.to_glib_none().0, use_size.into_glib());
         }
     }
 
-    pub fn get_property_level(&self) -> FontLevel {
+    #[cfg(not(feature = "v4_10"))]
+    #[cfg_attr(docsrs, doc(cfg(not(feature = "v4_10"))))]
+    pub fn level(&self) -> FontLevel {
         ObjectExt::property(self, "level")
     }
 
-    pub fn set_property_level(&self, level: FontLevel) {
+    #[cfg(not(feature = "v4_10"))]
+    #[cfg_attr(docsrs, doc(cfg(not(feature = "v4_10"))))]
+    pub fn set_level(&self, level: FontLevel) {
         ObjectExt::set_property(self, "level", level)
     }
 
+    #[cfg(not(feature = "v4_10"))]
+    #[cfg_attr(docsrs, doc(cfg(not(feature = "v4_10"))))]
     #[doc(alias = "use-font")]
-    pub fn get_property_use_font(&self) -> bool {
+    pub fn uses_font(&self) -> bool {
         ObjectExt::property(self, "use-font")
     }
 
+    #[cfg(not(feature = "v4_10"))]
+    #[cfg_attr(docsrs, doc(cfg(not(feature = "v4_10"))))]
     #[doc(alias = "use-font")]
-    pub fn set_property_use_font(&self, use_font: bool) {
+    pub fn set_use_font(&self, use_font: bool) {
         ObjectExt::set_property(self, "use-font", use_font)
     }
 
+    #[cfg(not(feature = "v4_10"))]
+    #[cfg_attr(docsrs, doc(cfg(not(feature = "v4_10"))))]
     #[doc(alias = "use-size")]
-    pub fn get_property_use_size(&self) -> bool {
+    pub fn uses_size(&self) -> bool {
         ObjectExt::property(self, "use-size")
     }
 
+    #[cfg(not(feature = "v4_10"))]
+    #[cfg_attr(docsrs, doc(cfg(not(feature = "v4_10"))))]
     #[doc(alias = "use-size")]
-    pub fn set_property_use_size(&self, use_size: bool) {
+    pub fn set_use_size(&self, use_size: bool) {
         ObjectExt::set_property(self, "use-size", use_size)
     }
 
@@ -208,7 +234,7 @@ impl FontDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -239,7 +265,7 @@ impl FontDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::dialog\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_dialog_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -264,7 +290,7 @@ impl FontDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::font-desc\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_font_desc_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -289,7 +315,7 @@ impl FontDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::font-features\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_font_features_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -314,7 +340,7 @@ impl FontDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::language\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_language_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -337,7 +363,7 @@ impl FontDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::level\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_level_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -360,7 +386,7 @@ impl FontDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-font\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_font_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -383,7 +409,7 @@ impl FontDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-size\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_size_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -546,6 +572,14 @@ impl FontDialogButtonBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -654,6 +688,7 @@ impl FontDialogButtonBuilder {
     /// Build the [`FontDialogButton`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> FontDialogButton {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

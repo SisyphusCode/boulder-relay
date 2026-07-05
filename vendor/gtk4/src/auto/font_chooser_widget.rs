@@ -4,8 +4,8 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, FontChooser, FontChooserLevel,
-    LayoutManager, Overflow, Widget,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, FontChooser,
+    FontChooserLevel, LayoutManager, Overflow, Widget,
 };
 use glib::{
     prelude::*,
@@ -60,7 +60,7 @@ impl FontChooserWidget {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::tweak-action\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_tweak_action_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -168,6 +168,14 @@ impl FontChooserWidgetBuilder {
             builder: self
                 .builder
                 .property("layout-manager", layout_manager.clone().upcast()),
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
         }
     }
 
@@ -323,6 +331,7 @@ impl FontChooserWidgetBuilder {
     /// Build the [`FontChooserWidget`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> FontChooserWidget {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

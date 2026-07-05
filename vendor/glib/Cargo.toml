@@ -13,9 +13,15 @@
 edition = "2021"
 rust-version = "1.70"
 name = "glib"
-version = "0.19.9"
+version = "0.20.12"
 authors = ["The gtk-rs Project Developers"]
+build = false
 exclude = ["gir-files/*"]
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "Rust bindings for the GLib library"
 homepage = "https://gtk-rs.org/"
 documentation = "https://gtk-rs.org/gtk-rs-core/stable/latest/docs/glib/"
@@ -41,23 +47,141 @@ rustdoc-args = [
     "--generate-link-to-definition",
 ]
 
+[features]
+compiletests = []
+default = ["gio"]
+gio = ["gio-sys"]
+log = ["rs-log"]
+log_macros = ["log"]
+v2_58 = [
+    "glib-sys/v2_58",
+    "gobject-sys/v2_58",
+]
+v2_60 = [
+    "v2_58",
+    "glib-sys/v2_60",
+]
+v2_62 = [
+    "v2_60",
+    "glib-sys/v2_62",
+    "gobject-sys/v2_62",
+]
+v2_64 = [
+    "v2_62",
+    "glib-sys/v2_64",
+]
+v2_66 = [
+    "v2_64",
+    "glib-sys/v2_66",
+    "gobject-sys/v2_66",
+]
+v2_68 = [
+    "v2_66",
+    "glib-sys/v2_68",
+    "gobject-sys/v2_68",
+]
+v2_70 = [
+    "v2_68",
+    "glib-sys/v2_70",
+    "gobject-sys/v2_70",
+]
+v2_72 = [
+    "v2_70",
+    "glib-sys/v2_72",
+    "gobject-sys/v2_72",
+]
+v2_74 = [
+    "v2_72",
+    "glib-sys/v2_74",
+    "gobject-sys/v2_74",
+]
+v2_76 = [
+    "v2_74",
+    "glib-sys/v2_76",
+    "gobject-sys/v2_76",
+]
+v2_78 = [
+    "v2_76",
+    "glib-sys/v2_78",
+    "gobject-sys/v2_78",
+]
+v2_80 = [
+    "v2_78",
+    "glib-sys/v2_80",
+    "gobject-sys/v2_80",
+]
+v2_82 = [
+    "v2_80",
+    "glib-sys/v2_82",
+    "gobject-sys/v2_82",
+]
+v2_84 = [
+    "v2_82",
+    "glib-sys/v2_84",
+    "gobject-sys/v2_84",
+]
+v2_86 = [
+    "v2_84",
+    "glib-sys/v2_86",
+    "gobject-sys/v2_86",
+]
+
 [lib]
 name = "glib"
+path = "src/lib.rs"
+
+[[test]]
+name = "bridged_logging"
+path = "tests/bridged_logging.rs"
+
+[[test]]
+name = "check_gir"
+path = "tests/check_gir.rs"
+
+[[test]]
+name = "clone"
+path = "tests/clone.rs"
+
+[[test]]
+name = "derive"
+path = "tests/derive.rs"
+
+[[test]]
+name = "log"
+path = "tests/log.rs"
+
+[[test]]
+name = "print"
+path = "tests/print.rs"
+
+[[test]]
+name = "regex_compiletest"
+path = "tests/regex_compiletest.rs"
+
+[[test]]
+name = "structured_log"
+path = "tests/structured_log.rs"
 
 [[test]]
 name = "subclass_compiletest"
+path = "tests/subclass_compiletest.rs"
 required-features = ["compiletests"]
+
+[[test]]
+name = "unicollate"
+path = "tests/unicollate.rs"
+
+[[test]]
+name = "value"
+path = "tests/value.rs"
 
 [[bench]]
 name = "gstring"
+path = "benches/gstring.rs"
 harness = false
 
 [dependencies.bitflags]
-version = "2.4"
-
-[dependencies.ffi]
-version = "0.19"
-package = "glib-sys"
+version = "2.6"
 
 [dependencies.futures-channel]
 version = "0.3"
@@ -76,23 +200,24 @@ default-features = false
 [dependencies.futures-util]
 version = "0.3"
 
-[dependencies.gio_ffi]
-version = "0.19"
+[dependencies.gio-sys]
+version = "0.20.6"
 optional = true
-package = "gio-sys"
 
 [dependencies.glib-macros]
-version = "0.19.9"
+version = "0.20.3"
 
-[dependencies.gobject_ffi]
-version = "0.19"
-package = "gobject-sys"
+[dependencies.glib-sys]
+version = "0.20.6"
+
+[dependencies.gobject-sys]
+version = "0.20"
 
 [dependencies.libc]
 version = "0.2"
 
 [dependencies.memchr]
-version = "2.7.1"
+version = "2.7.4"
 
 [dependencies.rs-log]
 version = "0.4"
@@ -100,15 +225,12 @@ optional = true
 package = "log"
 
 [dependencies.smallvec]
-version = "1.12"
+version = "1.13"
 features = [
     "union",
     "const_generics",
     "const_new",
 ]
-
-[dependencies.thiserror]
-version = "1"
 
 [dev-dependencies.criterion]
 version = "0.5.1"
@@ -121,68 +243,3 @@ version = "3"
 
 [dev-dependencies.trybuild2]
 version = "1"
-
-[features]
-compiletests = []
-default = ["gio"]
-gio = ["gio_ffi"]
-log = ["rs-log"]
-log_macros = ["log"]
-unstable-clone-syntax = ["glib-macros/unstable-clone-syntax"]
-v2_58 = [
-    "ffi/v2_58",
-    "gobject_ffi/v2_58",
-]
-v2_60 = [
-    "v2_58",
-    "ffi/v2_60",
-]
-v2_62 = [
-    "v2_60",
-    "ffi/v2_62",
-    "gobject_ffi/v2_62",
-]
-v2_64 = [
-    "v2_62",
-    "ffi/v2_64",
-]
-v2_66 = [
-    "v2_64",
-    "ffi/v2_66",
-    "gobject_ffi/v2_66",
-]
-v2_68 = [
-    "v2_66",
-    "ffi/v2_68",
-    "gobject_ffi/v2_68",
-]
-v2_70 = [
-    "v2_68",
-    "ffi/v2_70",
-    "gobject_ffi/v2_70",
-]
-v2_72 = [
-    "v2_70",
-    "ffi/v2_72",
-    "gobject_ffi/v2_72",
-]
-v2_74 = [
-    "v2_72",
-    "ffi/v2_74",
-    "gobject_ffi/v2_74",
-]
-v2_76 = [
-    "v2_74",
-    "ffi/v2_76",
-    "gobject_ffi/v2_76",
-]
-v2_78 = [
-    "v2_76",
-    "ffi/v2_78",
-    "gobject_ffi/v2_78",
-]
-v2_80 = [
-    "v2_78",
-    "ffi/v2_80",
-    "gobject_ffi/v2_80",
-]

@@ -4,10 +4,12 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AccessibleRole, Align, Application, Box, Buildable, ConstraintTarget, HeaderBar,
-    LayoutManager, Native, Overflow, ResponseType, Root, ShortcutManager, Widget, Window,
+    ffi, Accessible, AccessibleRole, Align, Application, Box, Buildable, ConstraintTarget,
+    HeaderBar, LayoutManager, Native, Overflow, ResponseType, Root, ShortcutManager, Widget,
+    Window,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -308,6 +310,14 @@ impl DialogBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -416,6 +426,7 @@ impl DialogBuilder {
     /// Build the [`Dialog`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Dialog {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }
@@ -544,7 +555,7 @@ pub trait DialogExt: IsA<Dialog> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"close\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     close_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -578,7 +589,7 @@ pub trait DialogExt: IsA<Dialog> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"response\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     response_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

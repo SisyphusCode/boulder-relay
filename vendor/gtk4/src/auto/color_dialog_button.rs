@@ -3,9 +3,12 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ColorDialog, ConstraintTarget, LayoutManager,
-    Overflow, Widget,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ColorDialog, ConstraintTarget,
+    LayoutManager, Overflow, Widget,
 };
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+use glib::object::ObjectType as _;
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -57,6 +60,7 @@ impl ColorDialogButton {
     }
 
     #[doc(alias = "gtk_color_dialog_button_set_dialog")]
+    #[doc(alias = "dialog")]
     pub fn set_dialog(&self, dialog: &ColorDialog) {
         unsafe {
             ffi::gtk_color_dialog_button_set_dialog(self.to_glib_none().0, dialog.to_glib_none().0);
@@ -64,6 +68,7 @@ impl ColorDialogButton {
     }
 
     #[doc(alias = "gtk_color_dialog_button_set_rgba")]
+    #[doc(alias = "rgba")]
     pub fn set_rgba(&self, color: &gdk::RGBA) {
         unsafe {
             ffi::gtk_color_dialog_button_set_rgba(self.to_glib_none().0, color.to_glib_none().0);
@@ -86,7 +91,7 @@ impl ColorDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -117,7 +122,7 @@ impl ColorDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::dialog\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_dialog_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -142,7 +147,7 @@ impl ColorDialogButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::rgba\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_rgba_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -271,6 +276,14 @@ impl ColorDialogButtonBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -379,6 +392,7 @@ impl ColorDialogButtonBuilder {
     /// Build the [`ColorDialogButton`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> ColorDialogButton {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

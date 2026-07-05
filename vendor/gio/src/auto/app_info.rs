@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{AppInfoCreateFlags, AppLaunchContext, AsyncResult, Cancellable, File, Icon};
+use crate::{ffi, AppInfoCreateFlags, AppLaunchContext, AsyncResult, Cancellable, File, Icon};
 use glib::{prelude::*, translate::*};
 use std::{boxed::Box as Box_, pin::Pin};
 
@@ -287,7 +287,7 @@ impl AppInfo {
             user_data: glib::ffi::gpointer,
         ) {
             let mut error = std::ptr::null_mut();
-            let _ = ffi::g_app_info_launch_default_for_uri_finish(res, &mut error);
+            ffi::g_app_info_launch_default_for_uri_finish(res, &mut error);
             let result = if error.is_null() {
                 Ok(())
             } else {

@@ -3,10 +3,11 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Actionable, Align, Buildable, ConstraintTarget, LayoutManager,
+    ffi, Accessible, AccessibleRole, Actionable, Align, Buildable, ConstraintTarget, LayoutManager,
     Overflow, Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -202,6 +203,14 @@ impl CheckButtonBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -324,6 +333,7 @@ impl CheckButtonBuilder {
     /// Build the [`CheckButton`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> CheckButton {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }
@@ -336,6 +346,7 @@ mod sealed {
 pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
     #[doc(alias = "gtk_check_button_get_active")]
     #[doc(alias = "get_active")]
+    #[doc(alias = "active")]
     fn is_active(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_check_button_get_active(
@@ -358,6 +369,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_check_button_get_inconsistent")]
     #[doc(alias = "get_inconsistent")]
+    #[doc(alias = "inconsistent")]
     fn is_inconsistent(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_check_button_get_inconsistent(
@@ -378,6 +390,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_check_button_get_use_underline")]
     #[doc(alias = "get_use_underline")]
+    #[doc(alias = "use-underline")]
     fn uses_underline(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_check_button_get_use_underline(
@@ -387,6 +400,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_check_button_set_active")]
+    #[doc(alias = "active")]
     fn set_active(&self, setting: bool) {
         unsafe {
             ffi::gtk_check_button_set_active(self.as_ref().to_glib_none().0, setting.into_glib());
@@ -396,6 +410,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
     #[cfg(feature = "v4_8")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_8")))]
     #[doc(alias = "gtk_check_button_set_child")]
+    #[doc(alias = "child")]
     fn set_child(&self, child: Option<&impl IsA<Widget>>) {
         unsafe {
             ffi::gtk_check_button_set_child(
@@ -406,6 +421,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_check_button_set_group")]
+    #[doc(alias = "group")]
     fn set_group(&self, group: Option<&impl IsA<CheckButton>>) {
         unsafe {
             ffi::gtk_check_button_set_group(
@@ -416,6 +432,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_check_button_set_inconsistent")]
+    #[doc(alias = "inconsistent")]
     fn set_inconsistent(&self, inconsistent: bool) {
         unsafe {
             ffi::gtk_check_button_set_inconsistent(
@@ -426,6 +443,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_check_button_set_label")]
+    #[doc(alias = "label")]
     fn set_label(&self, label: Option<&str>) {
         unsafe {
             ffi::gtk_check_button_set_label(self.as_ref().to_glib_none().0, label.to_glib_none().0);
@@ -433,6 +451,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_check_button_set_use_underline")]
+    #[doc(alias = "use-underline")]
     fn set_use_underline(&self, setting: bool) {
         unsafe {
             ffi::gtk_check_button_set_use_underline(
@@ -458,7 +477,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -486,7 +505,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"toggled\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     toggled_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -509,7 +528,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::active\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_active_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -534,7 +553,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_child_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -557,7 +576,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::group\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_group_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -583,7 +602,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::inconsistent\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_inconsistent_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -606,7 +625,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::label\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_label_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -632,7 +651,7 @@ pub trait CheckButtonExt: IsA<CheckButton> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-underline\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_underline_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

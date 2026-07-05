@@ -2,6 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use crate::ffi;
 #[cfg(feature = "v4_12")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
 use crate::SectionModel;
@@ -73,6 +74,7 @@ impl SliceListModel {
     }
 
     #[doc(alias = "gtk_slice_list_model_set_model")]
+    #[doc(alias = "model")]
     pub fn set_model(&self, model: Option<&impl IsA<gio::ListModel>>) {
         unsafe {
             ffi::gtk_slice_list_model_set_model(
@@ -83,6 +85,7 @@ impl SliceListModel {
     }
 
     #[doc(alias = "gtk_slice_list_model_set_offset")]
+    #[doc(alias = "offset")]
     pub fn set_offset(&self, offset: u32) {
         unsafe {
             ffi::gtk_slice_list_model_set_offset(self.to_glib_none().0, offset);
@@ -90,6 +93,7 @@ impl SliceListModel {
     }
 
     #[doc(alias = "gtk_slice_list_model_set_size")]
+    #[doc(alias = "size")]
     pub fn set_size(&self, size: u32) {
         unsafe {
             ffi::gtk_slice_list_model_set_size(self.to_glib_none().0, size);
@@ -111,7 +115,7 @@ impl SliceListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::model\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_model_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -134,7 +138,7 @@ impl SliceListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::offset\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_offset_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -157,7 +161,7 @@ impl SliceListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::size\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_size_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -210,6 +214,7 @@ impl SliceListModelBuilder {
     /// Build the [`SliceListModel`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> SliceListModel {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

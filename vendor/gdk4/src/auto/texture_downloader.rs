@@ -2,7 +2,10 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{MemoryFormat, Texture};
+#[cfg(feature = "v4_16")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_16")))]
+use crate::ColorState;
+use crate::{ffi, MemoryFormat, Texture};
 use glib::{prelude::*, translate::*};
 
 glib::wrapper! {
@@ -44,6 +47,18 @@ impl TextureDownloader {
     //    unsafe { TODO: call ffi:gdk_texture_downloader_download_into() }
     //}
 
+    #[cfg(feature = "v4_16")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_16")))]
+    #[doc(alias = "gdk_texture_downloader_get_color_state")]
+    #[doc(alias = "get_color_state")]
+    pub fn color_state(&self) -> ColorState {
+        unsafe {
+            from_glib_full(ffi::gdk_texture_downloader_get_color_state(
+                self.to_glib_none().0,
+            ))
+        }
+    }
+
     #[doc(alias = "gdk_texture_downloader_get_format")]
     #[doc(alias = "get_format")]
     pub fn format(&self) -> MemoryFormat {
@@ -61,6 +76,18 @@ impl TextureDownloader {
             from_glib_none(ffi::gdk_texture_downloader_get_texture(
                 self.to_glib_none().0,
             ))
+        }
+    }
+
+    #[cfg(feature = "v4_16")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_16")))]
+    #[doc(alias = "gdk_texture_downloader_set_color_state")]
+    pub fn set_color_state(&mut self, color_state: &ColorState) {
+        unsafe {
+            ffi::gdk_texture_downloader_set_color_state(
+                self.to_glib_none_mut().0,
+                color_state.to_glib_none().0,
+            );
         }
     }
 

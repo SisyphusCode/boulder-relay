@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::ShortcutTrigger;
+use crate::{ffi, ShortcutTrigger};
 use glib::{prelude::*, translate::*};
 
 glib::wrapper! {
@@ -97,6 +97,7 @@ impl AlternativeTriggerBuilder {
     /// Build the [`AlternativeTrigger`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> AlternativeTrigger {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

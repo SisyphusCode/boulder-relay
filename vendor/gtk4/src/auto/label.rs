@@ -2,20 +2,36 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+use crate::AccessibleText;
 #[cfg(feature = "v4_6")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_6")))]
 use crate::NaturalWrapMode;
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, Justification, LayoutManager,
-    MovementStep, Overflow, Widget,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, Justification,
+    LayoutManager, MovementStep, Overflow, Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
 };
 use std::boxed::Box as Box_;
 
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+glib::wrapper! {
+    #[doc(alias = "GtkLabel")]
+    pub struct Label(Object<ffi::GtkLabel>) @extends Widget, @implements Accessible, Buildable, ConstraintTarget, AccessibleText;
+
+    match fn {
+        type_ => || ffi::gtk_label_get_type(),
+    }
+}
+
+#[cfg(not(any(feature = "v4_14")))]
 glib::wrapper! {
     #[doc(alias = "GtkLabel")]
     pub struct Label(Object<ffi::GtkLabel>) @extends Widget, @implements Accessible, Buildable, ConstraintTarget;
@@ -70,6 +86,7 @@ impl Label {
 
     #[doc(alias = "gtk_label_get_extra_menu")]
     #[doc(alias = "get_extra_menu")]
+    #[doc(alias = "extra-menu")]
     pub fn extra_menu(&self) -> Option<gio::MenuModel> {
         unsafe { from_glib_none(ffi::gtk_label_get_extra_menu(self.to_glib_none().0)) }
     }
@@ -115,12 +132,14 @@ impl Label {
 
     #[doc(alias = "gtk_label_get_max_width_chars")]
     #[doc(alias = "get_max_width_chars")]
+    #[doc(alias = "max-width-chars")]
     pub fn max_width_chars(&self) -> i32 {
         unsafe { ffi::gtk_label_get_max_width_chars(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_label_get_mnemonic_widget")]
     #[doc(alias = "get_mnemonic_widget")]
+    #[doc(alias = "mnemonic-widget")]
     pub fn mnemonic_widget(&self) -> Option<Widget> {
         unsafe { from_glib_none(ffi::gtk_label_get_mnemonic_widget(self.to_glib_none().0)) }
     }
@@ -129,12 +148,14 @@ impl Label {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_6")))]
     #[doc(alias = "gtk_label_get_natural_wrap_mode")]
     #[doc(alias = "get_natural_wrap_mode")]
+    #[doc(alias = "natural-wrap-mode")]
     pub fn natural_wrap_mode(&self) -> NaturalWrapMode {
         unsafe { from_glib(ffi::gtk_label_get_natural_wrap_mode(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_label_get_selectable")]
     #[doc(alias = "get_selectable")]
+    #[doc(alias = "selectable")]
     pub fn is_selectable(&self) -> bool {
         unsafe { from_glib(ffi::gtk_label_get_selectable(self.to_glib_none().0)) }
     }
@@ -160,6 +181,7 @@ impl Label {
 
     #[doc(alias = "gtk_label_get_single_line_mode")]
     #[doc(alias = "get_single_line_mode")]
+    #[doc(alias = "single-line-mode")]
     pub fn is_single_line_mode(&self) -> bool {
         unsafe { from_glib(ffi::gtk_label_get_single_line_mode(self.to_glib_none().0)) }
     }
@@ -180,30 +202,35 @@ impl Label {
 
     #[doc(alias = "gtk_label_get_use_markup")]
     #[doc(alias = "get_use_markup")]
+    #[doc(alias = "use-markup")]
     pub fn uses_markup(&self) -> bool {
         unsafe { from_glib(ffi::gtk_label_get_use_markup(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_label_get_use_underline")]
     #[doc(alias = "get_use_underline")]
+    #[doc(alias = "use-underline")]
     pub fn uses_underline(&self) -> bool {
         unsafe { from_glib(ffi::gtk_label_get_use_underline(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_label_get_width_chars")]
     #[doc(alias = "get_width_chars")]
+    #[doc(alias = "width-chars")]
     pub fn width_chars(&self) -> i32 {
         unsafe { ffi::gtk_label_get_width_chars(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_label_get_wrap")]
     #[doc(alias = "get_wrap")]
+    #[doc(alias = "wrap")]
     pub fn wraps(&self) -> bool {
         unsafe { from_glib(ffi::gtk_label_get_wrap(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_label_get_wrap_mode")]
     #[doc(alias = "get_wrap_mode")]
+    #[doc(alias = "wrap-mode")]
     pub fn wrap_mode(&self) -> pango::WrapMode {
         unsafe { from_glib(ffi::gtk_label_get_wrap_mode(self.to_glib_none().0)) }
     }
@@ -228,6 +255,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_attributes")]
+    #[doc(alias = "attributes")]
     pub fn set_attributes(&self, attrs: Option<&pango::AttrList>) {
         unsafe {
             ffi::gtk_label_set_attributes(self.to_glib_none().0, attrs.to_glib_none().0);
@@ -235,6 +263,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_ellipsize")]
+    #[doc(alias = "ellipsize")]
     pub fn set_ellipsize(&self, mode: pango::EllipsizeMode) {
         unsafe {
             ffi::gtk_label_set_ellipsize(self.to_glib_none().0, mode.into_glib());
@@ -242,6 +271,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_extra_menu")]
+    #[doc(alias = "extra-menu")]
     pub fn set_extra_menu(&self, model: Option<&impl IsA<gio::MenuModel>>) {
         unsafe {
             ffi::gtk_label_set_extra_menu(
@@ -252,6 +282,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_justify")]
+    #[doc(alias = "justify")]
     pub fn set_justify(&self, jtype: Justification) {
         unsafe {
             ffi::gtk_label_set_justify(self.to_glib_none().0, jtype.into_glib());
@@ -259,6 +290,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_label")]
+    #[doc(alias = "label")]
     pub fn set_label(&self, str: &str) {
         unsafe {
             ffi::gtk_label_set_label(self.to_glib_none().0, str.to_glib_none().0);
@@ -266,6 +298,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_lines")]
+    #[doc(alias = "lines")]
     pub fn set_lines(&self, lines: i32) {
         unsafe {
             ffi::gtk_label_set_lines(self.to_glib_none().0, lines);
@@ -287,6 +320,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_max_width_chars")]
+    #[doc(alias = "max-width-chars")]
     pub fn set_max_width_chars(&self, n_chars: i32) {
         unsafe {
             ffi::gtk_label_set_max_width_chars(self.to_glib_none().0, n_chars);
@@ -294,6 +328,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_mnemonic_widget")]
+    #[doc(alias = "mnemonic-widget")]
     pub fn set_mnemonic_widget(&self, widget: Option<&impl IsA<Widget>>) {
         unsafe {
             ffi::gtk_label_set_mnemonic_widget(
@@ -306,6 +341,7 @@ impl Label {
     #[cfg(feature = "v4_6")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_6")))]
     #[doc(alias = "gtk_label_set_natural_wrap_mode")]
+    #[doc(alias = "natural-wrap-mode")]
     pub fn set_natural_wrap_mode(&self, wrap_mode: NaturalWrapMode) {
         unsafe {
             ffi::gtk_label_set_natural_wrap_mode(self.to_glib_none().0, wrap_mode.into_glib());
@@ -313,6 +349,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_selectable")]
+    #[doc(alias = "selectable")]
     pub fn set_selectable(&self, setting: bool) {
         unsafe {
             ffi::gtk_label_set_selectable(self.to_glib_none().0, setting.into_glib());
@@ -320,6 +357,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_single_line_mode")]
+    #[doc(alias = "single-line-mode")]
     pub fn set_single_line_mode(&self, single_line_mode: bool) {
         unsafe {
             ffi::gtk_label_set_single_line_mode(
@@ -332,6 +370,7 @@ impl Label {
     #[cfg(feature = "v4_8")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_8")))]
     #[doc(alias = "gtk_label_set_tabs")]
+    #[doc(alias = "tabs")]
     pub fn set_tabs(&self, tabs: Option<&pango::TabArray>) {
         unsafe {
             ffi::gtk_label_set_tabs(self.to_glib_none().0, mut_override(tabs.to_glib_none().0));
@@ -353,6 +392,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_use_markup")]
+    #[doc(alias = "use-markup")]
     pub fn set_use_markup(&self, setting: bool) {
         unsafe {
             ffi::gtk_label_set_use_markup(self.to_glib_none().0, setting.into_glib());
@@ -360,6 +400,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_use_underline")]
+    #[doc(alias = "use-underline")]
     pub fn set_use_underline(&self, setting: bool) {
         unsafe {
             ffi::gtk_label_set_use_underline(self.to_glib_none().0, setting.into_glib());
@@ -367,6 +408,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_width_chars")]
+    #[doc(alias = "width-chars")]
     pub fn set_width_chars(&self, n_chars: i32) {
         unsafe {
             ffi::gtk_label_set_width_chars(self.to_glib_none().0, n_chars);
@@ -374,6 +416,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_wrap")]
+    #[doc(alias = "wrap")]
     pub fn set_wrap(&self, wrap: bool) {
         unsafe {
             ffi::gtk_label_set_wrap(self.to_glib_none().0, wrap.into_glib());
@@ -381,6 +424,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_wrap_mode")]
+    #[doc(alias = "wrap-mode")]
     pub fn set_wrap_mode(&self, wrap_mode: pango::WrapMode) {
         unsafe {
             ffi::gtk_label_set_wrap_mode(self.to_glib_none().0, wrap_mode.into_glib());
@@ -388,6 +432,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_xalign")]
+    #[doc(alias = "xalign")]
     pub fn set_xalign(&self, xalign: f32) {
         unsafe {
             ffi::gtk_label_set_xalign(self.to_glib_none().0, xalign);
@@ -395,6 +440,7 @@ impl Label {
     }
 
     #[doc(alias = "gtk_label_set_yalign")]
+    #[doc(alias = "yalign")]
     pub fn set_yalign(&self, yalign: f32) {
         unsafe {
             ffi::gtk_label_set_yalign(self.to_glib_none().0, yalign);
@@ -415,7 +461,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate-current-link\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_current_link_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -436,7 +482,7 @@ impl Label {
             F: Fn(&Label, &str) -> glib::Propagation + 'static,
         >(
             this: *mut ffi::GtkLabel,
-            uri: *mut libc::c_char,
+            uri: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) -> glib::ffi::gboolean {
             let f: &F = &*(f as *const F);
@@ -451,7 +497,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate-link\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_link_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -473,7 +519,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"copy-clipboard\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     copy_clipboard_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -495,7 +541,7 @@ impl Label {
         >(
             this: *mut ffi::GtkLabel,
             step: ffi::GtkMovementStep,
-            count: libc::c_int,
+            count: std::ffi::c_int,
             extend_selection: glib::ffi::gboolean,
             f: glib::ffi::gpointer,
         ) {
@@ -512,7 +558,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"move-cursor\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     move_cursor_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -539,7 +585,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::attributes\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_attributes_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -562,7 +608,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::ellipsize\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_ellipsize_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -585,7 +631,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::extra-menu\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_extra_menu_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -608,7 +654,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::justify\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_justify_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -631,7 +677,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::label\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_label_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -654,7 +700,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::lines\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_lines_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -677,7 +723,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::max-width-chars\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_max_width_chars_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -700,7 +746,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::mnemonic-keyval\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_mnemonic_keyval_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -723,7 +769,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::mnemonic-widget\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_mnemonic_widget_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -751,7 +797,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::natural-wrap-mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_natural_wrap_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -774,7 +820,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::selectable\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_selectable_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -797,7 +843,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::single-line-mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_single_line_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -822,7 +868,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::tabs\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_tabs_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -845,7 +891,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-markup\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_markup_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -868,7 +914,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-underline\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_underline_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -891,7 +937,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::width-chars\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_width_chars_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -914,7 +960,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::wrap\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_wrap_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -937,7 +983,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::wrap-mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_wrap_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -960,7 +1006,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::xalign\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_xalign_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -983,7 +1029,7 @@ impl Label {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::yalign\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_yalign_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1218,6 +1264,14 @@ impl LabelBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -1326,6 +1380,7 @@ impl LabelBuilder {
     /// Build the [`Label`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Label {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

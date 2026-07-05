@@ -3,7 +3,8 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow, Widget,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
+    Widget,
 };
 use glib::{
     prelude::*,
@@ -52,6 +53,7 @@ impl AspectFrame {
 
     #[doc(alias = "gtk_aspect_frame_get_obey_child")]
     #[doc(alias = "get_obey_child")]
+    #[doc(alias = "obey-child")]
     pub fn is_obey_child(&self) -> bool {
         unsafe { from_glib(ffi::gtk_aspect_frame_get_obey_child(self.to_glib_none().0)) }
     }
@@ -75,6 +77,7 @@ impl AspectFrame {
     }
 
     #[doc(alias = "gtk_aspect_frame_set_child")]
+    #[doc(alias = "child")]
     pub fn set_child(&self, child: Option<&impl IsA<Widget>>) {
         unsafe {
             ffi::gtk_aspect_frame_set_child(
@@ -85,6 +88,7 @@ impl AspectFrame {
     }
 
     #[doc(alias = "gtk_aspect_frame_set_obey_child")]
+    #[doc(alias = "obey-child")]
     pub fn set_obey_child(&self, obey_child: bool) {
         unsafe {
             ffi::gtk_aspect_frame_set_obey_child(self.to_glib_none().0, obey_child.into_glib());
@@ -92,6 +96,7 @@ impl AspectFrame {
     }
 
     #[doc(alias = "gtk_aspect_frame_set_ratio")]
+    #[doc(alias = "ratio")]
     pub fn set_ratio(&self, ratio: f32) {
         unsafe {
             ffi::gtk_aspect_frame_set_ratio(self.to_glib_none().0, ratio);
@@ -99,6 +104,7 @@ impl AspectFrame {
     }
 
     #[doc(alias = "gtk_aspect_frame_set_xalign")]
+    #[doc(alias = "xalign")]
     pub fn set_xalign(&self, xalign: f32) {
         unsafe {
             ffi::gtk_aspect_frame_set_xalign(self.to_glib_none().0, xalign);
@@ -106,6 +112,7 @@ impl AspectFrame {
     }
 
     #[doc(alias = "gtk_aspect_frame_set_yalign")]
+    #[doc(alias = "yalign")]
     pub fn set_yalign(&self, yalign: f32) {
         unsafe {
             ffi::gtk_aspect_frame_set_yalign(self.to_glib_none().0, yalign);
@@ -127,7 +134,7 @@ impl AspectFrame {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -150,7 +157,7 @@ impl AspectFrame {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::obey-child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_obey_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -173,7 +180,7 @@ impl AspectFrame {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::ratio\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_ratio_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -196,7 +203,7 @@ impl AspectFrame {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::xalign\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_xalign_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -219,7 +226,7 @@ impl AspectFrame {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::yalign\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_yalign_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -360,6 +367,14 @@ impl AspectFrameBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -468,6 +483,7 @@ impl AspectFrameBuilder {
     /// Build the [`AspectFrame`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> AspectFrame {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

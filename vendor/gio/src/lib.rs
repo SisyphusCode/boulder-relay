@@ -4,9 +4,10 @@
 #![allow(clippy::type_complexity)]
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::missing_safety_doc)]
+#![allow(clippy::manual_c_str_literals)]
 #![doc = include_str!("../README.md")]
 
-pub use ffi;
+pub use gio_sys as ffi;
 pub use glib;
 
 mod action_entry;
@@ -18,6 +19,7 @@ pub use action_entry::{ActionEntry, ActionEntryBuilder};
 pub use application::{ApplicationBusyGuard, ApplicationHoldGuard};
 mod async_initable;
 mod cancellable;
+pub use cancellable::CancelledHandlerId;
 mod cancellable_future;
 pub use crate::cancellable_future::{CancellableFuture, Cancelled};
 mod converter;
@@ -28,8 +30,8 @@ mod dbus;
 pub use self::dbus::*;
 mod dbus_connection;
 pub use self::dbus_connection::{
-    ActionGroupExportId, FilterId, MenuModelExportId, RegistrationId, SignalSubscriptionId,
-    WatcherId,
+    ActionGroupExportId, FilterId, MenuModelExportId, RegistrationBuilder, RegistrationId,
+    SignalSubscriptionId, WatcherId,
 };
 mod dbus_message;
 mod dbus_method_invocation;
@@ -82,6 +84,7 @@ mod simple_proxy_resolver;
 mod socket;
 pub use socket::{InputMessage, InputVector, OutputMessage, OutputVector, SocketControlMessages};
 mod socket_control_message;
+mod socket_listener;
 mod socket_msg_flags;
 pub use socket_msg_flags::SocketMsgFlags;
 mod subprocess;

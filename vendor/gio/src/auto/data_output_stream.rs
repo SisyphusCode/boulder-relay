@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Cancellable, DataStreamByteOrder, FilterOutputStream, OutputStream, Seekable};
+use crate::{ffi, Cancellable, DataStreamByteOrder, FilterOutputStream, OutputStream, Seekable};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -100,6 +100,7 @@ mod sealed {
 pub trait DataOutputStreamExt: IsA<DataOutputStream> + sealed::Sealed + 'static {
     #[doc(alias = "g_data_output_stream_get_byte_order")]
     #[doc(alias = "get_byte_order")]
+    #[doc(alias = "byte-order")]
     fn byte_order(&self) -> DataStreamByteOrder {
         unsafe {
             from_glib(ffi::g_data_output_stream_get_byte_order(
@@ -293,6 +294,7 @@ pub trait DataOutputStreamExt: IsA<DataOutputStream> + sealed::Sealed + 'static 
     }
 
     #[doc(alias = "g_data_output_stream_set_byte_order")]
+    #[doc(alias = "byte-order")]
     fn set_byte_order(&self, order: DataStreamByteOrder) {
         unsafe {
             ffi::g_data_output_stream_set_byte_order(

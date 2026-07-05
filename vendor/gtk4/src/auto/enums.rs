@@ -2,6 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use crate::ffi;
 use glib::{prelude::*, translate::*};
 
 #[cfg(feature = "v4_14")]
@@ -490,6 +491,10 @@ pub enum AccessibleProperty {
     ValueNow,
     #[doc(alias = "GTK_ACCESSIBLE_PROPERTY_VALUE_TEXT")]
     ValueText,
+    #[cfg(feature = "v4_16")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_16")))]
+    #[doc(alias = "GTK_ACCESSIBLE_PROPERTY_HELP_TEXT")]
+    HelpText,
     #[doc(hidden)]
     __Unknown(i32),
 }
@@ -529,6 +534,8 @@ impl IntoGlib for AccessibleProperty {
             Self::ValueMin => ffi::GTK_ACCESSIBLE_PROPERTY_VALUE_MIN,
             Self::ValueNow => ffi::GTK_ACCESSIBLE_PROPERTY_VALUE_NOW,
             Self::ValueText => ffi::GTK_ACCESSIBLE_PROPERTY_VALUE_TEXT,
+            #[cfg(feature = "v4_16")]
+            Self::HelpText => ffi::GTK_ACCESSIBLE_PROPERTY_HELP_TEXT,
             Self::__Unknown(value) => value,
         }
     }
@@ -559,6 +566,8 @@ impl FromGlib<ffi::GtkAccessibleProperty> for AccessibleProperty {
             ffi::GTK_ACCESSIBLE_PROPERTY_VALUE_MIN => Self::ValueMin,
             ffi::GTK_ACCESSIBLE_PROPERTY_VALUE_NOW => Self::ValueNow,
             ffi::GTK_ACCESSIBLE_PROPERTY_VALUE_TEXT => Self::ValueText,
+            #[cfg(feature = "v4_16")]
+            ffi::GTK_ACCESSIBLE_PROPERTY_HELP_TEXT => Self::HelpText,
             value => Self::__Unknown(value),
         }
     }
@@ -660,6 +669,30 @@ pub enum AccessibleRelation {
     RowSpan,
     #[doc(alias = "GTK_ACCESSIBLE_RELATION_SET_SIZE")]
     SetSize,
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "GTK_ACCESSIBLE_RELATION_LABEL_FOR")]
+    LabelFor,
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "GTK_ACCESSIBLE_RELATION_DESCRIPTION_FOR")]
+    DescriptionFor,
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "GTK_ACCESSIBLE_RELATION_CONTROLLED_BY")]
+    ControlledBy,
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "GTK_ACCESSIBLE_RELATION_DETAILS_FOR")]
+    DetailsFor,
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "GTK_ACCESSIBLE_RELATION_ERROR_MESSAGE_FOR")]
+    ErrorMessageFor,
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "GTK_ACCESSIBLE_RELATION_FLOW_FROM")]
+    FlowFrom,
     #[doc(hidden)]
     __Unknown(i32),
 }
@@ -698,6 +731,18 @@ impl IntoGlib for AccessibleRelation {
             Self::RowIndexText => ffi::GTK_ACCESSIBLE_RELATION_ROW_INDEX_TEXT,
             Self::RowSpan => ffi::GTK_ACCESSIBLE_RELATION_ROW_SPAN,
             Self::SetSize => ffi::GTK_ACCESSIBLE_RELATION_SET_SIZE,
+            #[cfg(feature = "v4_18")]
+            Self::LabelFor => ffi::GTK_ACCESSIBLE_RELATION_LABEL_FOR,
+            #[cfg(feature = "v4_18")]
+            Self::DescriptionFor => ffi::GTK_ACCESSIBLE_RELATION_DESCRIPTION_FOR,
+            #[cfg(feature = "v4_18")]
+            Self::ControlledBy => ffi::GTK_ACCESSIBLE_RELATION_CONTROLLED_BY,
+            #[cfg(feature = "v4_18")]
+            Self::DetailsFor => ffi::GTK_ACCESSIBLE_RELATION_DETAILS_FOR,
+            #[cfg(feature = "v4_18")]
+            Self::ErrorMessageFor => ffi::GTK_ACCESSIBLE_RELATION_ERROR_MESSAGE_FOR,
+            #[cfg(feature = "v4_18")]
+            Self::FlowFrom => ffi::GTK_ACCESSIBLE_RELATION_FLOW_FROM,
             Self::__Unknown(value) => value,
         }
     }
@@ -727,6 +772,18 @@ impl FromGlib<ffi::GtkAccessibleRelation> for AccessibleRelation {
             ffi::GTK_ACCESSIBLE_RELATION_ROW_INDEX_TEXT => Self::RowIndexText,
             ffi::GTK_ACCESSIBLE_RELATION_ROW_SPAN => Self::RowSpan,
             ffi::GTK_ACCESSIBLE_RELATION_SET_SIZE => Self::SetSize,
+            #[cfg(feature = "v4_18")]
+            ffi::GTK_ACCESSIBLE_RELATION_LABEL_FOR => Self::LabelFor,
+            #[cfg(feature = "v4_18")]
+            ffi::GTK_ACCESSIBLE_RELATION_DESCRIPTION_FOR => Self::DescriptionFor,
+            #[cfg(feature = "v4_18")]
+            ffi::GTK_ACCESSIBLE_RELATION_CONTROLLED_BY => Self::ControlledBy,
+            #[cfg(feature = "v4_18")]
+            ffi::GTK_ACCESSIBLE_RELATION_DETAILS_FOR => Self::DetailsFor,
+            #[cfg(feature = "v4_18")]
+            ffi::GTK_ACCESSIBLE_RELATION_ERROR_MESSAGE_FOR => Self::ErrorMessageFor,
+            #[cfg(feature = "v4_18")]
+            ffi::GTK_ACCESSIBLE_RELATION_FLOW_FROM => Self::FlowFrom,
             value => Self::__Unknown(value),
         }
     }
@@ -1479,6 +1536,246 @@ impl ToValue for AccessibleState {
 impl From<AccessibleState> for glib::Value {
     #[inline]
     fn from(v: AccessibleState) -> Self {
+        skip_assert_initialized!();
+        ToValue::to_value(&v)
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
+#[doc(alias = "GtkAccessibleTextContentChange")]
+pub enum AccessibleTextContentChange {
+    #[doc(alias = "GTK_ACCESSIBLE_TEXT_CONTENT_CHANGE_INSERT")]
+    Insert,
+    #[doc(alias = "GTK_ACCESSIBLE_TEXT_CONTENT_CHANGE_REMOVE")]
+    Remove,
+    #[doc(hidden)]
+    __Unknown(i32),
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+#[doc(hidden)]
+impl IntoGlib for AccessibleTextContentChange {
+    type GlibType = ffi::GtkAccessibleTextContentChange;
+
+    #[inline]
+    fn into_glib(self) -> ffi::GtkAccessibleTextContentChange {
+        match self {
+            Self::Insert => ffi::GTK_ACCESSIBLE_TEXT_CONTENT_CHANGE_INSERT,
+            Self::Remove => ffi::GTK_ACCESSIBLE_TEXT_CONTENT_CHANGE_REMOVE,
+            Self::__Unknown(value) => value,
+        }
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+#[doc(hidden)]
+impl FromGlib<ffi::GtkAccessibleTextContentChange> for AccessibleTextContentChange {
+    #[inline]
+    unsafe fn from_glib(value: ffi::GtkAccessibleTextContentChange) -> Self {
+        skip_assert_initialized!();
+
+        match value {
+            ffi::GTK_ACCESSIBLE_TEXT_CONTENT_CHANGE_INSERT => Self::Insert,
+            ffi::GTK_ACCESSIBLE_TEXT_CONTENT_CHANGE_REMOVE => Self::Remove,
+            value => Self::__Unknown(value),
+        }
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl StaticType for AccessibleTextContentChange {
+    #[inline]
+    #[doc(alias = "gtk_accessible_text_content_change_get_type")]
+    fn static_type() -> glib::Type {
+        unsafe { from_glib(ffi::gtk_accessible_text_content_change_get_type()) }
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl glib::HasParamSpec for AccessibleTextContentChange {
+    type ParamSpec = glib::ParamSpecEnum;
+    type SetValue = Self;
+    type BuilderFn = fn(&str, Self) -> glib::ParamSpecEnumBuilder<Self>;
+
+    fn param_spec_builder() -> Self::BuilderFn {
+        Self::ParamSpec::builder_with_default
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl glib::value::ValueType for AccessibleTextContentChange {
+    type Type = Self;
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+unsafe impl<'a> glib::value::FromValue<'a> for AccessibleTextContentChange {
+    type Checker = glib::value::GenericValueTypeChecker<Self>;
+
+    #[inline]
+    unsafe fn from_value(value: &'a glib::Value) -> Self {
+        skip_assert_initialized!();
+        from_glib(glib::gobject_ffi::g_value_get_enum(value.to_glib_none().0))
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl ToValue for AccessibleTextContentChange {
+    #[inline]
+    fn to_value(&self) -> glib::Value {
+        let mut value = glib::Value::for_value_type::<Self>();
+        unsafe {
+            glib::gobject_ffi::g_value_set_enum(value.to_glib_none_mut().0, self.into_glib());
+        }
+        value
+    }
+
+    #[inline]
+    fn value_type(&self) -> glib::Type {
+        Self::static_type()
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl From<AccessibleTextContentChange> for glib::Value {
+    #[inline]
+    fn from(v: AccessibleTextContentChange) -> Self {
+        skip_assert_initialized!();
+        ToValue::to_value(&v)
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
+#[doc(alias = "GtkAccessibleTextGranularity")]
+pub enum AccessibleTextGranularity {
+    #[doc(alias = "GTK_ACCESSIBLE_TEXT_GRANULARITY_CHARACTER")]
+    Character,
+    #[doc(alias = "GTK_ACCESSIBLE_TEXT_GRANULARITY_WORD")]
+    Word,
+    #[doc(alias = "GTK_ACCESSIBLE_TEXT_GRANULARITY_SENTENCE")]
+    Sentence,
+    #[doc(alias = "GTK_ACCESSIBLE_TEXT_GRANULARITY_LINE")]
+    Line,
+    #[doc(alias = "GTK_ACCESSIBLE_TEXT_GRANULARITY_PARAGRAPH")]
+    Paragraph,
+    #[doc(hidden)]
+    __Unknown(i32),
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+#[doc(hidden)]
+impl IntoGlib for AccessibleTextGranularity {
+    type GlibType = ffi::GtkAccessibleTextGranularity;
+
+    #[inline]
+    fn into_glib(self) -> ffi::GtkAccessibleTextGranularity {
+        match self {
+            Self::Character => ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_CHARACTER,
+            Self::Word => ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_WORD,
+            Self::Sentence => ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_SENTENCE,
+            Self::Line => ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_LINE,
+            Self::Paragraph => ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_PARAGRAPH,
+            Self::__Unknown(value) => value,
+        }
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+#[doc(hidden)]
+impl FromGlib<ffi::GtkAccessibleTextGranularity> for AccessibleTextGranularity {
+    #[inline]
+    unsafe fn from_glib(value: ffi::GtkAccessibleTextGranularity) -> Self {
+        skip_assert_initialized!();
+
+        match value {
+            ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_CHARACTER => Self::Character,
+            ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_WORD => Self::Word,
+            ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_SENTENCE => Self::Sentence,
+            ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_LINE => Self::Line,
+            ffi::GTK_ACCESSIBLE_TEXT_GRANULARITY_PARAGRAPH => Self::Paragraph,
+            value => Self::__Unknown(value),
+        }
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl StaticType for AccessibleTextGranularity {
+    #[inline]
+    #[doc(alias = "gtk_accessible_text_granularity_get_type")]
+    fn static_type() -> glib::Type {
+        unsafe { from_glib(ffi::gtk_accessible_text_granularity_get_type()) }
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl glib::HasParamSpec for AccessibleTextGranularity {
+    type ParamSpec = glib::ParamSpecEnum;
+    type SetValue = Self;
+    type BuilderFn = fn(&str, Self) -> glib::ParamSpecEnumBuilder<Self>;
+
+    fn param_spec_builder() -> Self::BuilderFn {
+        Self::ParamSpec::builder_with_default
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl glib::value::ValueType for AccessibleTextGranularity {
+    type Type = Self;
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+unsafe impl<'a> glib::value::FromValue<'a> for AccessibleTextGranularity {
+    type Checker = glib::value::GenericValueTypeChecker<Self>;
+
+    #[inline]
+    unsafe fn from_value(value: &'a glib::Value) -> Self {
+        skip_assert_initialized!();
+        from_glib(glib::gobject_ffi::g_value_get_enum(value.to_glib_none().0))
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl ToValue for AccessibleTextGranularity {
+    #[inline]
+    fn to_value(&self) -> glib::Value {
+        let mut value = glib::Value::for_value_type::<Self>();
+        unsafe {
+            glib::gobject_ffi::g_value_set_enum(value.to_glib_none_mut().0, self.into_glib());
+        }
+        value
+    }
+
+    #[inline]
+    fn value_type(&self) -> glib::Type {
+        Self::static_type()
+    }
+}
+
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+impl From<AccessibleTextGranularity> for glib::Value {
+    #[inline]
+    fn from(v: AccessibleTextGranularity) -> Self {
         skip_assert_initialized!();
         ToValue::to_value(&v)
     }

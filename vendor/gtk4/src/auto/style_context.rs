@@ -3,7 +3,7 @@
 // DO NOT EDIT
 #![allow(deprecated)]
 
-use crate::{Border, StateFlags, StyleContextPrintFlags, StyleProvider};
+use crate::{ffi, Border, StateFlags, StyleContextPrintFlags, StyleProvider};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -223,6 +223,7 @@ pub trait StyleContextExt: IsA<StyleContext> + sealed::Sealed + 'static {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_style_context_set_display")]
+    #[doc(alias = "display")]
     fn set_display(&self, display: &impl IsA<gdk::Display>) {
         unsafe {
             ffi::gtk_style_context_set_display(
@@ -280,7 +281,7 @@ pub trait StyleContextExt: IsA<StyleContext> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::display\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_display_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

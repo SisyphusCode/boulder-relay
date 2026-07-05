@@ -111,7 +111,8 @@ use std::{
 };
 
 use crate::{
-    prelude::*, translate::*, Bytes, Type, VariantIter, VariantStrIter, VariantTy, VariantType,
+    ffi, gobject_ffi, prelude::*, translate::*, Bytes, Type, VariantIter, VariantStrIter,
+    VariantTy, VariantType,
 };
 
 wrapper! {
@@ -840,7 +841,7 @@ impl Variant {
     /// }
     /// # Ok::<(), Box<dyn std::error::Error>>(())
     /// ```
-    pub fn array_iter_str(&self) -> Result<VariantStrIter, VariantTypeMismatchError> {
+    pub fn array_iter_str(&self) -> Result<VariantStrIter<'_>, VariantTypeMismatchError> {
         let child_ty = String::static_variant_type();
         let actual_ty = self.type_();
         let expected_ty = child_ty.as_array();
@@ -997,20 +998,20 @@ impl StaticVariantType for Variant {
     }
 }
 
-impl<'a, T: ?Sized + ToVariant> ToVariant for &'a T {
+impl<T: ?Sized + ToVariant> ToVariant for &T {
     fn to_variant(&self) -> Variant {
         <T as ToVariant>::to_variant(self)
     }
 }
 
-impl<'a, T: ?Sized + Into<Variant> + Clone> From<&'a T> for Variant {
+impl<'a, T: Into<Variant> + Clone> From<&'a T> for Variant {
     #[inline]
     fn from(v: &'a T) -> Self {
         v.clone().into()
     }
 }
 
-impl<'a, T: ?Sized + StaticVariantType> StaticVariantType for &'a T {
+impl<T: ?Sized + StaticVariantType> StaticVariantType for &T {
     fn static_variant_type() -> Cow<'static, VariantTy> {
         <T as StaticVariantType>::static_variant_type()
     }
@@ -1440,14 +1441,8 @@ where
 
         for i in 0..variant.n_children() {
             let entry = variant.child_value(i);
-            let key = match entry.child_value(0).get() {
-                Some(key) => key,
-                None => return None,
-            };
-            let val = match entry.child_value(1).get() {
-                Some(val) => val,
-                None => return None,
-            };
+            let key = entry.child_value(0).get()?;
+            let val = entry.child_value(1).get()?;
 
             map.insert(key, val);
         }
@@ -1470,14 +1465,8 @@ where
 
         for i in 0..variant.n_children() {
             let entry = variant.child_value(i);
-            let key = match entry.child_value(0).get() {
-                Some(key) => key,
-                None => return None,
-            };
-            let val = match entry.child_value(1).get() {
-                Some(val) => val,
-                None => return None,
-            };
+            let key = entry.child_value(0).get()?;
+            let val = entry.child_value(1).get()?;
 
             map.insert(key, val);
         }
@@ -1612,6 +1601,7 @@ where
 /// assert_eq!(dict.n_children(), 2);
 /// assert_eq!(dict.type_().as_str(), "a{su}");
 /// ```
+#[derive(Debug, Clone)]
 pub struct DictEntry<K, V> {
     key: K,
     value: V,
@@ -1645,14 +1635,8 @@ where
             return None;
         }
 
-        let key = match variant.child_value(0).get() {
-            Some(key) => key,
-            None => return None,
-        };
-        let value = match variant.child_value(1).get() {
-            Some(value) => value,
-            None => return None,
-        };
+        let key = variant.child_value(0).get()?;
+        let value = variant.child_value(1).get()?;
 
         Some(Self { key, value })
     }

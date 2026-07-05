@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::Window;
+use crate::{ffi, Window};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -108,6 +108,7 @@ impl ColorDialog {
 
     #[doc(alias = "gtk_color_dialog_get_modal")]
     #[doc(alias = "get_modal")]
+    #[doc(alias = "modal")]
     pub fn is_modal(&self) -> bool {
         unsafe { from_glib(ffi::gtk_color_dialog_get_modal(self.to_glib_none().0)) }
     }
@@ -120,11 +121,13 @@ impl ColorDialog {
 
     #[doc(alias = "gtk_color_dialog_get_with_alpha")]
     #[doc(alias = "get_with_alpha")]
+    #[doc(alias = "with-alpha")]
     pub fn is_with_alpha(&self) -> bool {
         unsafe { from_glib(ffi::gtk_color_dialog_get_with_alpha(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_color_dialog_set_modal")]
+    #[doc(alias = "modal")]
     pub fn set_modal(&self, modal: bool) {
         unsafe {
             ffi::gtk_color_dialog_set_modal(self.to_glib_none().0, modal.into_glib());
@@ -132,6 +135,7 @@ impl ColorDialog {
     }
 
     #[doc(alias = "gtk_color_dialog_set_title")]
+    #[doc(alias = "title")]
     pub fn set_title(&self, title: &str) {
         unsafe {
             ffi::gtk_color_dialog_set_title(self.to_glib_none().0, title.to_glib_none().0);
@@ -139,6 +143,7 @@ impl ColorDialog {
     }
 
     #[doc(alias = "gtk_color_dialog_set_with_alpha")]
+    #[doc(alias = "with-alpha")]
     pub fn set_with_alpha(&self, with_alpha: bool) {
         unsafe {
             ffi::gtk_color_dialog_set_with_alpha(self.to_glib_none().0, with_alpha.into_glib());
@@ -162,7 +167,7 @@ impl ColorDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::modal\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_modal_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -187,7 +192,7 @@ impl ColorDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::title\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_title_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -212,7 +217,7 @@ impl ColorDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::with-alpha\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_with_alpha_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -273,6 +278,7 @@ impl ColorDialogBuilder {
     /// Build the [`ColorDialog`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> ColorDialog {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

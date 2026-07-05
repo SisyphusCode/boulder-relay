@@ -2,17 +2,18 @@
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![allow(deprecated)]
+#![allow(clippy::manual_c_str_literals)]
 #![doc = include_str!("../README.md")]
 
 // Re-export gtk dependencies
 pub use cairo;
-pub use ffi;
 pub use gdk;
 pub use gdk_pixbuf;
 pub use gio;
 pub use glib;
 pub use graphene;
 pub use gsk;
+pub use gtk4_sys as ffi;
 pub use pango;
 
 #[macro_use]
@@ -88,6 +89,7 @@ where
 #[allow(clippy::derived_hash_with_manual_eq)]
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::type_complexity)]
+#[allow(unused_imports)]
 mod auto;
 
 #[macro_use]
@@ -102,6 +104,9 @@ pub use auto::*;
 pub use rt::*;
 
 pub mod accessible;
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+mod accessible_text_range;
 mod actionable;
 mod application;
 mod assistant;
@@ -134,6 +139,7 @@ mod entry;
 mod entry_buffer;
 mod entry_completion;
 mod enums;
+mod event_controller;
 mod event_controller_key;
 mod expression_watch;
 mod file_chooser;
@@ -196,6 +202,9 @@ mod tree_view;
 mod tree_view_column;
 mod widget;
 
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+pub use accessible_text_range::AccessibleTextRange;
 pub use bitset_iter::BitsetIter;
 pub use border::Border;
 pub use builder_cscope::BuilderCScope;

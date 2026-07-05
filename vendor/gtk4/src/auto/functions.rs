@@ -6,7 +6,7 @@
 #[cfg_attr(docsrs, doc(cfg(target_os = "linux")))]
 use crate::Printer;
 use crate::{
-    Accessible, AccessibleProperty, AccessibleRelation, AccessibleRole, AccessibleState,
+    ffi, Accessible, AccessibleProperty, AccessibleRelation, AccessibleRole, AccessibleState,
     DebugFlags, PageSetup, PrintSettings, StyleContext, TextDirection, TreeModel, TreePath, Widget,
     Window,
 };
@@ -32,6 +32,16 @@ pub fn check_version(
             required_minor,
             required_micro,
         ))
+    }
+}
+
+#[cfg(feature = "v4_18")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+#[doc(alias = "gtk_disable_portals")]
+pub fn disable_portals() {
+    assert_not_initialized!();
+    unsafe {
+        ffi::gtk_disable_portals();
     }
 }
 

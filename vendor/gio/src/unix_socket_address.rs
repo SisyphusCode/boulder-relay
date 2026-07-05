@@ -9,7 +9,7 @@ use std::{path, ptr, slice};
 
 use glib::translate::*;
 
-use crate::{prelude::*, SocketAddress, UnixSocketAddress, UnixSocketAddressType};
+use crate::{ffi, prelude::*, SocketAddress, UnixSocketAddress, UnixSocketAddressType};
 
 #[derive(Debug)]
 pub enum UnixSocketAddressPath<'a> {
@@ -19,7 +19,7 @@ pub enum UnixSocketAddressPath<'a> {
     AbstractPadded(&'a [u8]),
 }
 
-impl<'a> UnixSocketAddressPath<'a> {
+impl UnixSocketAddressPath<'_> {
     fn to_type(&self) -> UnixSocketAddressType {
         use self::UnixSocketAddressPath::*;
 
@@ -73,7 +73,7 @@ mod sealed {
 pub trait UnixSocketAddressExtManual: sealed::Sealed + IsA<UnixSocketAddress> + 'static {
     #[doc(alias = "g_unix_socket_address_get_path")]
     #[doc(alias = "get_path")]
-    fn path(&self) -> Option<UnixSocketAddressPath> {
+    fn path(&self) -> Option<UnixSocketAddressPath<'_>> {
         use self::UnixSocketAddressPath::*;
 
         let path = unsafe {

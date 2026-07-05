@@ -3,7 +3,7 @@
 use glib::{translate::*, GString};
 use libc::{c_int, c_uint};
 
-use crate::{prelude::*, EntryBuffer};
+use crate::{ffi, prelude::*, EntryBuffer};
 
 impl EntryBuffer {
     #[doc(alias = "gtk_entry_buffer_new")]
@@ -24,7 +24,7 @@ macro_rules! to_u16 {
     ($e:expr) => (
         {
             let x = $e;
-            assert!(x as usize <= u16::max_value() as usize,
+            assert!(x as usize <= u16::MAX as usize,
                 "Unexpected value exceeding `u16` range");
             x as u16
         }

@@ -2,6 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use crate::ffi;
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -62,6 +63,7 @@ impl EntryBufferBuilder {
     /// Build the [`EntryBuffer`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> EntryBuffer {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }
@@ -110,7 +112,7 @@ pub trait EntryBufferExt: IsA<EntryBuffer> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::length\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_length_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -136,7 +138,7 @@ pub trait EntryBufferExt: IsA<EntryBuffer> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::max-length\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_max_length_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -159,7 +161,7 @@ pub trait EntryBufferExt: IsA<EntryBuffer> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::text\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_text_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

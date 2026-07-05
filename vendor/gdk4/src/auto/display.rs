@@ -9,8 +9,9 @@ use crate::DmabufFormats;
 #[cfg(feature = "v4_6")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_6")))]
 use crate::GLContext;
-use crate::{AppLaunchContext, Clipboard, Device, Event, Monitor, Seat, Surface};
+use crate::{ffi, AppLaunchContext, Clipboard, Device, Event, Monitor, Seat, Surface};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -138,6 +139,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
     #[doc(alias = "gdk_display_get_dmabuf_formats")]
     #[doc(alias = "get_dmabuf_formats")]
+    #[doc(alias = "dmabuf-formats")]
     fn dmabuf_formats(&self) -> DmabufFormats {
         unsafe {
             from_glib_none(ffi::gdk_display_get_dmabuf_formats(
@@ -201,6 +203,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gdk_display_is_composited")]
+    #[doc(alias = "composited")]
     fn is_composited(&self) -> bool {
         unsafe {
             from_glib(ffi::gdk_display_is_composited(
@@ -210,6 +213,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gdk_display_is_rgba")]
+    #[doc(alias = "rgba")]
     fn is_rgba(&self) -> bool {
         unsafe { from_glib(ffi::gdk_display_is_rgba(self.as_ref().to_glib_none().0)) }
     }
@@ -264,6 +268,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gdk_display_supports_input_shapes")]
+    #[doc(alias = "input-shapes")]
     fn supports_input_shapes(&self) -> bool {
         unsafe {
             from_glib(ffi::gdk_display_supports_input_shapes(
@@ -275,6 +280,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
     #[cfg(feature = "v4_14")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
     #[doc(alias = "gdk_display_supports_shadow_width")]
+    #[doc(alias = "shadow-width")]
     fn supports_shadow_width(&self) -> bool {
         unsafe {
             from_glib(ffi::gdk_display_supports_shadow_width(
@@ -288,11 +294,6 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
         unsafe {
             ffi::gdk_display_sync(self.as_ref().to_glib_none().0);
         }
-    }
-
-    #[doc(alias = "input-shapes")]
-    fn is_input_shapes(&self) -> bool {
-        ObjectExt::property(self.as_ref(), "input-shapes")
     }
 
     #[doc(alias = "closed")]
@@ -313,7 +314,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"closed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     closed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -335,7 +336,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"opened\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     opened_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -361,7 +362,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"seat-added\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     seat_added_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -390,7 +391,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"seat-removed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     seat_removed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -405,7 +406,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             F: Fn(&P, &str) + 'static,
         >(
             this: *mut ffi::GdkDisplay,
-            setting: *mut libc::c_char,
+            setting: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -419,7 +420,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"setting-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     setting_changed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -442,7 +443,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::composited\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_composited_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -470,7 +471,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::dmabuf-formats\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_dmabuf_formats_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -496,7 +497,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::input-shapes\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_input_shapes_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -519,7 +520,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::rgba\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_rgba_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -547,7 +548,7 @@ pub trait DisplayExt: IsA<Display> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::shadow-width\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_shadow_width_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

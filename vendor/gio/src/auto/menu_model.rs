@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{MenuAttributeIter, MenuLinkIter};
+use crate::{ffi, MenuAttributeIter, MenuLinkIter};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -119,9 +120,9 @@ pub trait MenuModelExt: IsA<MenuModel> + sealed::Sealed + 'static {
             F: Fn(&P, i32, i32, i32) + 'static,
         >(
             this: *mut ffi::GMenuModel,
-            position: libc::c_int,
-            removed: libc::c_int,
-            added: libc::c_int,
+            position: std::ffi::c_int,
+            removed: std::ffi::c_int,
+            added: std::ffi::c_int,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);

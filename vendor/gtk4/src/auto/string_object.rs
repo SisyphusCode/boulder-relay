@@ -2,6 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use crate::ffi;
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -46,7 +47,7 @@ impl StringObject {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::string\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_string_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

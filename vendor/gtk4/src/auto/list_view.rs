@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, LayoutManager,
+    ffi, Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, LayoutManager,
     ListBase, ListItemFactory, Orientable, Orientation, Overflow, Scrollable, ScrollablePolicy,
     SelectionModel, Widget,
 };
@@ -11,6 +11,7 @@ use crate::{
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
 use crate::{ListScrollFlags, ListTabBehavior, ScrollInfo};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -52,6 +53,7 @@ impl ListView {
 
     #[doc(alias = "gtk_list_view_get_enable_rubberband")]
     #[doc(alias = "get_enable_rubberband")]
+    #[doc(alias = "enable-rubberband")]
     pub fn enables_rubberband(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_list_view_get_enable_rubberband(
@@ -70,6 +72,7 @@ impl ListView {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_list_view_get_header_factory")]
     #[doc(alias = "get_header_factory")]
+    #[doc(alias = "header-factory")]
     pub fn header_factory(&self) -> Option<ListItemFactory> {
         unsafe { from_glib_none(ffi::gtk_list_view_get_header_factory(self.to_glib_none().0)) }
     }
@@ -82,6 +85,7 @@ impl ListView {
 
     #[doc(alias = "gtk_list_view_get_show_separators")]
     #[doc(alias = "get_show_separators")]
+    #[doc(alias = "show-separators")]
     pub fn shows_separators(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_list_view_get_show_separators(
@@ -92,6 +96,7 @@ impl ListView {
 
     #[doc(alias = "gtk_list_view_get_single_click_activate")]
     #[doc(alias = "get_single_click_activate")]
+    #[doc(alias = "single-click-activate")]
     pub fn is_single_click_activate(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_list_view_get_single_click_activate(
@@ -104,6 +109,7 @@ impl ListView {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_list_view_get_tab_behavior")]
     #[doc(alias = "get_tab_behavior")]
+    #[doc(alias = "tab-behavior")]
     pub fn tab_behavior(&self) -> ListTabBehavior {
         unsafe { from_glib(ffi::gtk_list_view_get_tab_behavior(self.to_glib_none().0)) }
     }
@@ -123,6 +129,7 @@ impl ListView {
     }
 
     #[doc(alias = "gtk_list_view_set_enable_rubberband")]
+    #[doc(alias = "enable-rubberband")]
     pub fn set_enable_rubberband(&self, enable_rubberband: bool) {
         unsafe {
             ffi::gtk_list_view_set_enable_rubberband(
@@ -133,6 +140,7 @@ impl ListView {
     }
 
     #[doc(alias = "gtk_list_view_set_factory")]
+    #[doc(alias = "factory")]
     pub fn set_factory(&self, factory: Option<&impl IsA<ListItemFactory>>) {
         unsafe {
             ffi::gtk_list_view_set_factory(
@@ -145,6 +153,7 @@ impl ListView {
     #[cfg(feature = "v4_12")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_list_view_set_header_factory")]
+    #[doc(alias = "header-factory")]
     pub fn set_header_factory(&self, factory: Option<&impl IsA<ListItemFactory>>) {
         unsafe {
             ffi::gtk_list_view_set_header_factory(
@@ -155,6 +164,7 @@ impl ListView {
     }
 
     #[doc(alias = "gtk_list_view_set_model")]
+    #[doc(alias = "model")]
     pub fn set_model(&self, model: Option<&impl IsA<SelectionModel>>) {
         unsafe {
             ffi::gtk_list_view_set_model(
@@ -165,6 +175,7 @@ impl ListView {
     }
 
     #[doc(alias = "gtk_list_view_set_show_separators")]
+    #[doc(alias = "show-separators")]
     pub fn set_show_separators(&self, show_separators: bool) {
         unsafe {
             ffi::gtk_list_view_set_show_separators(
@@ -175,6 +186,7 @@ impl ListView {
     }
 
     #[doc(alias = "gtk_list_view_set_single_click_activate")]
+    #[doc(alias = "single-click-activate")]
     pub fn set_single_click_activate(&self, single_click_activate: bool) {
         unsafe {
             ffi::gtk_list_view_set_single_click_activate(
@@ -187,6 +199,7 @@ impl ListView {
     #[cfg(feature = "v4_12")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_list_view_set_tab_behavior")]
+    #[doc(alias = "tab-behavior")]
     pub fn set_tab_behavior(&self, tab_behavior: ListTabBehavior) {
         unsafe {
             ffi::gtk_list_view_set_tab_behavior(self.to_glib_none().0, tab_behavior.into_glib());
@@ -197,7 +210,7 @@ impl ListView {
     pub fn connect_activate<F: Fn(&Self, u32) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn activate_trampoline<F: Fn(&ListView, u32) + 'static>(
             this: *mut ffi::GtkListView,
-            position: libc::c_uint,
+            position: std::ffi::c_uint,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -208,7 +221,7 @@ impl ListView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -234,7 +247,7 @@ impl ListView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::enable-rubberband\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_enable_rubberband_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -257,7 +270,7 @@ impl ListView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::factory\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_factory_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -282,7 +295,7 @@ impl ListView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::header-factory\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_header_factory_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -305,7 +318,7 @@ impl ListView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::model\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_model_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -328,7 +341,7 @@ impl ListView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-separators\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_separators_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -354,7 +367,7 @@ impl ListView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::single-click-activate\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_single_click_activate_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -379,7 +392,7 @@ impl ListView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::tab-behavior\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_tab_behavior_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -548,6 +561,14 @@ impl ListViewBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -684,6 +705,7 @@ impl ListViewBuilder {
     /// Build the [`ListView`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> ListView {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

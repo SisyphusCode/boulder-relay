@@ -9,9 +9,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+## [0.20.8] - 2026-05-29
+### Changed
+- [PR#89](https://github.com/EmbarkStudios/cfg-expr/pull/89) updated the builtin target list to 1.96.0, 1.95.0 was skipped as it had zero changes to the target list.
+
+## [0.20.7] - 2026-03-06
+### Changed
+- [PR#87](https://github.com/EmbarkStudios/cfg-expr/pull/87) updated the builtin target list to 1.94.0.
+
+## [0.20.6] - 2026-01-22
+### Changed
+- [PR#86](https://github.com/EmbarkStudios/cfg-expr/pull/86) updated the builtin target list to 1.93.0.
+
+## [0.20.5] - 2025-12-12
+### Changed
+- [PR#85](https://github.com/EmbarkStudios/cfg-expr/pull/85) updated the builtin target list to 1.92.0.
+
+## [0.20.4] - 2025-10-31
+### Changed
+- [PR#83](https://github.com/EmbarkStudios/cfg-expr/pull/83) updated the builtin target list to 1.91.0.
+
+## [0.20.3] - 2025-09-18
+### Changed
+- [PR#82](https://github.com/EmbarkStudios/cfg-expr/pull/82) updated the builtin target list to 1.90.0.
+
+## [0.20.2] - 2025-08-07
+### Changed
+- [PR#81](https://github.com/EmbarkStudios/cfg-expr/pull/81) updated the builtin target list to 1.89.0.
+
+## [0.20.1] - 2025-07-07
+### Changed
+- [PR#80](https://github.com/EmbarkStudios/cfg-expr/pull/80) updated the builtin target list to 1.88.0.
+
+## [0.20.0] - 2025-05-16
+### Changed
+- [PR#79](https://github.com/EmbarkStudios/cfg-expr/pull/79) updated the builtin target list to 1.87.0.
+
+## [0.19.0] - 2025-04-03
+### Changed
+- [PR#78](https://github.com/EmbarkStudios/cfg-expr/pull/78) updated the builtin target list to 1.86.0.
+- [PR#78](https://github.com/EmbarkStudios/cfg-expr/pull/78) changed the MSRV to 1.85.0 and the edition to 2024.
+
+## [0.18.0] - 2025-02-20
+### Changed
+- [PR#77](https://github.com/EmbarkStudios/cfg-expr/pull/77) updated the builtin target list to 1.84.1 and 1.85.0.
+
+## [0.17.2] - 2024-11-29
+### Changed
+- [PR#76](https://github.com/EmbarkStudios/cfg-expr/pull/76) updated the builtin target list to 1.83.0.
+
+## [0.17.1] - 2024-11-15
+### Changed
+- [PR#75](https://github.com/EmbarkStudios/cfg-expr/pull/75) updated the builtin target list to 1.82.0.
+
+## [0.17.0] - 2024-09-05
+### Changed
+- [PR#74](https://github.com/EmbarkStudios/cfg-expr/pull/74) updated the builtin target list to 1.81.0.
+
+## [0.16.0] - 2024-07-29
+### Changed
+- [PR#70](https://github.com/EmbarkStudios/cfg-expr/pull/70) updated the builtin target list to 1.80.0. Thanks [@sunshowers](https://github.com/sunshowers)!
+
 ## [0.15.8] - 2024-04-10
 ### Changed
-- [PR#69](https://github.com/EmbarkStudios/cfg-expr/pull/67) updated the builtin target list to 1.77.2.
+- [PR#69](https://github.com/EmbarkStudios/cfg-expr/pull/69) updated the builtin target list to 1.77.2.
 
 ## [0.15.7] - 2024-02-09
 ### Changed
@@ -170,7 +231,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial add of all the things
 
 <!-- next-url -->
-[Unreleased]: https://github.com/EmbarkStudios/cfg-expr/compare/0.15.8...HEAD
+[Unreleased]: https://github.com/EmbarkStudios/cfg-expr/compare/0.20.8...HEAD
+[0.20.8]: https://github.com/EmbarkStudios/cfg-expr/compare/0.20.7...0.20.8
+[0.20.7]: https://github.com/EmbarkStudios/cfg-expr/compare/0.20.6...0.20.7
+[0.20.6]: https://github.com/EmbarkStudios/cfg-expr/compare/0.20.5...0.20.6
+[0.20.5]: https://github.com/EmbarkStudios/cfg-expr/compare/0.20.4...0.20.5
+[0.20.4]: https://github.com/EmbarkStudios/cfg-expr/compare/0.20.3...0.20.4
+[0.20.3]: https://github.com/EmbarkStudios/cfg-expr/compare/0.20.2...0.20.3
+[0.20.2]: https://github.com/EmbarkStudios/cfg-expr/compare/0.20.1...0.20.2
+[0.20.1]: https://github.com/EmbarkStudios/cfg-expr/compare/0.20.0...0.20.1
+[0.20.0]: https://github.com/EmbarkStudios/cfg-expr/compare/0.19.0...0.20.0
+[0.19.0]: https://github.com/EmbarkStudios/cfg-expr/compare/0.18.0...0.19.0
+[0.18.0]: https://github.com/EmbarkStudios/cfg-expr/compare/0.17.2...0.18.0
+[0.17.2]: https://github.com/EmbarkStudios/cfg-expr/compare/0.17.1...0.17.2
+[0.17.1]: https://github.com/EmbarkStudios/cfg-expr/compare/0.17.0...0.17.1
+[0.17.0]: https://github.com/EmbarkStudios/cfg-expr/compare/0.16.0...0.17.0
+[0.16.0]: https://github.com/EmbarkStudios/cfg-expr/compare/0.15.8...0.16.0
 [0.15.8]: https://github.com/EmbarkStudios/cfg-expr/compare/0.15.7...0.15.8
 [0.15.7]: https://github.com/EmbarkStudios/cfg-expr/compare/0.15.6...0.15.7
 [0.15.6]: https://github.com/EmbarkStudios/cfg-expr/compare/0.15.5...0.15.6

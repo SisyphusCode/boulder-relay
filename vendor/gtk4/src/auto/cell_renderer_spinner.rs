@@ -3,7 +3,7 @@
 // DO NOT EDIT
 #![allow(deprecated)]
 
-use crate::{CellRenderer, CellRendererMode, IconSize};
+use crate::{ffi, CellRenderer, CellRendererMode, IconSize};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -76,7 +76,7 @@ impl CellRendererSpinner {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::active\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_active_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -99,7 +99,7 @@ impl CellRendererSpinner {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::pulse\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_pulse_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -122,7 +122,7 @@ impl CellRendererSpinner {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::size\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_size_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -265,6 +265,7 @@ impl CellRendererSpinnerBuilder {
     /// Build the [`CellRendererSpinner`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> CellRendererSpinner {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

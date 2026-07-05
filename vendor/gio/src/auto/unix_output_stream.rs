@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{FileDescriptorBased, OutputStream, PollableOutputStream};
+use crate::{ffi, FileDescriptorBased, OutputStream, PollableOutputStream};
 use glib::{prelude::*, translate::*};
 
 glib::wrapper! {
@@ -26,6 +26,7 @@ mod sealed {
 pub trait UnixOutputStreamExt: IsA<UnixOutputStream> + sealed::Sealed + 'static {
     #[doc(alias = "g_unix_output_stream_get_close_fd")]
     #[doc(alias = "get_close_fd")]
+    #[doc(alias = "close-fd")]
     fn closes_fd(&self) -> bool {
         unsafe {
             from_glib(ffi::g_unix_output_stream_get_close_fd(

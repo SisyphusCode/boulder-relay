@@ -3,8 +3,9 @@
 // DO NOT EDIT
 #![allow(deprecated)]
 
-use crate::{CellRenderer, CellRendererMode, TreePath};
+use crate::{ffi, CellRenderer, CellRendererMode, TreePath};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -41,6 +42,7 @@ impl CellRendererToggle {
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_renderer_toggle_get_activatable")]
     #[doc(alias = "get_activatable")]
+    #[doc(alias = "activatable")]
     pub fn is_activatable(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_cell_renderer_toggle_get_activatable(
@@ -53,6 +55,7 @@ impl CellRendererToggle {
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_renderer_toggle_get_active")]
     #[doc(alias = "get_active")]
+    #[doc(alias = "active")]
     pub fn is_active(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_cell_renderer_toggle_get_active(
@@ -65,6 +68,7 @@ impl CellRendererToggle {
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_renderer_toggle_get_radio")]
     #[doc(alias = "get_radio")]
+    #[doc(alias = "radio")]
     pub fn is_radio(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_cell_renderer_toggle_get_radio(
@@ -76,6 +80,7 @@ impl CellRendererToggle {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_renderer_toggle_set_activatable")]
+    #[doc(alias = "activatable")]
     pub fn set_activatable(&self, setting: bool) {
         unsafe {
             ffi::gtk_cell_renderer_toggle_set_activatable(
@@ -88,6 +93,7 @@ impl CellRendererToggle {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_renderer_toggle_set_active")]
+    #[doc(alias = "active")]
     pub fn set_active(&self, setting: bool) {
         unsafe {
             ffi::gtk_cell_renderer_toggle_set_active(self.to_glib_none().0, setting.into_glib());
@@ -97,6 +103,7 @@ impl CellRendererToggle {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_renderer_toggle_set_radio")]
+    #[doc(alias = "radio")]
     pub fn set_radio(&self, radio: bool) {
         unsafe {
             ffi::gtk_cell_renderer_toggle_set_radio(self.to_glib_none().0, radio.into_glib());
@@ -115,7 +122,7 @@ impl CellRendererToggle {
     pub fn connect_toggled<F: Fn(&Self, TreePath) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn toggled_trampoline<F: Fn(&CellRendererToggle, TreePath) + 'static>(
             this: *mut ffi::GtkCellRendererToggle,
-            path: *mut libc::c_char,
+            path: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -127,7 +134,7 @@ impl CellRendererToggle {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"toggled\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     toggled_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -150,7 +157,7 @@ impl CellRendererToggle {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::activatable\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_activatable_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -173,7 +180,7 @@ impl CellRendererToggle {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::active\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_active_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -198,7 +205,7 @@ impl CellRendererToggle {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::inconsistent\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_inconsistent_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -221,7 +228,7 @@ impl CellRendererToggle {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::radio\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_radio_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -370,6 +377,7 @@ impl CellRendererToggleBuilder {
     /// Build the [`CellRendererToggle`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> CellRendererToggle {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

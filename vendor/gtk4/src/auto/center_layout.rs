@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{BaselinePosition, LayoutManager, Orientation, Widget};
+use crate::{ffi, BaselinePosition, LayoutManager, Orientation, Widget};
 #[cfg(feature = "v4_12")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
 use glib::signal::{connect_raw, SignalHandlerId};
@@ -67,6 +67,7 @@ impl CenterLayout {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_center_layout_get_shrink_center_last")]
     #[doc(alias = "get_shrink_center_last")]
+    #[doc(alias = "shrink-center-last")]
     pub fn shrinks_center_last(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_center_layout_get_shrink_center_last(
@@ -125,6 +126,7 @@ impl CenterLayout {
     #[cfg(feature = "v4_12")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_center_layout_set_shrink_center_last")]
+    #[doc(alias = "shrink-center-last")]
     pub fn set_shrink_center_last(&self, shrink_center_last: bool) {
         unsafe {
             ffi::gtk_center_layout_set_shrink_center_last(
@@ -166,7 +168,7 @@ impl CenterLayout {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::shrink-center-last\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_shrink_center_last_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::Orientation;
+use crate::{ffi, Orientation};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -40,6 +40,7 @@ pub trait OrientableExt: IsA<Orientable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_orientable_set_orientation")]
+    #[doc(alias = "orientation")]
     fn set_orientation(&self, orientation: Orientation) {
         unsafe {
             ffi::gtk_orientable_set_orientation(
@@ -67,7 +68,7 @@ pub trait OrientableExt: IsA<Orientable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::orientation\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_orientation_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

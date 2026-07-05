@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{AsyncResult, Cancellable, Initable, NetworkConnectivity, SocketConnectable};
+use crate::{ffi, AsyncResult, Cancellable, Initable, NetworkConnectivity, SocketConnectable};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -86,8 +87,7 @@ pub trait NetworkMonitorExt: IsA<NetworkMonitor> + sealed::Sealed + 'static {
             user_data: glib::ffi::gpointer,
         ) {
             let mut error = std::ptr::null_mut();
-            let _ =
-                ffi::g_network_monitor_can_reach_finish(_source_object as *mut _, res, &mut error);
+            ffi::g_network_monitor_can_reach_finish(_source_object as *mut _, res, &mut error);
             let result = if error.is_null() {
                 Ok(())
             } else {
@@ -137,6 +137,7 @@ pub trait NetworkMonitorExt: IsA<NetworkMonitor> + sealed::Sealed + 'static {
 
     #[doc(alias = "g_network_monitor_get_network_available")]
     #[doc(alias = "get_network_available")]
+    #[doc(alias = "network-available")]
     fn is_network_available(&self) -> bool {
         unsafe {
             from_glib(ffi::g_network_monitor_get_network_available(
@@ -147,6 +148,7 @@ pub trait NetworkMonitorExt: IsA<NetworkMonitor> + sealed::Sealed + 'static {
 
     #[doc(alias = "g_network_monitor_get_network_metered")]
     #[doc(alias = "get_network_metered")]
+    #[doc(alias = "network-metered")]
     fn is_network_metered(&self) -> bool {
         unsafe {
             from_glib(ffi::g_network_monitor_get_network_metered(

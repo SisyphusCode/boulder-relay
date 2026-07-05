@@ -3,10 +3,11 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, FlowBoxChild,
+    ffi, Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, FlowBoxChild,
     LayoutManager, MovementStep, Orientable, Orientation, Overflow, SelectionMode, Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -82,6 +83,7 @@ impl FlowBox {
 
     #[doc(alias = "gtk_flow_box_get_activate_on_single_click")]
     #[doc(alias = "get_activate_on_single_click")]
+    #[doc(alias = "activate-on-single-click")]
     pub fn activates_on_single_click(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_flow_box_get_activate_on_single_click(
@@ -115,30 +117,35 @@ impl FlowBox {
 
     #[doc(alias = "gtk_flow_box_get_column_spacing")]
     #[doc(alias = "get_column_spacing")]
+    #[doc(alias = "column-spacing")]
     pub fn column_spacing(&self) -> u32 {
         unsafe { ffi::gtk_flow_box_get_column_spacing(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_flow_box_get_homogeneous")]
     #[doc(alias = "get_homogeneous")]
+    #[doc(alias = "homogeneous")]
     pub fn is_homogeneous(&self) -> bool {
         unsafe { from_glib(ffi::gtk_flow_box_get_homogeneous(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_flow_box_get_max_children_per_line")]
     #[doc(alias = "get_max_children_per_line")]
+    #[doc(alias = "max-children-per-line")]
     pub fn max_children_per_line(&self) -> u32 {
         unsafe { ffi::gtk_flow_box_get_max_children_per_line(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_flow_box_get_min_children_per_line")]
     #[doc(alias = "get_min_children_per_line")]
+    #[doc(alias = "min-children-per-line")]
     pub fn min_children_per_line(&self) -> u32 {
         unsafe { ffi::gtk_flow_box_get_min_children_per_line(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_flow_box_get_row_spacing")]
     #[doc(alias = "get_row_spacing")]
+    #[doc(alias = "row-spacing")]
     pub fn row_spacing(&self) -> u32 {
         unsafe { ffi::gtk_flow_box_get_row_spacing(self.to_glib_none().0) }
     }
@@ -155,6 +162,7 @@ impl FlowBox {
 
     #[doc(alias = "gtk_flow_box_get_selection_mode")]
     #[doc(alias = "get_selection_mode")]
+    #[doc(alias = "selection-mode")]
     pub fn selection_mode(&self) -> SelectionMode {
         unsafe { from_glib(ffi::gtk_flow_box_get_selection_mode(self.to_glib_none().0)) }
     }
@@ -225,7 +233,7 @@ impl FlowBox {
 
     #[doc(alias = "gtk_flow_box_selected_foreach")]
     pub fn selected_foreach<P: FnMut(&FlowBox, &FlowBoxChild)>(&self, func: P) {
-        let func_data: P = func;
+        let mut func_data: P = func;
         unsafe extern "C" fn func_func<P: FnMut(&FlowBox, &FlowBoxChild)>(
             box_: *mut ffi::GtkFlowBox,
             child: *mut ffi::GtkFlowBoxChild,
@@ -237,17 +245,18 @@ impl FlowBox {
             (*callback)(&box_, &child)
         }
         let func = Some(func_func::<P> as _);
-        let super_callback0: &P = &func_data;
+        let super_callback0: &mut P = &mut func_data;
         unsafe {
             ffi::gtk_flow_box_selected_foreach(
                 self.to_glib_none().0,
                 func,
-                super_callback0 as *const _ as *mut _,
+                super_callback0 as *mut _ as *mut _,
             );
         }
     }
 
     #[doc(alias = "gtk_flow_box_set_activate_on_single_click")]
+    #[doc(alias = "activate-on-single-click")]
     pub fn set_activate_on_single_click(&self, single: bool) {
         unsafe {
             ffi::gtk_flow_box_set_activate_on_single_click(
@@ -258,6 +267,7 @@ impl FlowBox {
     }
 
     #[doc(alias = "gtk_flow_box_set_column_spacing")]
+    #[doc(alias = "column-spacing")]
     pub fn set_column_spacing(&self, spacing: u32) {
         unsafe {
             ffi::gtk_flow_box_set_column_spacing(self.to_glib_none().0, spacing);
@@ -304,6 +314,7 @@ impl FlowBox {
     }
 
     #[doc(alias = "gtk_flow_box_set_homogeneous")]
+    #[doc(alias = "homogeneous")]
     pub fn set_homogeneous(&self, homogeneous: bool) {
         unsafe {
             ffi::gtk_flow_box_set_homogeneous(self.to_glib_none().0, homogeneous.into_glib());
@@ -311,6 +322,7 @@ impl FlowBox {
     }
 
     #[doc(alias = "gtk_flow_box_set_max_children_per_line")]
+    #[doc(alias = "max-children-per-line")]
     pub fn set_max_children_per_line(&self, n_children: u32) {
         unsafe {
             ffi::gtk_flow_box_set_max_children_per_line(self.to_glib_none().0, n_children);
@@ -318,6 +330,7 @@ impl FlowBox {
     }
 
     #[doc(alias = "gtk_flow_box_set_min_children_per_line")]
+    #[doc(alias = "min-children-per-line")]
     pub fn set_min_children_per_line(&self, n_children: u32) {
         unsafe {
             ffi::gtk_flow_box_set_min_children_per_line(self.to_glib_none().0, n_children);
@@ -325,6 +338,7 @@ impl FlowBox {
     }
 
     #[doc(alias = "gtk_flow_box_set_row_spacing")]
+    #[doc(alias = "row-spacing")]
     pub fn set_row_spacing(&self, spacing: u32) {
         unsafe {
             ffi::gtk_flow_box_set_row_spacing(self.to_glib_none().0, spacing);
@@ -332,6 +346,7 @@ impl FlowBox {
     }
 
     #[doc(alias = "gtk_flow_box_set_selection_mode")]
+    #[doc(alias = "selection-mode")]
     pub fn set_selection_mode(&self, mode: SelectionMode) {
         unsafe {
             ffi::gtk_flow_box_set_selection_mode(self.to_glib_none().0, mode.into_glib());
@@ -389,7 +404,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate-cursor-child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_cursor_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -421,7 +436,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"child-activated\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     child_activated_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -439,7 +454,7 @@ impl FlowBox {
         >(
             this: *mut ffi::GtkFlowBox,
             step: ffi::GtkMovementStep,
-            count: libc::c_int,
+            count: std::ffi::c_int,
             extend: glib::ffi::gboolean,
             modify: glib::ffi::gboolean,
             f: glib::ffi::gpointer,
@@ -459,7 +474,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"move-cursor\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     move_cursor_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -491,7 +506,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"select-all\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     select_all_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -520,7 +535,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"selected-children-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     selected_children_changed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -542,7 +557,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"toggle-cursor-child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     toggle_cursor_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -568,7 +583,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"unselect-all\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     unselect_all_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -600,7 +615,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::accept-unpaired-release\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_accept_unpaired_release_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -628,7 +643,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::activate-on-single-click\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_activate_on_single_click_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -651,7 +666,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::column-spacing\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_column_spacing_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -674,7 +689,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::homogeneous\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_homogeneous_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -700,7 +715,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::max-children-per-line\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_max_children_per_line_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -726,7 +741,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::min-children-per-line\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_min_children_per_line_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -749,7 +764,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::row-spacing\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_row_spacing_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -772,7 +787,7 @@ impl FlowBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::selection-mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_selection_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -939,6 +954,14 @@ impl FlowBoxBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -1053,6 +1076,7 @@ impl FlowBoxBuilder {
     /// Build the [`FlowBox`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> FlowBox {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

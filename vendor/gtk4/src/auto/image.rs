@@ -4,7 +4,7 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, IconSize, ImageType,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, IconSize, ImageType,
     LayoutManager, Overflow, Widget,
 };
 use glib::{
@@ -125,12 +125,14 @@ impl Image {
 
     #[doc(alias = "gtk_image_get_icon_name")]
     #[doc(alias = "get_icon_name")]
+    #[doc(alias = "icon-name")]
     pub fn icon_name(&self) -> Option<glib::GString> {
         unsafe { from_glib_none(ffi::gtk_image_get_icon_name(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_image_get_icon_size")]
     #[doc(alias = "get_icon_size")]
+    #[doc(alias = "icon-size")]
     pub fn icon_size(&self) -> IconSize {
         unsafe { from_glib(ffi::gtk_image_get_icon_size(self.to_glib_none().0)) }
     }
@@ -143,17 +145,20 @@ impl Image {
 
     #[doc(alias = "gtk_image_get_pixel_size")]
     #[doc(alias = "get_pixel_size")]
+    #[doc(alias = "pixel-size")]
     pub fn pixel_size(&self) -> i32 {
         unsafe { ffi::gtk_image_get_pixel_size(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_image_get_storage_type")]
     #[doc(alias = "get_storage_type")]
+    #[doc(alias = "storage-type")]
     pub fn storage_type(&self) -> ImageType {
         unsafe { from_glib(ffi::gtk_image_get_storage_type(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_image_set_from_file")]
+    #[doc(alias = "file")]
     pub fn set_from_file(&self, filename: Option<impl AsRef<std::path::Path>>) {
         unsafe {
             ffi::gtk_image_set_from_file(
@@ -164,6 +169,7 @@ impl Image {
     }
 
     #[doc(alias = "gtk_image_set_from_gicon")]
+    #[doc(alias = "gicon")]
     pub fn set_from_gicon(&self, icon: &impl IsA<gio::Icon>) {
         unsafe {
             ffi::gtk_image_set_from_gicon(self.to_glib_none().0, icon.as_ref().to_glib_none().0);
@@ -171,14 +177,18 @@ impl Image {
     }
 
     #[doc(alias = "gtk_image_set_from_icon_name")]
-    pub fn set_from_icon_name(&self, icon_name: Option<&str>) {
+    #[doc(alias = "set_from_icon_name")]
+    #[doc(alias = "icon-name")]
+    pub fn set_icon_name(&self, icon_name: Option<&str>) {
         unsafe {
             ffi::gtk_image_set_from_icon_name(self.to_glib_none().0, icon_name.to_glib_none().0);
         }
     }
 
     #[doc(alias = "gtk_image_set_from_paintable")]
-    pub fn set_from_paintable(&self, paintable: Option<&impl IsA<gdk::Paintable>>) {
+    #[doc(alias = "set_from_paintable")]
+    #[doc(alias = "paintable")]
+    pub fn set_paintable(&self, paintable: Option<&impl IsA<gdk::Paintable>>) {
         unsafe {
             ffi::gtk_image_set_from_paintable(
                 self.to_glib_none().0,
@@ -197,13 +207,16 @@ impl Image {
     }
 
     #[doc(alias = "gtk_image_set_from_resource")]
-    pub fn set_from_resource(&self, resource_path: Option<&str>) {
+    #[doc(alias = "set_from_resource")]
+    #[doc(alias = "resource")]
+    pub fn set_resource(&self, resource_path: Option<&str>) {
         unsafe {
             ffi::gtk_image_set_from_resource(self.to_glib_none().0, resource_path.to_glib_none().0);
         }
     }
 
     #[doc(alias = "gtk_image_set_icon_size")]
+    #[doc(alias = "icon-size")]
     pub fn set_icon_size(&self, icon_size: IconSize) {
         unsafe {
             ffi::gtk_image_set_icon_size(self.to_glib_none().0, icon_size.into_glib());
@@ -211,6 +224,7 @@ impl Image {
     }
 
     #[doc(alias = "gtk_image_set_pixel_size")]
+    #[doc(alias = "pixel-size")]
     pub fn set_pixel_size(&self, pixel_size: i32) {
         unsafe {
             ffi::gtk_image_set_pixel_size(self.to_glib_none().0, pixel_size);
@@ -221,29 +235,8 @@ impl Image {
         ObjectExt::property(self, "file")
     }
 
-    pub fn set_file(&self, file: Option<&str>) {
-        ObjectExt::set_property(self, "file", file)
-    }
-
-    pub fn set_gicon<P: IsA<gio::Icon>>(&self, gicon: Option<&P>) {
-        ObjectExt::set_property(self, "gicon", gicon)
-    }
-
-    #[doc(alias = "icon-name")]
-    pub fn set_icon_name(&self, icon_name: Option<&str>) {
-        ObjectExt::set_property(self, "icon-name", icon_name)
-    }
-
-    pub fn set_paintable<P: IsA<gdk::Paintable>>(&self, paintable: Option<&P>) {
-        ObjectExt::set_property(self, "paintable", paintable)
-    }
-
     pub fn resource(&self) -> Option<glib::GString> {
         ObjectExt::property(self, "resource")
-    }
-
-    pub fn set_resource(&self, resource: Option<&str>) {
-        ObjectExt::set_property(self, "resource", resource)
     }
 
     #[doc(alias = "use-fallback")]
@@ -271,7 +264,7 @@ impl Image {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::file\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_file_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -294,7 +287,7 @@ impl Image {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::gicon\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_gicon_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -317,7 +310,7 @@ impl Image {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::icon-name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_icon_name_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -340,7 +333,7 @@ impl Image {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::icon-size\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_icon_size_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -363,7 +356,7 @@ impl Image {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::paintable\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_paintable_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -386,7 +379,7 @@ impl Image {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::pixel-size\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_pixel_size_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -409,7 +402,7 @@ impl Image {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::resource\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_resource_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -432,7 +425,7 @@ impl Image {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::storage-type\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_storage_type_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -455,7 +448,7 @@ impl Image {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-fallback\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_fallback_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -616,6 +609,14 @@ impl ImageBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -724,6 +725,7 @@ impl ImageBuilder {
     /// Build the [`Image`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Image {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

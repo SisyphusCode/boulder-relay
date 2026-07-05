@@ -49,11 +49,11 @@ Use this in to your `Cargo.toml`:
 
 ```toml
 # Core library
-relm4 = "0.8"
+relm4 = "0.9"
 # Optional: reusable components
-relm4-components = "0.8"
+relm4-components = "0.9"
 # Optional: icons (more info at https://github.com/Relm4/icons)
-relm4-icons = "0.8.0"
+relm4-icons = "0.9.0"
 ```
 
 ### Features
@@ -174,6 +174,10 @@ fn main() {
 - [Rhino Setup](https://github.com/rhino-linux/rhino-setup) - Setup wizard for [Rolling Rhino](https://rhinolinux.org/)
 - [Lemoa](https://github.com/lemmy-gtk/lemoa) - Desktop client for Lemmy
 - [Score Tracker](https://github.com/weclaw1/score-tracker) - App for tracking player scores in card and board games
+- [Spidey](https://github.com/kdwk/Spidey) - A seamless and distraction-free work and play environment on the web
+- [Toolbox Tuner](https://github.com/13hannes11/toolbox-tuner) - An application to manage Toolbx containers
+- [BitRitter](https://codeberg.org/Chfkch/bitritter) - A bitwarden/vaultwarden client with mobile devices in mind
+- [Space Acres](https://github.com/autonomys/space-acres) - An opinionated GUI application for farming on Autonomys Network
 
 ## License
 

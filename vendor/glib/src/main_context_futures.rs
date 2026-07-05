@@ -1,7 +1,8 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
 use std::{
-    any::Any, cell::Cell, marker::PhantomData, mem, num::NonZeroU32, panic, pin::Pin, ptr, thread,
+    any::Any, cell::Cell, fmt, marker::PhantomData, mem, num::NonZeroU32, panic, pin::Pin, ptr,
+    thread,
 };
 
 use futures_channel::oneshot;
@@ -13,7 +14,7 @@ use futures_task::{FutureObj, LocalFutureObj, LocalSpawn, Spawn, SpawnError};
 use futures_util::FutureExt;
 
 use crate::{
-    thread_guard::ThreadGuard, translate::*, MainContext, MainLoop, Priority, Source, SourceId,
+    ffi, thread_guard::ThreadGuard, translate::*, MainContext, MainLoop, Priority, Source, SourceId,
 };
 
 // Wrapper around Send Futures and non-Send Futures that will panic
@@ -491,11 +492,9 @@ impl std::fmt::Display for JoinError {
     }
 }
 
-#[derive(thiserror::Error, Debug)]
+#[derive(Debug)]
 enum JoinErrorInner {
-    #[error("task cancelled")]
     Cancelled,
-    #[error("task panicked")]
     Panic(Box<dyn Any + Send + 'static>),
 }
 
@@ -503,6 +502,17 @@ impl From<JoinErrorInner> for JoinError {
     #[inline]
     fn from(e: JoinErrorInner) -> Self {
         Self(e)
+    }
+}
+
+impl std::error::Error for JoinErrorInner {}
+
+impl fmt::Display for JoinErrorInner {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Cancelled => fmt.write_str("task cancelled"),
+            Self::Panic(_) => fmt.write_str("task panicked"),
+        }
     }
 }
 
@@ -723,13 +733,15 @@ mod tests {
                 }),
         );
 
-        thread::spawn(move || {
+        let join_handle = thread::spawn(move || {
             l.run();
         });
 
         o_sender.send(()).unwrap();
 
         receiver.recv().unwrap();
+
+        join_handle.join().unwrap();
     }
 
     #[test]
@@ -753,7 +765,7 @@ mod tests {
         let c = MainContext::new();
         let l = crate::MainLoop::new(Some(&c), false);
 
-        std::thread::spawn({
+        let join_handle = std::thread::spawn({
             let l_clone = l.clone();
             move || {
                 c.spawn_from_within(move || async move {
@@ -766,6 +778,8 @@ mod tests {
         });
 
         l.run();
+
+        join_handle.join().unwrap();
     }
 
     #[test]

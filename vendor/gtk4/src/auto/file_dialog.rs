@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{FileFilter, Window};
+use crate::{ffi, FileFilter, Window};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -36,12 +36,14 @@ impl FileDialog {
 
     #[doc(alias = "gtk_file_dialog_get_accept_label")]
     #[doc(alias = "get_accept_label")]
+    #[doc(alias = "accept-label")]
     pub fn accept_label(&self) -> Option<glib::GString> {
         unsafe { from_glib_none(ffi::gtk_file_dialog_get_accept_label(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_file_dialog_get_default_filter")]
     #[doc(alias = "get_default_filter")]
+    #[doc(alias = "default-filter")]
     pub fn default_filter(&self) -> Option<FileFilter> {
         unsafe {
             from_glib_none(ffi::gtk_file_dialog_get_default_filter(
@@ -58,12 +60,14 @@ impl FileDialog {
 
     #[doc(alias = "gtk_file_dialog_get_initial_file")]
     #[doc(alias = "get_initial_file")]
+    #[doc(alias = "initial-file")]
     pub fn initial_file(&self) -> Option<gio::File> {
         unsafe { from_glib_none(ffi::gtk_file_dialog_get_initial_file(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_file_dialog_get_initial_folder")]
     #[doc(alias = "get_initial_folder")]
+    #[doc(alias = "initial-folder")]
     pub fn initial_folder(&self) -> Option<gio::File> {
         unsafe {
             from_glib_none(ffi::gtk_file_dialog_get_initial_folder(
@@ -74,12 +78,14 @@ impl FileDialog {
 
     #[doc(alias = "gtk_file_dialog_get_initial_name")]
     #[doc(alias = "get_initial_name")]
+    #[doc(alias = "initial-name")]
     pub fn initial_name(&self) -> Option<glib::GString> {
         unsafe { from_glib_none(ffi::gtk_file_dialog_get_initial_name(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_file_dialog_get_modal")]
     #[doc(alias = "get_modal")]
+    #[doc(alias = "modal")]
     pub fn is_modal(&self) -> bool {
         unsafe { from_glib(ffi::gtk_file_dialog_get_modal(self.to_glib_none().0)) }
     }
@@ -227,6 +233,174 @@ impl FileDialog {
         }))
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "gtk_file_dialog_open_multiple_text_files")]
+    pub fn open_multiple_text_files<
+        P: FnOnce(Result<(Option<gio::ListModel>, glib::GString), glib::Error>) + 'static,
+    >(
+        &self,
+        parent: Option<&impl IsA<Window>>,
+        cancellable: Option<&impl IsA<gio::Cancellable>>,
+        callback: P,
+    ) {
+        let main_context = glib::MainContext::ref_thread_default();
+        let is_main_context_owner = main_context.is_owner();
+        let has_acquired_main_context = (!is_main_context_owner)
+            .then(|| main_context.acquire().ok())
+            .flatten();
+        assert!(
+            is_main_context_owner || has_acquired_main_context.is_some(),
+            "Async operations only allowed if the thread is owning the MainContext"
+        );
+
+        let user_data: Box_<glib::thread_guard::ThreadGuard<P>> =
+            Box_::new(glib::thread_guard::ThreadGuard::new(callback));
+        unsafe extern "C" fn open_multiple_text_files_trampoline<
+            P: FnOnce(Result<(Option<gio::ListModel>, glib::GString), glib::Error>) + 'static,
+        >(
+            _source_object: *mut glib::gobject_ffi::GObject,
+            res: *mut gio::ffi::GAsyncResult,
+            user_data: glib::ffi::gpointer,
+        ) {
+            let mut error = std::ptr::null_mut();
+            let mut encoding = std::ptr::null();
+            let ret = ffi::gtk_file_dialog_open_multiple_text_files_finish(
+                _source_object as *mut _,
+                res,
+                &mut encoding,
+                &mut error,
+            );
+            let result = if error.is_null() {
+                Ok((from_glib_full(ret), from_glib_none(encoding)))
+            } else {
+                Err(from_glib_full(error))
+            };
+            let callback: Box_<glib::thread_guard::ThreadGuard<P>> =
+                Box_::from_raw(user_data as *mut _);
+            let callback: P = callback.into_inner();
+            callback(result);
+        }
+        let callback = open_multiple_text_files_trampoline::<P>;
+        unsafe {
+            ffi::gtk_file_dialog_open_multiple_text_files(
+                self.to_glib_none().0,
+                parent.map(|p| p.as_ref()).to_glib_none().0,
+                cancellable.map(|p| p.as_ref()).to_glib_none().0,
+                Some(callback),
+                Box_::into_raw(user_data) as *mut _,
+            );
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn open_multiple_text_files_future(
+        &self,
+        parent: Option<&(impl IsA<Window> + Clone + 'static)>,
+    ) -> Pin<
+        Box_<
+            dyn std::future::Future<
+                    Output = Result<(Option<gio::ListModel>, glib::GString), glib::Error>,
+                > + 'static,
+        >,
+    > {
+        let parent = parent.map(ToOwned::to_owned);
+        Box_::pin(gio::GioFuture::new(self, move |obj, cancellable, send| {
+            obj.open_multiple_text_files(
+                parent.as_ref().map(::std::borrow::Borrow::borrow),
+                Some(cancellable),
+                move |res| {
+                    send.resolve(res);
+                },
+            );
+        }))
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "gtk_file_dialog_open_text_file")]
+    pub fn open_text_file<
+        P: FnOnce(Result<(Option<gio::File>, glib::GString), glib::Error>) + 'static,
+    >(
+        &self,
+        parent: Option<&impl IsA<Window>>,
+        cancellable: Option<&impl IsA<gio::Cancellable>>,
+        callback: P,
+    ) {
+        let main_context = glib::MainContext::ref_thread_default();
+        let is_main_context_owner = main_context.is_owner();
+        let has_acquired_main_context = (!is_main_context_owner)
+            .then(|| main_context.acquire().ok())
+            .flatten();
+        assert!(
+            is_main_context_owner || has_acquired_main_context.is_some(),
+            "Async operations only allowed if the thread is owning the MainContext"
+        );
+
+        let user_data: Box_<glib::thread_guard::ThreadGuard<P>> =
+            Box_::new(glib::thread_guard::ThreadGuard::new(callback));
+        unsafe extern "C" fn open_text_file_trampoline<
+            P: FnOnce(Result<(Option<gio::File>, glib::GString), glib::Error>) + 'static,
+        >(
+            _source_object: *mut glib::gobject_ffi::GObject,
+            res: *mut gio::ffi::GAsyncResult,
+            user_data: glib::ffi::gpointer,
+        ) {
+            let mut error = std::ptr::null_mut();
+            let mut encoding = std::ptr::null();
+            let ret = ffi::gtk_file_dialog_open_text_file_finish(
+                _source_object as *mut _,
+                res,
+                &mut encoding,
+                &mut error,
+            );
+            let result = if error.is_null() {
+                Ok((from_glib_full(ret), from_glib_none(encoding)))
+            } else {
+                Err(from_glib_full(error))
+            };
+            let callback: Box_<glib::thread_guard::ThreadGuard<P>> =
+                Box_::from_raw(user_data as *mut _);
+            let callback: P = callback.into_inner();
+            callback(result);
+        }
+        let callback = open_text_file_trampoline::<P>;
+        unsafe {
+            ffi::gtk_file_dialog_open_text_file(
+                self.to_glib_none().0,
+                parent.map(|p| p.as_ref()).to_glib_none().0,
+                cancellable.map(|p| p.as_ref()).to_glib_none().0,
+                Some(callback),
+                Box_::into_raw(user_data) as *mut _,
+            );
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn open_text_file_future(
+        &self,
+        parent: Option<&(impl IsA<Window> + Clone + 'static)>,
+    ) -> Pin<
+        Box_<
+            dyn std::future::Future<
+                    Output = Result<(Option<gio::File>, glib::GString), glib::Error>,
+                > + 'static,
+        >,
+    > {
+        let parent = parent.map(ToOwned::to_owned);
+        Box_::pin(gio::GioFuture::new(self, move |obj, cancellable, send| {
+            obj.open_text_file(
+                parent.as_ref().map(::std::borrow::Borrow::borrow),
+                Some(cancellable),
+                move |res| {
+                    send.resolve(res);
+                },
+            );
+        }))
+    }
+
     #[doc(alias = "gtk_file_dialog_save")]
     pub fn save<P: FnOnce(Result<gio::File, glib::Error>) + 'static>(
         &self,
@@ -284,6 +458,97 @@ impl FileDialog {
         let parent = parent.map(ToOwned::to_owned);
         Box_::pin(gio::GioFuture::new(self, move |obj, cancellable, send| {
             obj.save(
+                parent.as_ref().map(::std::borrow::Borrow::borrow),
+                Some(cancellable),
+                move |res| {
+                    send.resolve(res);
+                },
+            );
+        }))
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "gtk_file_dialog_save_text_file")]
+    pub fn save_text_file<
+        P: FnOnce(Result<(Option<gio::File>, glib::GString, glib::GString), glib::Error>) + 'static,
+    >(
+        &self,
+        parent: Option<&impl IsA<Window>>,
+        cancellable: Option<&impl IsA<gio::Cancellable>>,
+        callback: P,
+    ) {
+        let main_context = glib::MainContext::ref_thread_default();
+        let is_main_context_owner = main_context.is_owner();
+        let has_acquired_main_context = (!is_main_context_owner)
+            .then(|| main_context.acquire().ok())
+            .flatten();
+        assert!(
+            is_main_context_owner || has_acquired_main_context.is_some(),
+            "Async operations only allowed if the thread is owning the MainContext"
+        );
+
+        let user_data: Box_<glib::thread_guard::ThreadGuard<P>> =
+            Box_::new(glib::thread_guard::ThreadGuard::new(callback));
+        unsafe extern "C" fn save_text_file_trampoline<
+            P: FnOnce(Result<(Option<gio::File>, glib::GString, glib::GString), glib::Error>)
+                + 'static,
+        >(
+            _source_object: *mut glib::gobject_ffi::GObject,
+            res: *mut gio::ffi::GAsyncResult,
+            user_data: glib::ffi::gpointer,
+        ) {
+            let mut error = std::ptr::null_mut();
+            let mut encoding = std::ptr::null();
+            let mut line_ending = std::ptr::null();
+            let ret = ffi::gtk_file_dialog_save_text_file_finish(
+                _source_object as *mut _,
+                res,
+                &mut encoding,
+                &mut line_ending,
+                &mut error,
+            );
+            let result = if error.is_null() {
+                Ok((
+                    from_glib_full(ret),
+                    from_glib_none(encoding),
+                    from_glib_none(line_ending),
+                ))
+            } else {
+                Err(from_glib_full(error))
+            };
+            let callback: Box_<glib::thread_guard::ThreadGuard<P>> =
+                Box_::from_raw(user_data as *mut _);
+            let callback: P = callback.into_inner();
+            callback(result);
+        }
+        let callback = save_text_file_trampoline::<P>;
+        unsafe {
+            ffi::gtk_file_dialog_save_text_file(
+                self.to_glib_none().0,
+                parent.map(|p| p.as_ref()).to_glib_none().0,
+                cancellable.map(|p| p.as_ref()).to_glib_none().0,
+                Some(callback),
+                Box_::into_raw(user_data) as *mut _,
+            );
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn save_text_file_future(
+        &self,
+        parent: Option<&(impl IsA<Window> + Clone + 'static)>,
+    ) -> Pin<
+        Box_<
+            dyn std::future::Future<
+                    Output = Result<(Option<gio::File>, glib::GString, glib::GString), glib::Error>,
+                > + 'static,
+        >,
+    > {
+        let parent = parent.map(ToOwned::to_owned);
+        Box_::pin(gio::GioFuture::new(self, move |obj, cancellable, send| {
+            obj.save_text_file(
                 parent.as_ref().map(::std::borrow::Borrow::borrow),
                 Some(cancellable),
                 move |res| {
@@ -435,6 +700,7 @@ impl FileDialog {
     }
 
     #[doc(alias = "gtk_file_dialog_set_accept_label")]
+    #[doc(alias = "accept-label")]
     pub fn set_accept_label(&self, accept_label: Option<&str>) {
         unsafe {
             ffi::gtk_file_dialog_set_accept_label(
@@ -445,6 +711,7 @@ impl FileDialog {
     }
 
     #[doc(alias = "gtk_file_dialog_set_default_filter")]
+    #[doc(alias = "default-filter")]
     pub fn set_default_filter(&self, filter: Option<&FileFilter>) {
         unsafe {
             ffi::gtk_file_dialog_set_default_filter(self.to_glib_none().0, filter.to_glib_none().0);
@@ -452,6 +719,7 @@ impl FileDialog {
     }
 
     #[doc(alias = "gtk_file_dialog_set_filters")]
+    #[doc(alias = "filters")]
     pub fn set_filters(&self, filters: Option<&impl IsA<gio::ListModel>>) {
         unsafe {
             ffi::gtk_file_dialog_set_filters(
@@ -462,6 +730,7 @@ impl FileDialog {
     }
 
     #[doc(alias = "gtk_file_dialog_set_initial_file")]
+    #[doc(alias = "initial-file")]
     pub fn set_initial_file(&self, file: Option<&impl IsA<gio::File>>) {
         unsafe {
             ffi::gtk_file_dialog_set_initial_file(
@@ -472,6 +741,7 @@ impl FileDialog {
     }
 
     #[doc(alias = "gtk_file_dialog_set_initial_folder")]
+    #[doc(alias = "initial-folder")]
     pub fn set_initial_folder(&self, folder: Option<&impl IsA<gio::File>>) {
         unsafe {
             ffi::gtk_file_dialog_set_initial_folder(
@@ -482,6 +752,7 @@ impl FileDialog {
     }
 
     #[doc(alias = "gtk_file_dialog_set_initial_name")]
+    #[doc(alias = "initial-name")]
     pub fn set_initial_name(&self, name: Option<&str>) {
         unsafe {
             ffi::gtk_file_dialog_set_initial_name(self.to_glib_none().0, name.to_glib_none().0);
@@ -489,6 +760,7 @@ impl FileDialog {
     }
 
     #[doc(alias = "gtk_file_dialog_set_modal")]
+    #[doc(alias = "modal")]
     pub fn set_modal(&self, modal: bool) {
         unsafe {
             ffi::gtk_file_dialog_set_modal(self.to_glib_none().0, modal.into_glib());
@@ -496,6 +768,7 @@ impl FileDialog {
     }
 
     #[doc(alias = "gtk_file_dialog_set_title")]
+    #[doc(alias = "title")]
     pub fn set_title(&self, title: &str) {
         unsafe {
             ffi::gtk_file_dialog_set_title(self.to_glib_none().0, title.to_glib_none().0);
@@ -519,7 +792,7 @@ impl FileDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::accept-label\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_accept_label_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -544,7 +817,7 @@ impl FileDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::default-filter\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_default_filter_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -569,7 +842,7 @@ impl FileDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::filters\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_filters_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -594,7 +867,7 @@ impl FileDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::initial-file\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_initial_file_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -619,7 +892,7 @@ impl FileDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::initial-folder\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_initial_folder_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -644,7 +917,7 @@ impl FileDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::initial-name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_initial_name_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -669,7 +942,7 @@ impl FileDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::modal\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_modal_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -694,7 +967,7 @@ impl FileDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::title\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_title_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -801,6 +1074,7 @@ impl FileDialogBuilder {
     /// Build the [`FileDialog`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> FileDialog {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

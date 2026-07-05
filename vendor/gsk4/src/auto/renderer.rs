@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::RenderNode;
+use crate::{ffi, RenderNode};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -47,6 +47,7 @@ pub trait GskRendererExt: IsA<Renderer> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gsk_renderer_is_realized")]
+    #[doc(alias = "realized")]
     fn is_realized(&self) -> bool {
         unsafe {
             from_glib(ffi::gsk_renderer_is_realized(
@@ -141,7 +142,7 @@ pub trait GskRendererExt: IsA<Renderer> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::realized\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_realized_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -164,7 +165,7 @@ pub trait GskRendererExt: IsA<Renderer> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::surface\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_surface_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

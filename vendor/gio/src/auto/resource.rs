@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{InputStream, ResourceLookupFlags};
+use crate::{ffi, InputStream, ResourceLookupFlags};
 use glib::translate::*;
 
 glib::wrapper! {
@@ -64,6 +64,18 @@ impl Resource {
             } else {
                 Err(from_glib_full(error))
             }
+        }
+    }
+
+    #[cfg(feature = "v2_84")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v2_84")))]
+    #[doc(alias = "g_resource_has_children")]
+    pub fn has_children(&self, path: &str) -> bool {
+        unsafe {
+            from_glib(ffi::g_resource_has_children(
+                self.to_glib_none().0,
+                path.to_glib_none().0,
+            ))
         }
     }
 

@@ -18,6 +18,13 @@ mod accessible_range;
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
 pub use self::accessible_range::AccessibleRange;
 
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+mod accessible_text;
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+pub use self::accessible_text::AccessibleText;
+
 mod action_bar;
 pub use self::action_bar::ActionBar;
 
@@ -842,7 +849,9 @@ pub use self::shortcut_action::ShortcutAction;
 mod shortcut_controller;
 pub use self::shortcut_controller::ShortcutController;
 
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 mod shortcut_label;
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 pub use self::shortcut_label::ShortcutLabel;
 
 mod shortcut_manager;
@@ -851,16 +860,24 @@ pub use self::shortcut_manager::ShortcutManager;
 mod shortcut_trigger;
 pub use self::shortcut_trigger::ShortcutTrigger;
 
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 mod shortcuts_group;
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 pub use self::shortcuts_group::ShortcutsGroup;
 
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 mod shortcuts_section;
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 pub use self::shortcuts_section::ShortcutsSection;
 
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 mod shortcuts_shortcut;
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 pub use self::shortcuts_shortcut::ShortcutsShortcut;
 
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 mod shortcuts_window;
+#[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
 pub use self::shortcuts_window::ShortcutsWindow;
 
 mod signal_action;
@@ -1127,6 +1144,12 @@ pub use self::enums::AccessibleRelation;
 pub use self::enums::AccessibleRole;
 pub use self::enums::AccessibleSort;
 pub use self::enums::AccessibleState;
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+pub use self::enums::AccessibleTextContentChange;
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+pub use self::enums::AccessibleTextGranularity;
 pub use self::enums::AccessibleTristate;
 pub use self::enums::ArrowType;
 pub use self::enums::AssistantPageType;
@@ -1263,6 +1286,9 @@ pub use self::flags::PrintCapabilities;
 pub use self::flags::ShortcutActionFlags;
 pub use self::flags::StateFlags;
 pub use self::flags::StyleContextPrintFlags;
+#[cfg(feature = "v4_16")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_16")))]
+pub use self::flags::TextBufferNotifyFlags;
 pub use self::flags::TextSearchFlags;
 #[allow(deprecated)]
 pub use self::flags::TreeModelFlags;
@@ -1428,6 +1454,9 @@ pub(crate) mod traits {
     #[cfg(feature = "v4_10")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
     pub use super::accessible_range::AccessibleRangeExt;
+    #[cfg(feature = "v4_14")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+    pub use super::accessible_text::AccessibleTextExt;
     pub use super::actionable::ActionableExt;
     pub use super::adjustment::AdjustmentExt;
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
@@ -1727,10 +1756,15 @@ pub(crate) mod builders {
     pub use super::separator::SeparatorBuilder;
     pub use super::settings::SettingsBuilder;
     pub use super::shortcut::ShortcutBuilder;
+    #[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
     pub use super::shortcut_label::ShortcutLabelBuilder;
+    #[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
     pub use super::shortcuts_group::ShortcutsGroupBuilder;
+    #[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
     pub use super::shortcuts_section::ShortcutsSectionBuilder;
+    #[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
     pub use super::shortcuts_shortcut::ShortcutsShortcutBuilder;
+    #[cfg_attr(feature = "v4_18", deprecated = "Since 4.18")]
     pub use super::shortcuts_window::ShortcutsWindowBuilder;
     pub use super::single_selection::SingleSelectionBuilder;
     pub use super::slice_list_model::SliceListModelBuilder;

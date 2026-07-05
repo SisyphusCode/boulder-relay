@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{AsyncResult, Cancellable};
+use crate::{ffi, AsyncResult, Cancellable};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -73,7 +73,7 @@ pub trait PermissionExt: IsA<Permission> + sealed::Sealed + 'static {
             user_data: glib::ffi::gpointer,
         ) {
             let mut error = std::ptr::null_mut();
-            let _ = ffi::g_permission_acquire_finish(_source_object as *mut _, res, &mut error);
+            ffi::g_permission_acquire_finish(_source_object as *mut _, res, &mut error);
             let result = if error.is_null() {
                 Ok(())
             } else {
@@ -110,6 +110,7 @@ pub trait PermissionExt: IsA<Permission> + sealed::Sealed + 'static {
 
     #[doc(alias = "g_permission_get_allowed")]
     #[doc(alias = "get_allowed")]
+    #[doc(alias = "allowed")]
     fn is_allowed(&self) -> bool {
         unsafe {
             from_glib(ffi::g_permission_get_allowed(
@@ -120,6 +121,7 @@ pub trait PermissionExt: IsA<Permission> + sealed::Sealed + 'static {
 
     #[doc(alias = "g_permission_get_can_acquire")]
     #[doc(alias = "get_can_acquire")]
+    #[doc(alias = "can-acquire")]
     fn can_acquire(&self) -> bool {
         unsafe {
             from_glib(ffi::g_permission_get_can_acquire(
@@ -130,6 +132,7 @@ pub trait PermissionExt: IsA<Permission> + sealed::Sealed + 'static {
 
     #[doc(alias = "g_permission_get_can_release")]
     #[doc(alias = "get_can_release")]
+    #[doc(alias = "can-release")]
     fn can_release(&self) -> bool {
         unsafe {
             from_glib(ffi::g_permission_get_can_release(
@@ -194,7 +197,7 @@ pub trait PermissionExt: IsA<Permission> + sealed::Sealed + 'static {
             user_data: glib::ffi::gpointer,
         ) {
             let mut error = std::ptr::null_mut();
-            let _ = ffi::g_permission_release_finish(_source_object as *mut _, res, &mut error);
+            ffi::g_permission_release_finish(_source_object as *mut _, res, &mut error);
             let result = if error.is_null() {
                 Ok(())
             } else {

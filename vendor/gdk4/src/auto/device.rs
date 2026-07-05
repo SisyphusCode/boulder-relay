@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{DeviceTool, Display, InputSource, ModifierType, Seat, Surface};
+use crate::{ffi, DeviceTool, Display, InputSource, ModifierType, Seat, Surface};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -36,8 +37,18 @@ mod sealed {
 }
 
 pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "gdk_device_get_active_layout_index")]
+    #[doc(alias = "get_active_layout_index")]
+    #[doc(alias = "active-layout-index")]
+    fn active_layout_index(&self) -> i32 {
+        unsafe { ffi::gdk_device_get_active_layout_index(self.as_ref().to_glib_none().0) }
+    }
+
     #[doc(alias = "gdk_device_get_caps_lock_state")]
     #[doc(alias = "get_caps_lock_state")]
+    #[doc(alias = "caps-lock-state")]
     fn is_caps_locked(&self) -> bool {
         unsafe {
             from_glib(ffi::gdk_device_get_caps_lock_state(
@@ -48,6 +59,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
 
     #[doc(alias = "gdk_device_get_device_tool")]
     #[doc(alias = "get_device_tool")]
+    #[doc(alias = "tool")]
     fn device_tool(&self) -> Option<DeviceTool> {
         unsafe {
             from_glib_none(ffi::gdk_device_get_device_tool(
@@ -74,6 +86,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
 
     #[doc(alias = "gdk_device_get_has_cursor")]
     #[doc(alias = "get_has_cursor")]
+    #[doc(alias = "has-cursor")]
     fn has_cursor(&self) -> bool {
         unsafe {
             from_glib(ffi::gdk_device_get_has_cursor(
@@ -82,8 +95,22 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "gdk_device_get_layout_names")]
+    #[doc(alias = "get_layout_names")]
+    #[doc(alias = "layout-names")]
+    fn layout_names(&self) -> Vec<glib::GString> {
+        unsafe {
+            FromGlibPtrContainer::from_glib_full(ffi::gdk_device_get_layout_names(
+                self.as_ref().to_glib_none().0,
+            ))
+        }
+    }
+
     #[doc(alias = "gdk_device_get_modifier_state")]
     #[doc(alias = "get_modifier_state")]
+    #[doc(alias = "modifier-state")]
     fn modifier_state(&self) -> ModifierType {
         unsafe {
             from_glib(ffi::gdk_device_get_modifier_state(
@@ -100,6 +127,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
 
     #[doc(alias = "gdk_device_get_num_lock_state")]
     #[doc(alias = "get_num_lock_state")]
+    #[doc(alias = "num-lock-state")]
     fn is_num_locked(&self) -> bool {
         unsafe {
             from_glib(ffi::gdk_device_get_num_lock_state(
@@ -110,12 +138,14 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
 
     #[doc(alias = "gdk_device_get_num_touches")]
     #[doc(alias = "get_num_touches")]
+    #[doc(alias = "num-touches")]
     fn num_touches(&self) -> u32 {
         unsafe { ffi::gdk_device_get_num_touches(self.as_ref().to_glib_none().0) }
     }
 
     #[doc(alias = "gdk_device_get_product_id")]
     #[doc(alias = "get_product_id")]
+    #[doc(alias = "product-id")]
     fn product_id(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gdk_device_get_product_id(
@@ -126,6 +156,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
 
     #[doc(alias = "gdk_device_get_scroll_lock_state")]
     #[doc(alias = "get_scroll_lock_state")]
+    #[doc(alias = "scroll-lock-state")]
     fn is_scroll_locked(&self) -> bool {
         unsafe {
             from_glib(ffi::gdk_device_get_scroll_lock_state(
@@ -171,6 +202,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
 
     #[doc(alias = "gdk_device_get_vendor_id")]
     #[doc(alias = "get_vendor_id")]
+    #[doc(alias = "vendor-id")]
     fn vendor_id(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gdk_device_get_vendor_id(
@@ -180,6 +212,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gdk_device_has_bidi_layouts")]
+    #[doc(alias = "has-bidi-layouts")]
     fn has_bidi_layouts(&self) -> bool {
         unsafe {
             from_glib(ffi::gdk_device_has_bidi_layouts(
@@ -211,7 +244,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     changed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -240,8 +273,36 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"tool-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     tool_changed_trampoline::<Self, F> as *const (),
+                )),
+                Box_::into_raw(f),
+            )
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "active-layout-index")]
+    fn connect_active_layout_index_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_active_layout_index_trampoline<
+            P: IsA<Device>,
+            F: Fn(&P) + 'static,
+        >(
+            this: *mut ffi::GdkDevice,
+            _param_spec: glib::ffi::gpointer,
+            f: glib::ffi::gpointer,
+        ) {
+            let f: &F = &*(f as *const F);
+            f(Device::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(
+                self.as_ptr() as *mut _,
+                b"notify::active-layout-index\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
+                    notify_active_layout_index_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
             )
@@ -266,7 +327,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::caps-lock-state\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_caps_lock_state_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -289,7 +350,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::direction\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_direction_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -315,8 +376,33 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::has-bidi-layouts\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_has_bidi_layouts_trampoline::<Self, F> as *const (),
+                )),
+                Box_::into_raw(f),
+            )
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "layout-names")]
+    fn connect_layout_names_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_layout_names_trampoline<P: IsA<Device>, F: Fn(&P) + 'static>(
+            this: *mut ffi::GdkDevice,
+            _param_spec: glib::ffi::gpointer,
+            f: glib::ffi::gpointer,
+        ) {
+            let f: &F = &*(f as *const F);
+            f(Device::from_glib_borrow(this).unsafe_cast_ref())
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(
+                self.as_ptr() as *mut _,
+                b"notify::layout-names\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
+                    notify_layout_names_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
             )
@@ -341,7 +427,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::modifier-state\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_modifier_state_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -364,7 +450,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::n-axes\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_n_axes_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -390,7 +476,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::num-lock-state\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_num_lock_state_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -416,7 +502,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::scroll-lock-state\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_scroll_lock_state_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -439,7 +525,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::seat\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_seat_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -462,7 +548,7 @@ pub trait DeviceExt: IsA<Device> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::tool\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_tool_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

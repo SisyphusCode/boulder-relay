@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{bitflags::bitflags, prelude::*, translate::*};
+use crate::{bitflags::bitflags, ffi, prelude::*, translate::*};
 
 #[cfg(feature = "v2_66")]
 bitflags! {
@@ -341,6 +341,10 @@ bitflags! {
         const OPTIONAL_ARG = ffi::G_OPTION_FLAG_OPTIONAL_ARG as _;
         #[doc(alias = "G_OPTION_FLAG_NOALIAS")]
         const NOALIAS = ffi::G_OPTION_FLAG_NOALIAS as _;
+        #[cfg(feature = "v2_84")]
+        #[cfg_attr(docsrs, doc(cfg(feature = "v2_84")))]
+        #[doc(alias = "G_OPTION_FLAG_DEPRECATED")]
+        const DEPRECATED = ffi::G_OPTION_FLAG_DEPRECATED as _;
     }
 }
 

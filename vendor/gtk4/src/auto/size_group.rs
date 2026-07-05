@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Buildable, SizeGroupMode, Widget};
+use crate::{ffi, Buildable, SizeGroupMode, Widget};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -60,6 +60,7 @@ impl SizeGroup {
     }
 
     #[doc(alias = "gtk_size_group_set_mode")]
+    #[doc(alias = "mode")]
     pub fn set_mode(&self, mode: SizeGroupMode) {
         unsafe {
             ffi::gtk_size_group_set_mode(self.to_glib_none().0, mode.into_glib());
@@ -81,7 +82,7 @@ impl SizeGroup {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

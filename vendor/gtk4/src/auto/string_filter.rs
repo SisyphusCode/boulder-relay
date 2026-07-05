@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Expression, Filter, StringFilterMatchMode};
+use crate::{ffi, Expression, Filter, StringFilterMatchMode};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -48,6 +48,7 @@ impl StringFilter {
 
     #[doc(alias = "gtk_string_filter_get_ignore_case")]
     #[doc(alias = "get_ignore_case")]
+    #[doc(alias = "ignore-case")]
     pub fn ignores_case(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_string_filter_get_ignore_case(
@@ -58,6 +59,7 @@ impl StringFilter {
 
     #[doc(alias = "gtk_string_filter_get_match_mode")]
     #[doc(alias = "get_match_mode")]
+    #[doc(alias = "match-mode")]
     pub fn match_mode(&self) -> StringFilterMatchMode {
         unsafe { from_glib(ffi::gtk_string_filter_get_match_mode(self.to_glib_none().0)) }
     }
@@ -69,6 +71,7 @@ impl StringFilter {
     }
 
     #[doc(alias = "gtk_string_filter_set_expression")]
+    #[doc(alias = "expression")]
     pub fn set_expression(&self, expression: Option<impl AsRef<Expression>>) {
         unsafe {
             ffi::gtk_string_filter_set_expression(
@@ -79,6 +82,7 @@ impl StringFilter {
     }
 
     #[doc(alias = "gtk_string_filter_set_ignore_case")]
+    #[doc(alias = "ignore-case")]
     pub fn set_ignore_case(&self, ignore_case: bool) {
         unsafe {
             ffi::gtk_string_filter_set_ignore_case(self.to_glib_none().0, ignore_case.into_glib());
@@ -86,6 +90,7 @@ impl StringFilter {
     }
 
     #[doc(alias = "gtk_string_filter_set_match_mode")]
+    #[doc(alias = "match-mode")]
     pub fn set_match_mode(&self, mode: StringFilterMatchMode) {
         unsafe {
             ffi::gtk_string_filter_set_match_mode(self.to_glib_none().0, mode.into_glib());
@@ -93,6 +98,7 @@ impl StringFilter {
     }
 
     #[doc(alias = "gtk_string_filter_set_search")]
+    #[doc(alias = "search")]
     pub fn set_search(&self, search: Option<&str>) {
         unsafe {
             ffi::gtk_string_filter_set_search(self.to_glib_none().0, search.to_glib_none().0);
@@ -114,7 +120,7 @@ impl StringFilter {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::expression\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_expression_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -137,7 +143,7 @@ impl StringFilter {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::ignore-case\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_ignore_case_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -160,7 +166,7 @@ impl StringFilter {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::match-mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_match_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -183,7 +189,7 @@ impl StringFilter {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::search\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_search_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -244,6 +250,7 @@ impl StringFilterBuilder {
     /// Build the [`StringFilter`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> StringFilter {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

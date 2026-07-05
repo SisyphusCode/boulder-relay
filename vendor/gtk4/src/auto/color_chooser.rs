@@ -3,7 +3,9 @@
 // DO NOT EDIT
 #![allow(deprecated)]
 
+use crate::ffi;
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -48,6 +50,7 @@ pub trait ColorChooserExt: IsA<ColorChooser> + sealed::Sealed + 'static {
     #[allow(deprecated)]
     #[doc(alias = "gtk_color_chooser_get_use_alpha")]
     #[doc(alias = "get_use_alpha")]
+    #[doc(alias = "use-alpha")]
     fn uses_alpha(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_color_chooser_get_use_alpha(
@@ -59,6 +62,7 @@ pub trait ColorChooserExt: IsA<ColorChooser> + sealed::Sealed + 'static {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_color_chooser_set_rgba")]
+    #[doc(alias = "rgba")]
     fn set_rgba(&self, color: &gdk::RGBA) {
         unsafe {
             ffi::gtk_color_chooser_set_rgba(self.as_ref().to_glib_none().0, color.to_glib_none().0);
@@ -68,6 +72,7 @@ pub trait ColorChooserExt: IsA<ColorChooser> + sealed::Sealed + 'static {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_color_chooser_set_use_alpha")]
+    #[doc(alias = "use-alpha")]
     fn set_use_alpha(&self, use_alpha: bool) {
         unsafe {
             ffi::gtk_color_chooser_set_use_alpha(
@@ -99,7 +104,7 @@ pub trait ColorChooserExt: IsA<ColorChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"color-activated\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     color_activated_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -123,7 +128,7 @@ pub trait ColorChooserExt: IsA<ColorChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::rgba\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_rgba_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -150,7 +155,7 @@ pub trait ColorChooserExt: IsA<ColorChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-alpha\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_alpha_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

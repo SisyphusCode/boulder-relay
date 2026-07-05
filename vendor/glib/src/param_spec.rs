@@ -8,6 +8,7 @@ use std::{
 };
 
 use crate::{
+    ffi, gobject_ffi,
     object::{Interface, InterfaceRef, IsClass, IsInterface, ObjectClass},
     prelude::*,
     translate::*,
@@ -295,20 +296,16 @@ pub unsafe trait ParamSpecType:
 {
 }
 
-#[link(name = "gobject-2.0")]
-extern "C" {
-    pub static g_param_spec_types: *const ffi::GType;
-}
-
 macro_rules! define_param_spec {
-    ($rust_type:ident, $ffi_type:path, $rust_type_offset:expr) => {
-        // Can't use get_type here as this is not a boxed type but another fundamental type
+    ($rust_type:ident, $ffi_type:path, $type_name:literal) => {
         impl StaticType for $rust_type {
             #[inline]
             fn static_type() -> Type {
-                unsafe {
-                    from_glib(*g_param_spec_types.add($rust_type_offset))
-                }
+                // Instead of using the direct reference to the `g_param_spec_types` table, we
+                // use `g_type_from_name` to query for each of the param spec types. This is
+                // because rust currently has issues properly linking variables from external
+                // libraries without using a `#[link]` attribute.
+                unsafe { from_glib(gobject_ffi::g_type_from_name(concat!($type_name, "\0").as_ptr() as *const _)) }
             }
         }
 
@@ -556,8 +553,8 @@ macro_rules! define_param_spec_min_max {
 }
 
 macro_rules! define_param_spec_numeric {
-    ($rust_type:ident, $ffi_type:path, $value_type:ty, $rust_type_offset:expr, $ffi_fun:ident) => {
-        define_param_spec!($rust_type, $ffi_type, $rust_type_offset);
+    ($rust_type:ident, $ffi_type:path, $value_type:ty, $type_name:literal, $ffi_fun:ident) => {
+        define_param_spec!($rust_type, $ffi_type, $type_name);
         define_param_spec_default!($rust_type, $ffi_type, $value_type, |x| x);
         define_param_spec_min_max!($rust_type, $ffi_type, $value_type);
 
@@ -787,7 +784,7 @@ define_param_spec_numeric!(
     ParamSpecChar,
     gobject_ffi::GParamSpecChar,
     i8,
-    0,
+    "GParamChar",
     g_param_spec_char
 );
 
@@ -807,7 +804,7 @@ define_param_spec_numeric!(
     ParamSpecUChar,
     gobject_ffi::GParamSpecUChar,
     u8,
-    1,
+    "GParamUChar",
     g_param_spec_uchar
 );
 
@@ -828,7 +825,11 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecBoolean, gobject_ffi::GParamSpecBoolean, 2);
+define_param_spec!(
+    ParamSpecBoolean,
+    gobject_ffi::GParamSpecBoolean,
+    "GParamBoolean"
+);
 
 define_param_spec_default!(
     ParamSpecBoolean,
@@ -879,7 +880,7 @@ define_param_spec_numeric!(
     ParamSpecInt,
     gobject_ffi::GParamSpecInt,
     i32,
-    3,
+    "GParamInt",
     g_param_spec_int
 );
 
@@ -899,7 +900,7 @@ define_param_spec_numeric!(
     ParamSpecUInt,
     gobject_ffi::GParamSpecUInt,
     u32,
-    4,
+    "GParamUInt",
     g_param_spec_uint
 );
 
@@ -924,7 +925,7 @@ define_param_spec_numeric!(
     ParamSpecLong,
     gobject_ffi::GParamSpecLong,
     libc::c_long,
-    5,
+    "GParamLong",
     g_param_spec_long
 );
 
@@ -949,7 +950,7 @@ define_param_spec_numeric!(
     ParamSpecULong,
     gobject_ffi::GParamSpecULong,
     libc::c_ulong,
-    6,
+    "GParamULong",
     g_param_spec_ulong
 );
 
@@ -974,7 +975,7 @@ define_param_spec_numeric!(
     ParamSpecInt64,
     gobject_ffi::GParamSpecInt64,
     i64,
-    7,
+    "GParamInt64",
     g_param_spec_int64
 );
 
@@ -999,7 +1000,7 @@ define_param_spec_numeric!(
     ParamSpecUInt64,
     gobject_ffi::GParamSpecUInt64,
     u64,
-    8,
+    "GParamUInt64",
     g_param_spec_uint64
 );
 
@@ -1020,7 +1021,11 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecUnichar, gobject_ffi::GParamSpecUnichar, 9);
+define_param_spec!(
+    ParamSpecUnichar,
+    gobject_ffi::GParamSpecUnichar,
+    "GParamUnichar"
+);
 define_param_spec_default!(ParamSpecUnichar, gobject_ffi::GParamSpecUnichar, Result<char, CharTryFromError>, TryFrom::try_from);
 
 impl ParamSpecUnichar {
@@ -1062,7 +1067,7 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecEnum, gobject_ffi::GParamSpecEnum, 10);
+define_param_spec!(ParamSpecEnum, gobject_ffi::GParamSpecEnum, "GParamEnum");
 
 impl ParamSpecEnum {
     unsafe fn new_unchecked<'a>(
@@ -1124,14 +1129,14 @@ impl ParamSpecEnum {
     pub fn builder_with_default<T: StaticType + FromGlib<i32> + IntoGlib<GlibType = i32>>(
         name: &str,
         default_value: T,
-    ) -> ParamSpecEnumBuilder<T> {
+    ) -> ParamSpecEnumBuilder<'_, T> {
         ParamSpecEnumBuilder::new(name, default_value)
     }
 
     #[doc(alias = "g_param_spec_enum")]
     pub fn builder<T: StaticType + FromGlib<i32> + IntoGlib<GlibType = i32> + Default>(
         name: &str,
-    ) -> ParamSpecEnumBuilder<T> {
+    ) -> ParamSpecEnumBuilder<'_, T> {
         ParamSpecEnumBuilder::new(name, T::default())
     }
 }
@@ -1206,7 +1211,7 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecFlags, gobject_ffi::GParamSpecFlags, 11);
+define_param_spec!(ParamSpecFlags, gobject_ffi::GParamSpecFlags, "GParamFlags");
 
 impl ParamSpecFlags {
     unsafe fn new_unchecked<'a>(
@@ -1267,7 +1272,7 @@ impl ParamSpecFlags {
     #[doc(alias = "g_param_spec_flags")]
     pub fn builder<T: StaticType + FromGlib<u32> + IntoGlib<GlibType = u32>>(
         name: &str,
-    ) -> ParamSpecFlagsBuilder<T> {
+    ) -> ParamSpecFlagsBuilder<'_, T> {
         ParamSpecFlagsBuilder::new(name)
     }
 }
@@ -1349,7 +1354,7 @@ define_param_spec_numeric!(
     ParamSpecFloat,
     gobject_ffi::GParamSpecFloat,
     f32,
-    12,
+    "GParamFloat",
     g_param_spec_float
 );
 
@@ -1374,7 +1379,7 @@ define_param_spec_numeric!(
     ParamSpecDouble,
     gobject_ffi::GParamSpecDouble,
     f64,
-    13,
+    "GParamDouble",
     g_param_spec_double
 );
 
@@ -1395,7 +1400,11 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecString, gobject_ffi::GParamSpecString, 14);
+define_param_spec!(
+    ParamSpecString,
+    gobject_ffi::GParamSpecString,
+    "GParamString"
+);
 
 define_param_spec_default!(
     ParamSpecString,
@@ -1433,7 +1442,7 @@ impl ParamSpecString {
     }
 
     #[doc(alias = "g_param_spec_string")]
-    pub fn builder(name: &str) -> ParamSpecStringBuilder {
+    pub fn builder(name: &str) -> ParamSpecStringBuilder<'_> {
         ParamSpecStringBuilder::new(name)
     }
 }
@@ -1504,7 +1513,7 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecParam, gobject_ffi::GParamSpecParam, 15);
+define_param_spec!(ParamSpecParam, gobject_ffi::GParamSpecParam, "GParamParam");
 
 impl ParamSpecParam {
     unsafe fn new_unchecked<'a>(
@@ -1546,7 +1555,7 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecBoxed, gobject_ffi::GParamSpecBoxed, 16);
+define_param_spec!(ParamSpecBoxed, gobject_ffi::GParamSpecBoxed, "GParamBoxed");
 
 impl ParamSpecBoxed {
     unsafe fn new_unchecked<'a>(
@@ -1568,7 +1577,7 @@ impl ParamSpecBoxed {
     }
 
     #[doc(alias = "g_param_spec_boxed")]
-    pub fn builder<T: StaticType>(name: &str) -> ParamSpecBoxedBuilder<T> {
+    pub fn builder<T: StaticType>(name: &str) -> ParamSpecBoxedBuilder<'_, T> {
         ParamSpecBoxedBuilder::new(name)
     }
 }
@@ -1634,7 +1643,11 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecPointer, gobject_ffi::GParamSpecPointer, 17);
+define_param_spec!(
+    ParamSpecPointer,
+    gobject_ffi::GParamSpecPointer,
+    "GParamPointer"
+);
 
 impl ParamSpecPointer {
     unsafe fn new_unchecked<'a>(
@@ -1670,7 +1683,11 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecValueArray, gobject_ffi::GParamSpecValueArray, 18);
+define_param_spec!(
+    ParamSpecValueArray,
+    gobject_ffi::GParamSpecValueArray,
+    "GParamValueArray"
+);
 
 impl ParamSpecValueArray {
     unsafe fn new_unchecked<'a>(
@@ -1719,7 +1736,7 @@ impl ParamSpecValueArray {
     }
 
     #[doc(alias = "g_param_spec_value_array")]
-    pub fn builder(name: &str) -> ParamSpecValueArrayBuilder {
+    pub fn builder(name: &str) -> ParamSpecValueArrayBuilder<'_> {
         ParamSpecValueArrayBuilder::new(name)
     }
 }
@@ -1790,7 +1807,11 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecObject, gobject_ffi::GParamSpecObject, 19);
+define_param_spec!(
+    ParamSpecObject,
+    gobject_ffi::GParamSpecObject,
+    "GParamObject"
+);
 
 impl ParamSpecObject {
     unsafe fn new_unchecked<'a>(
@@ -1812,7 +1833,7 @@ impl ParamSpecObject {
     }
 
     #[doc(alias = "g_param_spec_object")]
-    pub fn builder<T: StaticType + IsA<Object>>(name: &str) -> ParamSpecObjectBuilder<T> {
+    pub fn builder<T: StaticType + IsA<Object>>(name: &str) -> ParamSpecObjectBuilder<'_, T> {
         ParamSpecObjectBuilder::new(name)
     }
 }
@@ -1878,7 +1899,11 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecOverride, gobject_ffi::GParamSpecOverride, 20);
+define_param_spec!(
+    ParamSpecOverride,
+    gobject_ffi::GParamSpecOverride,
+    "GParamOverride"
+);
 
 impl ParamSpecOverride {
     unsafe fn new_unchecked(name: &str, overridden: impl AsRef<ParamSpec>) -> ParamSpec {
@@ -1986,7 +2011,7 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecGType, gobject_ffi::GParamSpecGType, 21);
+define_param_spec!(ParamSpecGType, gobject_ffi::GParamSpecGType, "GParamGType");
 
 impl ParamSpecGType {
     unsafe fn new_unchecked<'a>(
@@ -2026,7 +2051,11 @@ wrapper! {
         unref => |ptr| gobject_ffi::g_param_spec_unref(ptr as *mut gobject_ffi::GParamSpec),
     }
 }
-define_param_spec!(ParamSpecVariant, gobject_ffi::GParamSpecVariant, 22);
+define_param_spec!(
+    ParamSpecVariant,
+    gobject_ffi::GParamSpecVariant,
+    "GParamVariant"
+);
 
 define_param_spec_default!(
     ParamSpecVariant,
@@ -2278,8 +2307,7 @@ has_simple_spec!(bool, ParamSpecBoolean, ParamSpecBooleanBuilder);
 impl HasParamSpec for crate::Variant {
     type ParamSpec = ParamSpecVariant;
     type SetValue = Self;
-    type BuilderFn =
-        fn(&'static str, ty: &'static crate::VariantTy) -> ParamSpecVariantBuilder<'static>;
+    type BuilderFn = for<'a> fn(&'a str, ty: &'a crate::VariantTy) -> ParamSpecVariantBuilder<'a>;
 
     fn param_spec_builder() -> Self::BuilderFn {
         Self::ParamSpec::builder

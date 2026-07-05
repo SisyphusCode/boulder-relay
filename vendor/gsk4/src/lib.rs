@@ -2,13 +2,14 @@
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![allow(deprecated)]
+#![allow(clippy::manual_c_str_literals)]
 #![doc = include_str!("../README.md")]
 
 pub use cairo;
-pub use ffi;
 pub use gdk;
 pub use glib;
 pub use graphene;
+pub use gsk4_sys as ffi;
 pub use pango;
 
 // GSK 4 has no runtime to initialize
@@ -23,6 +24,7 @@ macro_rules! skip_assert_initialized {
 
 #[allow(clippy::derived_hash_with_manual_eq)]
 #[allow(clippy::too_many_arguments)]
+#[allow(unused_imports)]
 mod auto;
 
 pub mod builders;

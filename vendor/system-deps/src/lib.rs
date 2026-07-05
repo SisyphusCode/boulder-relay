@@ -5,6 +5,7 @@
 //! declarative, so other tools can read them as well.
 //!
 //! # Usage
+//!
 //! In your `Cargo.toml`:
 //!
 //! ```toml
@@ -78,6 +79,7 @@
 //! ```
 //!
 //! # Fallback library names
+//!
 //! Some libraries may be available under different names on different platforms or distributions.
 //! To allow for this, you can define fallback names to search for if the main library name does not work.
 //!
@@ -88,13 +90,16 @@
 //!
 //! You may also specify different fallback names for different versions:
 //!
+//! ```toml
 //! [package.metadata.system-deps.libfoo]
 //! version = "0.1"
 //! fallback-names = ["libfoo-0.1"]
 //! v1 = { version = "1.0", fallback-names = ["libfoo1"] }
 //! v2 = { version = "2.0", fallback-names = ["libfoo2"] }
+//! ```
 //!
 //! # Feature versions
+//!
 //! `-sys` crates willing to support various versions of their underlying system libraries
 //! can use features to control the version of the dependency required.
 //! `system-deps` will pick the highest version among enabled features.
@@ -149,8 +154,10 @@
 //! - `unix` and `windows`
 //!
 //! # Overriding build flags
+//!
 //! By default `system-deps` automatically defines the required build flags for each dependency using the information fetched from `pkg-config`.
 //! These flags can be overridden using environment variables if needed:
+//!
 //! - `SYSTEM_DEPS_$NAME_SEARCH_NATIVE` to override the [`cargo:rustc-link-search=native`](https://doc.rust-lang.org/cargo/reference/build-scripts.html#cargorustc-link-searchkindpath) flag;
 //! - `SYSTEM_DEPS_$NAME_SEARCH_FRAMEWORK` to override the [`cargo:rustc-link-search=framework`](https://doc.rust-lang.org/cargo/reference/build-scripts.html#cargorustc-link-searchkindpath) flag;
 //! - `SYSTEM_DEPS_$NAME_LIB` to override the [`cargo:rustc-link-lib`](https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib) flag;
@@ -167,6 +174,7 @@
 //!
 //! `-sys` crates can provide support for building and statically link their underlying system library as part of their build process.
 //! Here is how to do this in your `build.rs`:
+//!
 //! ```should_panic
 //! fn main() {
 //!     system_deps::Config::new()
@@ -181,6 +189,7 @@
 //!
 //! This feature can be controlled using the `SYSTEM_DEPS_$NAME_BUILD_INTERNAL` environment variable
 //! which can have the following values:
+//!
 //! - `auto`: build the dependency only if the required version has not been found by `pkg-config`;
 //! - `always`: always build the dependency, ignoring any version which may be installed on the system;
 //! - `never`: (default) never build the dependency, `system-deps` will fail if the required version is not found on the system.
@@ -204,7 +213,7 @@ extern crate lazy_static;
 mod test;
 
 use heck::{ToShoutySnakeCase, ToSnakeCase};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::env;
 use std::fmt;
 use std::ops::RangeBounds;
@@ -264,36 +273,33 @@ impl std::error::Error for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::PkgConfig(e) => write!(f, "{}", e),
-            Self::BuildInternalClosureError(s, e) => write!(f, "Failed to build {}: {}", s, e),
-            Self::FailToRead(s, _) => write!(f, "{}", s),
-            Self::InvalidMetadata(s) => write!(f, "{}", s),
+            Self::PkgConfig(e) => write!(f, "{e}"),
+            Self::BuildInternalClosureError(s, e) => write!(f, "Failed to build {s}: {e}"),
+            Self::FailToRead(s, _) => write!(f, "{s}"),
+            Self::InvalidMetadata(s) => write!(f, "{s}"),
             Self::MissingLib(s) => write!(
                 f,
                 "You should define at least one lib using {} or {}",
                 EnvVariable::new_lib(s),
                 EnvVariable::new_lib_framework(s),
             ),
-            Self::BuildInternalInvalid(s) => write!(f, "{}", s),
-            Self::BuildInternalNoClosure(s1, s2) => write!(
-                f,
-                "Missing build internal closure for {} (version {})",
-                s1, s2
-            ),
+            Self::BuildInternalInvalid(s) => write!(f, "{s}"),
+            Self::BuildInternalNoClosure(s1, s2) => {
+                write!(f, "Missing build internal closure for {s1} (version {s2})")
+            }
             Self::BuildInternalWrongVersion(s1, s2, s3) => write!(
                 f,
-                "Internally built {} {} but minimum required version is {}",
-                s1, s2, s3
+                "Internally built {s1} {s2} but minimum required version is {s3}"
             ),
-            Self::UnsupportedCfg(s) => write!(f, "Unsupported cfg() expression: {}", s),
+            Self::UnsupportedCfg(s) => write!(f, "Unsupported cfg() expression: {s}"),
         }
     }
 }
 
 #[derive(Debug, Default)]
-/// All the system dependencies retrieved by [Config::probe].
+/// All the system dependencies retrieved by [`Config::probe`].
 pub struct Dependencies {
-    libs: HashMap<String, Library>,
+    libs: BTreeMap<String, Library>,
 }
 
 impl Dependencies {
@@ -338,7 +344,7 @@ impl Dependencies {
         v
     }
 
-    /// Returns a vector of [Library::libs] of each library, removing duplicates.
+    /// Returns a vector of [`Library::libs`] of each library, removing duplicates.
     pub fn all_libs(&self) -> Vec<&str> {
         let mut v = self
             .libs
@@ -350,27 +356,39 @@ impl Dependencies {
         v
     }
 
-    /// Returns a vector of [Library::link_paths] of each library, removing duplicates.
+    /// Returns a vector of [`Library::link_paths`] of each library, removing duplicates.
     pub fn all_link_paths(&self) -> Vec<&PathBuf> {
         self.aggregate_path_buf(|l| &l.link_paths)
     }
 
-    /// Returns a vector of [Library::frameworks] of each library, removing duplicates.
+    /// Returns a vector of [`Library::frameworks`] of each library, removing duplicates.
     pub fn all_frameworks(&self) -> Vec<&str> {
         self.aggregate_str(|l| &l.frameworks)
     }
 
-    /// Returns a vector of [Library::framework_paths] of each library, removing duplicates.
+    /// Returns a vector of [`Library::framework_paths`] of each library, removing duplicates.
     pub fn all_framework_paths(&self) -> Vec<&PathBuf> {
         self.aggregate_path_buf(|l| &l.framework_paths)
     }
 
-    /// Returns a vector of [Library::include_paths] of each library, removing duplicates.
+    /// Returns a vector of [`Library::include_paths`] of each library, removing duplicates.
     pub fn all_include_paths(&self) -> Vec<&PathBuf> {
         self.aggregate_path_buf(|l| &l.include_paths)
     }
 
-    /// Returns a vector of [Library::defines] of each library, removing duplicates.
+    /// Returns a vector of [`Library::ld_args`] of each library, removing duplicates.
+    pub fn all_linker_args(&self) -> Vec<&Vec<String>> {
+        let mut v = self
+            .libs
+            .values()
+            .flat_map(|l| &l.ld_args)
+            .collect::<Vec<_>>();
+        v.sort_unstable();
+        v.dedup();
+        v
+    }
+
+    /// Returns a vector of [`Library::defines`] of each library, removing duplicates.
     pub fn all_defines(&self) -> Vec<(&str, &Option<String>)> {
         let mut v = self
             .libs
@@ -416,6 +434,12 @@ impl Dependencies {
             if let Some(value) = env.get(&EnvVariable::new_include(name)) {
                 lib.include_paths = split_paths(&value);
             }
+            if let Some(value) = env.get(&EnvVariable::new_linker_args(name)) {
+                lib.ld_args = split_string(&value)
+                    .into_iter()
+                    .map(|l| l.split(',').map(|l| l.to_string()).collect())
+                    .collect();
+            }
         }
     }
 
@@ -448,6 +472,9 @@ impl Dependencies {
             lib.frameworks
                 .iter()
                 .for_each(|f| flags.add(BuildFlag::LibFramework(f.clone())));
+            lib.ld_args
+                .iter()
+                .for_each(|f| flags.add(BuildFlag::LinkArg(f.clone())))
         }
 
         // Export DEP_$CRATE_INCLUDE env variable with the headers paths,
@@ -511,8 +538,8 @@ impl std::error::Error for BuildInternalClosureError {
 impl fmt::Display for BuildInternalClosureError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::PkgConfig(e) => write!(f, "{}", e),
-            Self::Failed(s) => write!(f, "{}", s),
+            Self::PkgConfig(e) => write!(f, "{e}"),
+            Self::Failed(s) => write!(f, "{s}"),
         }
     }
 }
@@ -528,6 +555,7 @@ enum EnvVariable {
     NoPkgConfig(String),
     BuildInternal(Option<String>),
     Link(Option<String>),
+    LinkerArgs(String),
 }
 
 impl EnvVariable {
@@ -551,6 +579,10 @@ impl EnvVariable {
         Self::Include(lib.to_string())
     }
 
+    fn new_linker_args(lib: &str) -> Self {
+        Self::LinkerArgs(lib.to_string())
+    }
+
     fn new_no_pkg_config(lib: &str) -> Self {
         Self::NoPkgConfig(lib.to_string())
     }
@@ -563,7 +595,7 @@ impl EnvVariable {
         Self::Link(lib.map(|l| l.to_string()))
     }
 
-    fn suffix(&self) -> &'static str {
+    const fn suffix(&self) -> &'static str {
         match self {
             EnvVariable::Lib(_) => "LIB",
             EnvVariable::LibFramework(_) => "LIB_FRAMEWORK",
@@ -573,6 +605,7 @@ impl EnvVariable {
             EnvVariable::NoPkgConfig(_) => "NO_PKG_CONFIG",
             EnvVariable::BuildInternal(_) => "BUILD_INTERNAL",
             EnvVariable::Link(_) => "LINK",
+            EnvVariable::LinkerArgs(_) => "LDFLAGS",
         }
     }
 
@@ -586,6 +619,7 @@ impl EnvVariable {
         add_to_flags(flags, EnvVariable::new_search_native(name));
         add_to_flags(flags, EnvVariable::new_search_framework(name));
         add_to_flags(flags, EnvVariable::new_include(name));
+        add_to_flags(flags, EnvVariable::new_linker_args(name));
         add_to_flags(flags, EnvVariable::new_no_pkg_config(name));
         add_to_flags(flags, EnvVariable::new_build_internal(Some(name)));
         add_to_flags(flags, EnvVariable::new_link(Some(name)));
@@ -600,6 +634,7 @@ impl fmt::Display for EnvVariable {
             | EnvVariable::SearchNative(lib)
             | EnvVariable::SearchFramework(lib)
             | EnvVariable::Include(lib)
+            | EnvVariable::LinkerArgs(lib)
             | EnvVariable::NoPkgConfig(lib)
             | EnvVariable::BuildInternal(Some(lib))
             | EnvVariable::Link(Some(lib)) => {
@@ -607,7 +642,7 @@ impl fmt::Display for EnvVariable {
             }
             EnvVariable::BuildInternal(None) | EnvVariable::Link(None) => self.suffix().to_string(),
         };
-        write!(f, "SYSTEM_DEPS_{}", suffix)
+        write!(f, "SYSTEM_DEPS_{suffix}")
     }
 }
 
@@ -648,7 +683,7 @@ impl Config {
         let flags = libraries.gen_flags()?;
 
         // Output cargo flags
-        println!("{}", flags);
+        println!("{flags}");
 
         for (name, _) in libraries.iter() {
             println!("cargo:rustc-cfg=system_deps_have_{}", name.to_snake_case());
@@ -667,6 +702,7 @@ impl Config {
     /// # Arguments
     /// * `name`: the name of the library, as defined in `Cargo.toml`
     /// * `func`: closure called when internally building the library.
+    ///
     /// It receives as argument the library name, and the minimum version required.
     pub fn add_build_internal<F>(self, name: &str, func: F) -> Self
     where
@@ -695,6 +731,8 @@ impl Config {
             .ok_or_else(|| Error::InvalidMetadata("$CARGO_MANIFEST_DIR not set".into()))?;
         let mut path = PathBuf::from(dir);
         path.push("Cargo.toml");
+
+        println!("cargo:rerun-if-changed={}", &path.to_string_lossy());
 
         let metadata = MetaData::from_file(&path)?;
 
@@ -734,7 +772,7 @@ impl Config {
                 optional = dep.optional;
             } else {
                 enabled_feature_overrides.sort_by(|a, b| {
-                    fn min_version(r: metadata::VersionRange) -> &str {
+                    fn min_version(r: metadata::VersionRange<'_>) -> &str {
                         match r.start_bound() {
                             std::ops::Bound::Unbounded => unreachable!(),
                             std::ops::Bound::Excluded(_) => unreachable!(),
@@ -750,7 +788,7 @@ impl Config {
                         .ord()
                         .expect("invalid version")
                 });
-                let highest = enabled_feature_overrides.into_iter().last().unwrap();
+                let highest = enabled_feature_overrides.into_iter().next_back().unwrap();
 
                 version = Some(highest.version.as_str());
                 lib_name = highest.name.as_deref().unwrap_or(dep.lib_name());
@@ -832,8 +870,7 @@ impl Config {
             Some(s) => {
                 let b = BuildInternal::from_str(s).map_err(|_| {
                     Error::BuildInternalInvalid(format!(
-                        "Invalid value in {}: {} (allowed: 'auto', 'always', 'never')",
-                        var, s
+                        "Invalid value in {var}: {s} (allowed: 'auto', 'always', 'never')"
                     ))
                 })?;
                 Ok(Some(b))
@@ -865,14 +902,14 @@ impl Config {
 
         // Check that the lib built internally matches the required version
         let version = metadata::parse_version(version_str);
-        fn min_version(r: metadata::VersionRange) -> &str {
+        fn min_version(r: metadata::VersionRange<'_>) -> &str {
             match r.start_bound() {
                 std::ops::Bound::Unbounded => unreachable!(),
                 std::ops::Bound::Excluded(_) => unreachable!(),
                 std::ops::Bound::Included(b) => b,
             }
         }
-        fn max_version(r: metadata::VersionRange) -> Option<&str> {
+        fn max_version(r: metadata::VersionRange<'_>) -> Option<&str> {
             match r.end_bound() {
                 std::ops::Bound::Included(_) => unreachable!(),
                 std::ops::Bound::Unbounded => None,
@@ -953,7 +990,7 @@ pub struct InternalLib {
 }
 
 impl InternalLib {
-    fn new(name: String, is_static_available: bool) -> Self {
+    const fn new(name: String, is_static_available: bool) -> Self {
         InternalLib {
             name,
             is_static_available,
@@ -978,6 +1015,8 @@ pub struct Library {
     pub framework_paths: Vec<PathBuf>,
     /// directories where the compiler should look for header files
     pub include_paths: Vec<PathBuf>,
+    /// flags that should be passed to the linker
+    pub ld_args: Vec<Vec<String>>,
     /// macros that should be defined by the compiler
     pub defines: HashMap<String, Option<String>>,
     /// library version
@@ -1012,7 +1051,7 @@ impl Library {
                 let mut names = vec![format!("lib{}.a", name)];
 
                 if cfg!(target_os = "windows") {
-                    names.push(format!("{}.lib", name));
+                    names.push(format!("{name}.lib"));
                 }
 
                 names
@@ -1034,6 +1073,7 @@ impl Library {
                 .collect(),
             link_paths: l.link_paths,
             include_paths: l.include_paths,
+            ld_args: l.ld_args,
             frameworks: l.frameworks,
             framework_paths: l.framework_paths,
             defines: l.defines,
@@ -1049,6 +1089,7 @@ impl Library {
             libs: Vec::new(),
             link_paths: Vec::new(),
             include_paths: Vec::new(),
+            ld_args: Vec::new(),
             frameworks: Vec::new(),
             framework_paths: Vec::new(),
             defines: HashMap::new(),
@@ -1168,23 +1209,27 @@ enum BuildFlag {
     Lib(String, bool), // true if static
     LibFramework(String),
     RerunIfEnvChanged(EnvVariable),
+    LinkArg(Vec<String>),
 }
 
 impl fmt::Display for BuildFlag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            BuildFlag::Include(paths) => write!(f, "include={}", paths),
-            BuildFlag::SearchNative(lib) => write!(f, "rustc-link-search=native={}", lib),
-            BuildFlag::SearchFramework(lib) => write!(f, "rustc-link-search=framework={}", lib),
+            BuildFlag::Include(paths) => write!(f, "include={paths}"),
+            BuildFlag::SearchNative(lib) => write!(f, "rustc-link-search=native={lib}"),
+            BuildFlag::SearchFramework(lib) => write!(f, "rustc-link-search=framework={lib}"),
             BuildFlag::Lib(lib, statik) => {
                 if *statik {
-                    write!(f, "rustc-link-lib=static={}", lib)
+                    write!(f, "rustc-link-lib=static={lib}")
                 } else {
-                    write!(f, "rustc-link-lib={}", lib)
+                    write!(f, "rustc-link-lib={lib}")
                 }
             }
-            BuildFlag::LibFramework(lib) => write!(f, "rustc-link-lib=framework={}", lib),
-            BuildFlag::RerunIfEnvChanged(env) => write!(f, "rerun-if-env-changed={}", env),
+            BuildFlag::LibFramework(lib) => write!(f, "rustc-link-lib=framework={lib}"),
+            BuildFlag::RerunIfEnvChanged(env) => write!(f, "rerun-if-env-changed={env}"),
+            BuildFlag::LinkArg(ld_option) => {
+                write!(f, "rustc-link-arg=-Wl,{}", ld_option.join(","))
+            }
         }
     }
 }
@@ -1193,7 +1238,7 @@ impl fmt::Display for BuildFlag {
 struct BuildFlags(Vec<BuildFlag>);
 
 impl BuildFlags {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self(Vec::new())
     }
 
@@ -1205,7 +1250,7 @@ impl BuildFlags {
 impl fmt::Display for BuildFlags {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for flag in self.0.iter() {
-            writeln!(f, "cargo:{}", flag)?;
+            writeln!(f, "cargo:{flag}")?;
         }
         Ok(())
     }
@@ -1228,17 +1273,12 @@ fn split_string(value: &str) -> Vec<String> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 enum BuildInternal {
     Auto,
     Always,
+    #[default]
     Never,
-}
-
-impl Default for BuildInternal {
-    fn default() -> Self {
-        Self::Never
-    }
 }
 
 impl FromStr for BuildInternal {
@@ -1264,7 +1304,7 @@ impl std::error::Error for ParseError {}
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::VariantNotFound(v) => write!(f, "Unknown variant: `{}`", v),
+            Self::VariantNotFound(v) => write!(f, "Unknown variant: `{v}`"),
         }
     }
 }

@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, Editable, LayoutManager,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, Editable, LayoutManager,
     Overflow, Widget,
 };
 use glib::{prelude::*, translate::*};
@@ -36,6 +36,7 @@ impl EditableLabel {
 
     #[doc(alias = "gtk_editable_label_get_editing")]
     #[doc(alias = "get_editing")]
+    #[doc(alias = "editing")]
     pub fn is_editing(&self) -> bool {
         unsafe { from_glib(ffi::gtk_editable_label_get_editing(self.to_glib_none().0)) }
     }
@@ -168,6 +169,14 @@ impl EditableLabelBuilder {
             builder: self
                 .builder
                 .property("layout-manager", layout_manager.clone().upcast()),
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
         }
     }
 
@@ -315,6 +324,7 @@ impl EditableLabelBuilder {
     /// Build the [`EditableLabel`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> EditableLabel {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

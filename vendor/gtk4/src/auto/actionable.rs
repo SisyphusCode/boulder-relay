@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Accessible, Buildable, ConstraintTarget, Widget};
+use crate::{ffi, Accessible, Buildable, ConstraintTarget, Widget};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -31,6 +31,7 @@ mod sealed {
 pub trait ActionableExt: IsA<Actionable> + sealed::Sealed + 'static {
     #[doc(alias = "gtk_actionable_get_action_name")]
     #[doc(alias = "get_action_name")]
+    #[doc(alias = "action-name")]
     fn action_name(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_actionable_get_action_name(
@@ -41,6 +42,7 @@ pub trait ActionableExt: IsA<Actionable> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_actionable_get_action_target_value")]
     #[doc(alias = "get_action_target_value")]
+    #[doc(alias = "action-target")]
     fn action_target_value(&self) -> Option<glib::Variant> {
         unsafe {
             from_glib_none(ffi::gtk_actionable_get_action_target_value(
@@ -50,6 +52,7 @@ pub trait ActionableExt: IsA<Actionable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_actionable_set_action_name")]
+    #[doc(alias = "action-name")]
     fn set_action_name(&self, action_name: Option<&str>) {
         unsafe {
             ffi::gtk_actionable_set_action_name(
@@ -60,6 +63,7 @@ pub trait ActionableExt: IsA<Actionable> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_actionable_set_action_target_value")]
+    #[doc(alias = "action-target")]
     fn set_action_target_value(&self, target_value: Option<&glib::Variant>) {
         unsafe {
             ffi::gtk_actionable_set_action_target_value(
@@ -97,7 +101,7 @@ pub trait ActionableExt: IsA<Actionable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::action-name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_action_name_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -123,7 +127,7 @@ pub trait ActionableExt: IsA<Actionable> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::action-target\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_action_target_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

@@ -147,6 +147,7 @@ use std::{
 };
 
 pub use crate::collections::{ptr_slice::IntoPtrSlice, strv::IntoStrV};
+use crate::ffi;
 pub use crate::gstring::{IntoGStr, IntoOptionalGStr};
 
 use libc::{c_char, size_t};
@@ -424,7 +425,7 @@ pub trait GlibPtrDefault {
     type GlibType: Ptr;
 }
 
-impl<'a, T: ?Sized + GlibPtrDefault> GlibPtrDefault for &'a T {
+impl<T: ?Sized + GlibPtrDefault> GlibPtrDefault for &T {
     type GlibType = <T as GlibPtrDefault>::GlibType;
 }
 
@@ -467,7 +468,7 @@ pub trait ToGlibPtrMut<'a, P: Copy> {
     ///
     /// The pointer in the `Stash` is only valid for the lifetime of the `Stash`.
     #[allow(clippy::wrong_self_convention)]
-    fn to_glib_none_mut(&'a mut self) -> StashMut<P, Self>;
+    fn to_glib_none_mut(&'a mut self) -> StashMut<'a, P, Self>;
 }
 
 impl<'a, P: Ptr, T: ToGlibPtr<'a, P>> ToGlibPtr<'a, P> for Option<T> {
@@ -1084,6 +1085,10 @@ impl_to_glib_container_from_slice_string!(&'a OsStr, *mut c_char);
 impl_to_glib_container_from_slice_string!(&'a OsStr, *const c_char);
 impl_to_glib_container_from_slice_string!(OsString, *mut c_char);
 impl_to_glib_container_from_slice_string!(OsString, *const c_char);
+impl_to_glib_container_from_slice_string!(&'a CStr, *mut c_char);
+impl_to_glib_container_from_slice_string!(&'a CStr, *const c_char);
+impl_to_glib_container_from_slice_string!(CString, *mut c_char);
+impl_to_glib_container_from_slice_string!(CString, *const c_char);
 impl_to_glib_container_from_slice_string!(crate::GString, *mut c_char);
 impl_to_glib_container_from_slice_string!(crate::GString, *const c_char);
 

@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::ContentFormats;
+use crate::{ffi, ContentFormats};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -83,6 +84,7 @@ pub trait ContentProviderExt: IsA<ContentProvider> + sealed::Sealed + 'static {
 
     #[doc(alias = "gdk_content_provider_ref_storable_formats")]
     #[doc(alias = "ref_storable_formats")]
+    #[doc(alias = "storable-formats")]
     fn storable_formats(&self) -> ContentFormats {
         unsafe {
             from_glib_full(ffi::gdk_content_provider_ref_storable_formats(
@@ -187,7 +189,7 @@ pub trait ContentProviderExt: IsA<ContentProvider> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"content-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     content_changed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -213,7 +215,7 @@ pub trait ContentProviderExt: IsA<ContentProvider> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::formats\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_formats_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -239,7 +241,7 @@ pub trait ContentProviderExt: IsA<ContentProvider> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::storable-formats\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_storable_formats_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

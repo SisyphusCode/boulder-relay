@@ -29,6 +29,7 @@ generate = [
     "Gio.DBusAuthObserver",
     "Gio.DBusCallFlags",
     "Gio.DBusCapabilityFlags",
+    "Gio.DBusError",
     "Gio.DBusInterfaceGetPropertyFunc",
     "Gio.DBusInterfaceMethodCallFunc",
     "Gio.DBusInterfaceSetPropertyFunc",
@@ -45,16 +46,23 @@ generate = [
     "Gio.DBusObject",
     "Gio.DBusObjectManager",
     "Gio.DBusObjectManagerClientFlags",
+    "Gio.DBusObjectManagerServer",
+    "Gio.DBusObjectProxy",
+    "Gio.DBusObjectSkeleton",
     "Gio.DBusPropertyInfo",
+    "Gio.DBusPropertyInfoFlags",
     "Gio.DBusSendMessageFlags",
     "Gio.DBusServer",
     "Gio.DBusServerFlags",
     "Gio.DBusSignalFlags",
     "Gio.DBusSignalInfo",
+    "Gio.DBusSubtreeFlags",
     "Gio.DebugController",
     "Gio.Drive",
     "Gio.DriveStartFlags",
     "Gio.DriveStartStopType",
+    "Gio.DtlsClientConnection",
+    "Gio.DtlsServerConnection",
     "Gio.Emblem",
     "Gio.EmblemedIcon",
     "Gio.EmblemOrigin",
@@ -72,8 +80,10 @@ generate = [
     "Gio.FilenameCompleter",
     "Gio.FileOutputStream",
     "Gio.FileQueryInfoFlags",
+    "Gio.FilesystemPreviewType",
     "Gio.FileType",
     "Gio.FilterInputStream",
+    "Gio.IOModuleScopeFlags",
     "Gio.IOStreamSpliceFlags",
     "Gio.LoadableIcon",
     "Gio.MemoryMonitor",
@@ -85,6 +95,8 @@ generate = [
     "Gio.MountOperation",
     "Gio.MountOperationResult",
     "Gio.MountUnmountFlags",
+    "Gio.NativeSocketAddress",
+    "Gio.NativeVolumeMonitor",
     "Gio.NetworkConnectivity",
     "Gio.NetworkMonitor",
     "Gio.NetworkService",
@@ -96,11 +108,13 @@ generate = [
     "Gio.PollableReturn",
     "Gio.PropertyAction",
     "Gio.Proxy",
+    "Gio.ProxyAddressEnumerator",
     "Gio.ProxyResolver",
     "Gio.RemoteActionGroup",
     "Gio.ResolverError",
     "Gio.ResolverNameLookupFlags",
     "Gio.ResourceError",
+    "Gio.ResourceFlags",
     "Gio.ResourceLookupFlags",
     "Gio.Seekable",
     "Gio.SettingsBackend",
@@ -118,17 +132,20 @@ generate = [
     "Gio.SocketConnectable",
     "Gio.SocketConnection",
     "Gio.SocketFamily",
-    "Gio.SocketListener",
     "Gio.SocketListenerEvent",
     "Gio.SocketProtocol",
     "Gio.SocketService",
     "Gio.SocketType",
     "Gio.SrvTarget",
     "Gio.TcpConnection",
+    "Gio.TcpWrapperConnection",
+    "Gio.TestDBus",
+    "Gio.TestDBusFlags",
     "Gio.TlsAuthenticationMode",
     "Gio.TlsBackend",
     "Gio.TlsCertificate",
     "Gio.TlsCertificateRequestFlags",
+    "Gio.TlsChannelBindingError",
     "Gio.TlsClientConnection",
     "Gio.TlsDatabase",
     "Gio.TlsDatabaseLookupFlags",
@@ -147,6 +164,7 @@ generate = [
 ]
 
 ignore = [
+    "Gio.ThreadedResolver", # Same as sys class, not sure if this needs to be exposed
 ]
 
 manual = [
@@ -156,6 +174,7 @@ manual = [
     "Gio.IOExtension",
     "Gio.IOExtensionPoint",
     "Gio.OutputMessage",
+    "Gio.SocketMsgFlags",
     "Gio.Task",
     "GLib.ByteArray",
     "GLib.Bytes",
@@ -588,6 +607,11 @@ status = "generate"
     pattern = "signal_.*subscribe"
     #wrapped with newtype manually
     manual = true
+    [[object.function]]
+    name = "register_object_with_closures2"
+    #old version is wrapped correctly and we don't require
+    #the new version
+    ignore = true
 
 [[object]]
 name = "Gio.DBusConnectionFlags"
@@ -645,7 +669,16 @@ status = "generate"
     name = "return_error_literal"
     # glib::ErrorDomain
     manual = true
-
+    [[object.function]]
+    name = "get_sender"
+        [object.function.return]
+        # https://gitlab.gnome.org/GNOME/glib/-/merge_requests/4414
+        nullable = true
+    [[object.function]]
+    name = "get_interface_name"
+        [object.function.return]
+        # https://gitlab.gnome.org/GNOME/glib/-/merge_requests/4414
+        nullable = true
 
 [[object]]
 name = "Gio.DBusProxy"
@@ -701,6 +734,13 @@ cfg_condition = "all(not(windows),not(target_os = \"macos\"))"
     manual = true
 
 [[object]]
+name = "Gio.DtlsConnection"
+status = "generate"
+    [[object.function]]
+    name = "get_channel_binding_data"
+    ignore = true # needs manual implementation
+
+[[object]]
 name = "Gio.File"
 status = "generate"
 concurrency = "send+sync"
@@ -753,10 +793,18 @@ manual_traits = ["FileExtManual"]
     manual = true
     doc_trait_name = "FileExtManual"
     [[object.function]]
+    name = "copy_async_with_closures"
+    # Manually implemented above
+    ignore = true
+    [[object.function]]
     name = "move_async"
     # Multiple callbacks
     manual = true
     doc_trait_name = "FileExtManual"
+    [[object.function]]
+    name = "move_async_with_closures"
+    # Manually implemented above
+    ignore = true
     [[object.function]]
     name = "load_partial_contents_async"
     # Multiple callbacks
@@ -1326,6 +1374,11 @@ manual_traits = ["SocketControlMessageExtManual"]
     doc_trait_name = "SocketControlMessageExtManual"
 
 [[object]]
+name = "Gio.SocketListener"
+status = "generate"
+manual_traits = ["SocketListenerExtManual"]
+
+[[object]]
 name = "Gio.Subprocess"
 status = "generate"
     [[object.function]]
@@ -1395,6 +1448,9 @@ status = "generate"
     [[object.function]]
     name = "close"
     cfg_condition = "unix"
+    [[object.function]]
+    name = "set_environ"
+    manual = true
 
 [[object]]
 name = "Gio.ThemedIcon"
@@ -1458,6 +1514,11 @@ status = "generate"
     # missing (element-type guint8) annotation
     name = "set_value"
     ignore = true
+
+[[object]]
+name = "Gio.UnixConnection"
+status = "generate"
+cfg_condition = "unix"
 
 [[object]]
 name = "Gio.UnixCredentialsMessage"
@@ -1553,6 +1614,37 @@ concurrency = "send+sync"
 cfg_condition = "unix"
     [[object.derive]]
     name = "Debug"
+    [[object.function]]
+    pattern = "compare|get_device_path|get_fs_type|get_mount_path|guess_can_eject|guess_name|guess_icon|guess_should_display|guess_symbolic_icon|is_readonly|is_system_internal"
+    version = "2.0"
+        [[object.function.parameter]]
+        pattern = ".+"
+        const = true
+    [[object.function]]
+    name = "get_options"
+    version = "2.58"
+        [[object.function.parameter]]
+        pattern = ".+"
+        const = true
+    [[object.function]]
+    name = "get_root_path"
+    version = "2.60"
+        [[object.function.parameter]]
+        pattern = ".+"
+        const = true
+    [[object.function]]
+    name = "at"
+    version = "2.0"
+    rename = "for_mount_path"
+    [[object.function]]
+    name = "for"
+    version = "2.0"
+    rename = "for_file_path"
+
+[[object]]
+name = "Gio.UnixMountMonitor"
+status = "generate"
+cfg_condition = "unix"
 
 [[object]]
 name = "Gio.UnixMountPoint"

@@ -3,8 +3,8 @@
 use std::{fmt, ptr};
 
 use crate::{
-    object::ObjectRef, prelude::*, translate::*, Binding, BindingFlags, BindingGroup, BoolError,
-    Object, ParamSpec, Value,
+    ffi, gobject_ffi, object::ObjectRef, prelude::*, translate::*, Binding, BindingFlags,
+    BindingGroup, BoolError, Object, ParamSpec, Value,
 };
 
 impl BindingGroup {
@@ -34,7 +34,7 @@ pub struct BindingGroupBuilder<'a> {
     transform_from: TransformFn,
 }
 
-impl<'a> fmt::Debug for BindingGroupBuilder<'a> {
+impl fmt::Debug for BindingGroupBuilder<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("BindingGroupBuilder")
             .field("group", &self.group)

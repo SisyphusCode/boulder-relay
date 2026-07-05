@@ -13,9 +13,15 @@
 edition = "2021"
 rust-version = "1.70"
 name = "graphene-rs"
-version = "0.19.8"
+version = "0.20.10"
 authors = ["The gtk-rs Project Developers"]
+build = false
 exclude = ["gir-files/*"]
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "Rust bindings for the Graphene library"
 homepage = "https://gtk-rs.org/"
 documentation = "https://gtk-rs.org/gtk-rs-core/stable/latest/docs/graphene/"
@@ -42,21 +48,24 @@ rustdoc-args = [
     "--generate-link-to-definition",
 ]
 
+[features]
+
 [lib]
 name = "graphene"
+path = "src/lib.rs"
 
-[dependencies.ffi]
-version = "0.19"
-package = "graphene-sys"
+[[test]]
+name = "check_gir"
+path = "tests/check_gir.rs"
 
 [dependencies.glib]
-version = "0.19"
+version = "0.20.3"
+
+[dependencies.graphene-sys]
+version = "0.20"
 
 [dependencies.libc]
 version = "0.2"
 
 [dev-dependencies.gir-format-check]
 version = "^0.1"
-
-[features]
-v1_12 = ["ffi/v1_12"]

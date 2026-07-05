@@ -2,8 +2,11 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+use crate::AccessibleText;
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, Editable, EntryBuffer,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, Editable, EntryBuffer,
     InputHints, InputPurpose, LayoutManager, Overflow, Widget,
 };
 use glib::{
@@ -13,6 +16,18 @@ use glib::{
 };
 use std::boxed::Box as Box_;
 
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+glib::wrapper! {
+    #[doc(alias = "GtkText")]
+    pub struct Text(Object<ffi::GtkText>) @extends Widget, @implements Accessible, Buildable, ConstraintTarget, AccessibleText, Editable;
+
+    match fn {
+        type_ => || ffi::gtk_text_get_type(),
+    }
+}
+
+#[cfg(not(any(feature = "v4_14")))]
 glib::wrapper! {
     #[doc(alias = "GtkText")]
     pub struct Text(Object<ffi::GtkText>) @extends Widget, @implements Accessible, Buildable, ConstraintTarget, Editable;
@@ -68,6 +83,7 @@ impl Text {
 
     #[doc(alias = "gtk_text_get_activates_default")]
     #[doc(alias = "get_activates_default")]
+    #[doc(alias = "activates-default")]
     pub fn activates_default(&self) -> bool {
         unsafe { from_glib(ffi::gtk_text_get_activates_default(self.to_glib_none().0)) }
     }
@@ -86,6 +102,7 @@ impl Text {
 
     #[doc(alias = "gtk_text_get_enable_emoji_completion")]
     #[doc(alias = "get_enable_emoji_completion")]
+    #[doc(alias = "enable-emoji-completion")]
     pub fn enables_emoji_completion(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_text_get_enable_emoji_completion(
@@ -96,24 +113,28 @@ impl Text {
 
     #[doc(alias = "gtk_text_get_extra_menu")]
     #[doc(alias = "get_extra_menu")]
+    #[doc(alias = "extra-menu")]
     pub fn extra_menu(&self) -> Option<gio::MenuModel> {
         unsafe { from_glib_none(ffi::gtk_text_get_extra_menu(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_text_get_input_hints")]
     #[doc(alias = "get_input_hints")]
+    #[doc(alias = "input-hints")]
     pub fn input_hints(&self) -> InputHints {
         unsafe { from_glib(ffi::gtk_text_get_input_hints(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_text_get_input_purpose")]
     #[doc(alias = "get_input_purpose")]
+    #[doc(alias = "input-purpose")]
     pub fn input_purpose(&self) -> InputPurpose {
         unsafe { from_glib(ffi::gtk_text_get_input_purpose(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_text_get_invisible_char")]
     #[doc(alias = "get_invisible_char")]
+    #[doc(alias = "invisible-char")]
     pub fn invisible_char(&self) -> char {
         unsafe {
             std::convert::TryFrom::try_from(ffi::gtk_text_get_invisible_char(self.to_glib_none().0))
@@ -123,24 +144,28 @@ impl Text {
 
     #[doc(alias = "gtk_text_get_max_length")]
     #[doc(alias = "get_max_length")]
+    #[doc(alias = "max-length")]
     pub fn max_length(&self) -> i32 {
         unsafe { ffi::gtk_text_get_max_length(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_text_get_overwrite_mode")]
     #[doc(alias = "get_overwrite_mode")]
+    #[doc(alias = "overwrite-mode")]
     pub fn is_overwrite_mode(&self) -> bool {
         unsafe { from_glib(ffi::gtk_text_get_overwrite_mode(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_text_get_placeholder_text")]
     #[doc(alias = "get_placeholder_text")]
+    #[doc(alias = "placeholder-text")]
     pub fn placeholder_text(&self) -> Option<glib::GString> {
         unsafe { from_glib_none(ffi::gtk_text_get_placeholder_text(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_text_get_propagate_text_width")]
     #[doc(alias = "get_propagate_text_width")]
+    #[doc(alias = "propagate-text-width")]
     pub fn propagates_text_width(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_text_get_propagate_text_width(
@@ -163,12 +188,14 @@ impl Text {
 
     #[doc(alias = "gtk_text_get_truncate_multiline")]
     #[doc(alias = "get_truncate_multiline")]
+    #[doc(alias = "truncate-multiline")]
     pub fn must_truncate_multiline(&self) -> bool {
         unsafe { from_glib(ffi::gtk_text_get_truncate_multiline(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_text_get_visibility")]
     #[doc(alias = "get_visibility")]
+    #[doc(alias = "visibility")]
     pub fn is_visible(&self) -> bool {
         unsafe { from_glib(ffi::gtk_text_get_visibility(self.to_glib_none().0)) }
     }
@@ -183,6 +210,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_activates_default")]
+    #[doc(alias = "activates-default")]
     pub fn set_activates_default(&self, activates: bool) {
         unsafe {
             ffi::gtk_text_set_activates_default(self.to_glib_none().0, activates.into_glib());
@@ -190,6 +218,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_attributes")]
+    #[doc(alias = "attributes")]
     pub fn set_attributes(&self, attrs: Option<&pango::AttrList>) {
         unsafe {
             ffi::gtk_text_set_attributes(self.to_glib_none().0, attrs.to_glib_none().0);
@@ -197,6 +226,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_buffer")]
+    #[doc(alias = "buffer")]
     pub fn set_buffer(&self, buffer: &impl IsA<EntryBuffer>) {
         unsafe {
             ffi::gtk_text_set_buffer(self.to_glib_none().0, buffer.as_ref().to_glib_none().0);
@@ -204,6 +234,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_enable_emoji_completion")]
+    #[doc(alias = "enable-emoji-completion")]
     pub fn set_enable_emoji_completion(&self, enable_emoji_completion: bool) {
         unsafe {
             ffi::gtk_text_set_enable_emoji_completion(
@@ -214,6 +245,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_extra_menu")]
+    #[doc(alias = "extra-menu")]
     pub fn set_extra_menu(&self, model: Option<&impl IsA<gio::MenuModel>>) {
         unsafe {
             ffi::gtk_text_set_extra_menu(
@@ -224,6 +256,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_input_hints")]
+    #[doc(alias = "input-hints")]
     pub fn set_input_hints(&self, hints: InputHints) {
         unsafe {
             ffi::gtk_text_set_input_hints(self.to_glib_none().0, hints.into_glib());
@@ -231,6 +264,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_input_purpose")]
+    #[doc(alias = "input-purpose")]
     pub fn set_input_purpose(&self, purpose: InputPurpose) {
         unsafe {
             ffi::gtk_text_set_input_purpose(self.to_glib_none().0, purpose.into_glib());
@@ -238,6 +272,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_invisible_char")]
+    #[doc(alias = "invisible-char")]
     pub fn set_invisible_char(&self, ch: char) {
         unsafe {
             ffi::gtk_text_set_invisible_char(self.to_glib_none().0, ch.into_glib());
@@ -245,6 +280,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_max_length")]
+    #[doc(alias = "max-length")]
     pub fn set_max_length(&self, length: i32) {
         unsafe {
             ffi::gtk_text_set_max_length(self.to_glib_none().0, length);
@@ -252,6 +288,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_overwrite_mode")]
+    #[doc(alias = "overwrite-mode")]
     pub fn set_overwrite_mode(&self, overwrite: bool) {
         unsafe {
             ffi::gtk_text_set_overwrite_mode(self.to_glib_none().0, overwrite.into_glib());
@@ -259,6 +296,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_placeholder_text")]
+    #[doc(alias = "placeholder-text")]
     pub fn set_placeholder_text(&self, text: Option<&str>) {
         unsafe {
             ffi::gtk_text_set_placeholder_text(self.to_glib_none().0, text.to_glib_none().0);
@@ -266,6 +304,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_propagate_text_width")]
+    #[doc(alias = "propagate-text-width")]
     pub fn set_propagate_text_width(&self, propagate_text_width: bool) {
         unsafe {
             ffi::gtk_text_set_propagate_text_width(
@@ -276,6 +315,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_tabs")]
+    #[doc(alias = "tabs")]
     pub fn set_tabs(&self, tabs: Option<&pango::TabArray>) {
         unsafe {
             ffi::gtk_text_set_tabs(self.to_glib_none().0, mut_override(tabs.to_glib_none().0));
@@ -283,6 +323,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_truncate_multiline")]
+    #[doc(alias = "truncate-multiline")]
     pub fn set_truncate_multiline(&self, truncate_multiline: bool) {
         unsafe {
             ffi::gtk_text_set_truncate_multiline(
@@ -293,6 +334,7 @@ impl Text {
     }
 
     #[doc(alias = "gtk_text_set_visibility")]
+    #[doc(alias = "visibility")]
     pub fn set_visibility(&self, visible: bool) {
         unsafe {
             ffi::gtk_text_set_visibility(self.to_glib_none().0, visible.into_glib());
@@ -344,7 +386,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::activates-default\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_activates_default_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -367,7 +409,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::attributes\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_attributes_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -390,7 +432,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::buffer\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_buffer_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -416,7 +458,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::enable-emoji-completion\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_enable_emoji_completion_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -439,7 +481,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::extra-menu\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_extra_menu_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -462,7 +504,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::im-module\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_im_module_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -485,7 +527,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::input-hints\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_input_hints_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -508,7 +550,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::input-purpose\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_input_purpose_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -531,7 +573,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::invisible-char\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_invisible_char_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -557,7 +599,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::invisible-char-set\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_invisible_char_set_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -580,7 +622,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::max-length\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_max_length_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -603,7 +645,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::overwrite-mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_overwrite_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -626,7 +668,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::placeholder-text\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_placeholder_text_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -652,7 +694,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::propagate-text-width\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_propagate_text_width_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -675,7 +717,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::scroll-offset\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_scroll_offset_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -698,7 +740,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::tabs\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_tabs_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -724,7 +766,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::truncate-multiline\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_truncate_multiline_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -747,7 +789,7 @@ impl Text {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::visibility\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_visibility_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -974,6 +1016,14 @@ impl TextBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -1118,6 +1168,7 @@ impl TextBuilder {
     /// Build the [`Text`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Text {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

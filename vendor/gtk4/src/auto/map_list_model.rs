@@ -2,6 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use crate::ffi;
 #[cfg(feature = "v4_12")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
 use crate::SectionModel;
@@ -74,6 +75,7 @@ impl MapListModel {
     }
 
     #[doc(alias = "gtk_map_list_model_has_map")]
+    #[doc(alias = "has-map")]
     pub fn has_map(&self) -> bool {
         unsafe { from_glib(ffi::gtk_map_list_model_has_map(self.to_glib_none().0)) }
     }
@@ -132,7 +134,7 @@ impl MapListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::has-map\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_has_map_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

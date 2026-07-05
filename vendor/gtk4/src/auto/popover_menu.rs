@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Native,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Native,
     Overflow, Popover, PopoverMenuFlags, PositionType, ShortcutManager, Widget,
 };
 use glib::{
@@ -80,6 +80,7 @@ impl PopoverMenu {
 
     #[doc(alias = "gtk_popover_menu_get_menu_model")]
     #[doc(alias = "get_menu_model")]
+    #[doc(alias = "menu-model")]
     pub fn menu_model(&self) -> Option<gio::MenuModel> {
         unsafe { from_glib_none(ffi::gtk_popover_menu_get_menu_model(self.to_glib_none().0)) }
     }
@@ -97,6 +98,7 @@ impl PopoverMenu {
     #[cfg(feature = "v4_14")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
     #[doc(alias = "gtk_popover_menu_set_flags")]
+    #[doc(alias = "flags")]
     pub fn set_flags(&self, flags: PopoverMenuFlags) {
         unsafe {
             ffi::gtk_popover_menu_set_flags(self.to_glib_none().0, flags.into_glib());
@@ -104,6 +106,7 @@ impl PopoverMenu {
     }
 
     #[doc(alias = "gtk_popover_menu_set_menu_model")]
+    #[doc(alias = "menu-model")]
     pub fn set_menu_model(&self, model: Option<&impl IsA<gio::MenuModel>>) {
         unsafe {
             ffi::gtk_popover_menu_set_menu_model(
@@ -140,7 +143,7 @@ impl PopoverMenu {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::flags\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_flags_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -163,7 +166,7 @@ impl PopoverMenu {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::menu-model\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_menu_model_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -186,7 +189,7 @@ impl PopoverMenu {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::visible-submenu\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_visible_submenu_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -367,6 +370,14 @@ impl PopoverMenuBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -475,6 +486,7 @@ impl PopoverMenuBuilder {
     /// Build the [`PopoverMenu`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> PopoverMenu {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

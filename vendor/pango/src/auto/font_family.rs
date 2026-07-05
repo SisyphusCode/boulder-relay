@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::FontFace;
+use crate::{ffi, FontFace};
 #[cfg(feature = "v1_52")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v1_52")))]
 use glib::signal::{connect_raw, SignalHandlerId};
@@ -61,6 +61,7 @@ pub trait FontFamilyExt: IsA<FontFamily> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "pango_font_family_is_monospace")]
+    #[doc(alias = "is-monospace")]
     fn is_monospace(&self) -> bool {
         unsafe {
             from_glib(ffi::pango_font_family_is_monospace(
@@ -72,6 +73,7 @@ pub trait FontFamilyExt: IsA<FontFamily> + sealed::Sealed + 'static {
     #[cfg(feature = "v1_44")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v1_44")))]
     #[doc(alias = "pango_font_family_is_variable")]
+    #[doc(alias = "is-variable")]
     fn is_variable(&self) -> bool {
         unsafe {
             from_glib(ffi::pango_font_family_is_variable(

@@ -3,7 +3,8 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow, Widget,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
+    Widget,
 };
 use glib::{
     prelude::*,
@@ -44,6 +45,7 @@ impl ActionBar {
 
     #[doc(alias = "gtk_action_bar_get_revealed")]
     #[doc(alias = "get_revealed")]
+    #[doc(alias = "revealed")]
     pub fn is_revealed(&self) -> bool {
         unsafe { from_glib(ffi::gtk_action_bar_get_revealed(self.to_glib_none().0)) }
     }
@@ -80,6 +82,7 @@ impl ActionBar {
     }
 
     #[doc(alias = "gtk_action_bar_set_revealed")]
+    #[doc(alias = "revealed")]
     pub fn set_revealed(&self, revealed: bool) {
         unsafe {
             ffi::gtk_action_bar_set_revealed(self.to_glib_none().0, revealed.into_glib());
@@ -101,7 +104,7 @@ impl ActionBar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::revealed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_revealed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -218,6 +221,14 @@ impl ActionBarBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -326,6 +337,7 @@ impl ActionBarBuilder {
     /// Build the [`ActionBar`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> ActionBar {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

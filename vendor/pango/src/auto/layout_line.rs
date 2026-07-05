@@ -5,7 +5,7 @@
 #[cfg(feature = "v1_50")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v1_50")))]
 use crate::Direction;
-use crate::Rectangle;
+use crate::{ffi, Rectangle};
 use glib::translate::*;
 
 glib::wrapper! {
@@ -88,23 +88,6 @@ impl LayoutLine {
     #[doc(alias = "get_start_index")]
     pub fn start_index(&self) -> i32 {
         unsafe { ffi::pango_layout_line_get_start_index(self.to_glib_none().0) }
-    }
-
-    #[doc(alias = "pango_layout_line_get_x_ranges")]
-    #[doc(alias = "get_x_ranges")]
-    pub fn x_ranges(&self, start_index: i32, end_index: i32) -> Vec<i32> {
-        unsafe {
-            let mut ranges = std::ptr::null_mut();
-            let mut n_ranges = std::mem::MaybeUninit::uninit();
-            ffi::pango_layout_line_get_x_ranges(
-                self.to_glib_none().0,
-                start_index,
-                end_index,
-                &mut ranges,
-                n_ranges.as_mut_ptr(),
-            );
-            FromGlibContainer::from_glib_full_num(ranges, n_ranges.assume_init() as _)
-        }
     }
 
     #[doc(alias = "pango_layout_line_index_to_x")]

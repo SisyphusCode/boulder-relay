@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::Buildable;
+use crate::{ffi, Buildable};
 use glib::translate::*;
 
 glib::wrapper! {
@@ -26,6 +26,13 @@ impl StringList {
         unsafe {
             ffi::gtk_string_list_append(self.to_glib_none().0, string.to_glib_none().0);
         }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "gtk_string_list_find")]
+    pub fn find(&self, string: &str) -> u32 {
+        unsafe { ffi::gtk_string_list_find(self.to_glib_none().0, string.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_string_list_get_string")]

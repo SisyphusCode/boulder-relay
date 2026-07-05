@@ -2,8 +2,12 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Action, SettingsBackend, SettingsSchema};
+#[cfg(feature = "v2_82")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v2_82")))]
+use crate::SettingsBindFlags;
+use crate::{ffi, Action, SettingsBackend, SettingsSchema};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -108,6 +112,31 @@ pub trait SettingsExt: IsA<Settings> + sealed::Sealed + 'static {
         }
     }
 
+    #[cfg(feature = "v2_82")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v2_82")))]
+    #[doc(alias = "g_settings_bind_with_mapping_closures")]
+    fn bind_with_mapping_closures(
+        &self,
+        key: &str,
+        object: &impl IsA<glib::Object>,
+        property: &str,
+        flags: SettingsBindFlags,
+        get_mapping: Option<&glib::Closure>,
+        set_mapping: Option<&glib::Closure>,
+    ) {
+        unsafe {
+            ffi::g_settings_bind_with_mapping_closures(
+                self.as_ref().to_glib_none().0,
+                key.to_glib_none().0,
+                object.as_ref().to_glib_none().0,
+                property.to_glib_none().0,
+                flags.into_glib(),
+                get_mapping.to_glib_none().0,
+                set_mapping.to_glib_none().0,
+            );
+        }
+    }
+
     #[doc(alias = "g_settings_bind_writable")]
     fn bind_writable(
         &self,
@@ -203,6 +232,7 @@ pub trait SettingsExt: IsA<Settings> + sealed::Sealed + 'static {
 
     #[doc(alias = "g_settings_get_has_unapplied")]
     #[doc(alias = "get_has_unapplied")]
+    #[doc(alias = "has-unapplied")]
     fn has_unapplied(&self) -> bool {
         unsafe {
             from_glib(ffi::g_settings_get_has_unapplied(
@@ -225,7 +255,7 @@ pub trait SettingsExt: IsA<Settings> + sealed::Sealed + 'static {
 
     //#[doc(alias = "g_settings_get_mapped")]
     //#[doc(alias = "get_mapped")]
-    //fn mapped(&self, key: &str, mapping: /*Unimplemented*/FnMut(&glib::Variant, /*Unimplemented*/Option<Basic: Pointer>) -> bool, user_data: /*Unimplemented*/Option<Basic: Pointer>) -> /*Unimplemented*/Option<Basic: Pointer> {
+    //fn mapped(&self, key: &str, mapping: /*Unimplemented*/FnMut(Option<&glib::Variant>, /*Unimplemented*/Option<Basic: Pointer>) -> bool, user_data: /*Unimplemented*/Option<Basic: Pointer>) -> /*Unimplemented*/Option<Basic: Pointer> {
     //    unsafe { TODO: call ffi:g_settings_get_mapped() }
     //}
 
@@ -488,7 +518,7 @@ pub trait SettingsExt: IsA<Settings> + sealed::Sealed + 'static {
     ) -> SignalHandlerId {
         unsafe extern "C" fn changed_trampoline<P: IsA<Settings>, F: Fn(&P, &str) + 'static>(
             this: *mut ffi::GSettings,
-            key: *mut libc::c_char,
+            key: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -524,7 +554,7 @@ pub trait SettingsExt: IsA<Settings> + sealed::Sealed + 'static {
             F: Fn(&P, u32) -> glib::Propagation + 'static,
         >(
             this: *mut ffi::GSettings,
-            key: libc::c_uint,
+            key: std::ffi::c_uint,
             f: glib::ffi::gpointer,
         ) -> glib::ffi::gboolean {
             let f: &F = &*(f as *const F);
@@ -554,7 +584,7 @@ pub trait SettingsExt: IsA<Settings> + sealed::Sealed + 'static {
             F: Fn(&P, &str) + 'static,
         >(
             this: *mut ffi::GSettings,
-            key: *mut libc::c_char,
+            key: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);

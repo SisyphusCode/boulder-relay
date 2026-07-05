@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{ContentFormats, ContentProvider, Display, Texture};
+use crate::{ffi, ContentFormats, ContentProvider, Display, Texture};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -39,6 +40,7 @@ impl Clipboard {
     }
 
     #[doc(alias = "gdk_clipboard_is_local")]
+    #[doc(alias = "local")]
     pub fn is_local(&self) -> bool {
         unsafe { from_glib(ffi::gdk_clipboard_is_local(self.to_glib_none().0)) }
     }
@@ -340,7 +342,7 @@ impl Clipboard {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     changed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -363,7 +365,7 @@ impl Clipboard {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::content\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_content_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -386,7 +388,7 @@ impl Clipboard {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::formats\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_formats_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -409,7 +411,7 @@ impl Clipboard {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::local\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_local_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

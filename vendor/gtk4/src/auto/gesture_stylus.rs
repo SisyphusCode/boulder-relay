@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{EventController, Gesture, GestureSingle, PropagationLimit, PropagationPhase};
+use crate::{ffi, EventController, Gesture, GestureSingle, PropagationLimit, PropagationPhase};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -88,6 +89,7 @@ impl GestureStylus {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
     #[doc(alias = "gtk_gesture_stylus_get_stylus_only")]
     #[doc(alias = "get_stylus_only")]
+    #[doc(alias = "stylus-only")]
     pub fn is_stylus_only(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_gesture_stylus_get_stylus_only(
@@ -99,6 +101,7 @@ impl GestureStylus {
     #[cfg(feature = "v4_10")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
     #[doc(alias = "gtk_gesture_stylus_set_stylus_only")]
+    #[doc(alias = "stylus-only")]
     pub fn set_stylus_only(&self, stylus_only: bool) {
         unsafe {
             ffi::gtk_gesture_stylus_set_stylus_only(self.to_glib_none().0, stylus_only.into_glib());
@@ -109,8 +112,8 @@ impl GestureStylus {
     pub fn connect_down<F: Fn(&Self, f64, f64) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn down_trampoline<F: Fn(&GestureStylus, f64, f64) + 'static>(
             this: *mut ffi::GtkGestureStylus,
-            x: libc::c_double,
-            y: libc::c_double,
+            x: std::ffi::c_double,
+            y: std::ffi::c_double,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -121,7 +124,7 @@ impl GestureStylus {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"down\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     down_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -133,8 +136,8 @@ impl GestureStylus {
     pub fn connect_motion<F: Fn(&Self, f64, f64) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn motion_trampoline<F: Fn(&GestureStylus, f64, f64) + 'static>(
             this: *mut ffi::GtkGestureStylus,
-            x: libc::c_double,
-            y: libc::c_double,
+            x: std::ffi::c_double,
+            y: std::ffi::c_double,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -145,7 +148,7 @@ impl GestureStylus {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"motion\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     motion_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -157,8 +160,8 @@ impl GestureStylus {
     pub fn connect_proximity<F: Fn(&Self, f64, f64) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn proximity_trampoline<F: Fn(&GestureStylus, f64, f64) + 'static>(
             this: *mut ffi::GtkGestureStylus,
-            x: libc::c_double,
-            y: libc::c_double,
+            x: std::ffi::c_double,
+            y: std::ffi::c_double,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -169,7 +172,7 @@ impl GestureStylus {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"proximity\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     proximity_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -181,8 +184,8 @@ impl GestureStylus {
     pub fn connect_up<F: Fn(&Self, f64, f64) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn up_trampoline<F: Fn(&GestureStylus, f64, f64) + 'static>(
             this: *mut ffi::GtkGestureStylus,
-            x: libc::c_double,
-            y: libc::c_double,
+            x: std::ffi::c_double,
+            y: std::ffi::c_double,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -193,7 +196,7 @@ impl GestureStylus {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"up\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     up_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -218,7 +221,7 @@ impl GestureStylus {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::stylus-only\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_stylus_only_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -307,6 +310,7 @@ impl GestureStylusBuilder {
     /// Build the [`GestureStylus`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> GestureStylus {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

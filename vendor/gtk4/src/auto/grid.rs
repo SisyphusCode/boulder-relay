@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, BaselinePosition, Buildable, ConstraintTarget,
+    ffi, Accessible, AccessibleRole, Align, BaselinePosition, Buildable, ConstraintTarget,
     LayoutManager, Orientable, Orientation, Overflow, PositionType, Widget,
 };
 use glib::{
@@ -174,6 +174,14 @@ impl GridBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -288,6 +296,7 @@ impl GridBuilder {
     /// Build the [`Grid`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Grid {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }
@@ -335,6 +344,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_grid_get_baseline_row")]
     #[doc(alias = "get_baseline_row")]
+    #[doc(alias = "baseline-row")]
     fn baseline_row(&self) -> i32 {
         unsafe { ffi::gtk_grid_get_baseline_row(self.as_ref().to_glib_none().0) }
     }
@@ -353,6 +363,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_grid_get_column_homogeneous")]
     #[doc(alias = "get_column_homogeneous")]
+    #[doc(alias = "column-homogeneous")]
     fn is_column_homogeneous(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_grid_get_column_homogeneous(
@@ -363,6 +374,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_grid_get_column_spacing")]
     #[doc(alias = "get_column_spacing")]
+    #[doc(alias = "column-spacing")]
     fn column_spacing(&self) -> u32 {
         unsafe { ffi::gtk_grid_get_column_spacing(self.as_ref().to_glib_none().0) }
     }
@@ -380,6 +392,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_grid_get_row_homogeneous")]
     #[doc(alias = "get_row_homogeneous")]
+    #[doc(alias = "row-homogeneous")]
     fn is_row_homogeneous(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_grid_get_row_homogeneous(
@@ -390,6 +403,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_grid_get_row_spacing")]
     #[doc(alias = "get_row_spacing")]
+    #[doc(alias = "row-spacing")]
     fn row_spacing(&self) -> u32 {
         unsafe { ffi::gtk_grid_get_row_spacing(self.as_ref().to_glib_none().0) }
     }
@@ -468,6 +482,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_grid_set_baseline_row")]
+    #[doc(alias = "baseline-row")]
     fn set_baseline_row(&self, row: i32) {
         unsafe {
             ffi::gtk_grid_set_baseline_row(self.as_ref().to_glib_none().0, row);
@@ -475,6 +490,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_grid_set_column_homogeneous")]
+    #[doc(alias = "column-homogeneous")]
     fn set_column_homogeneous(&self, homogeneous: bool) {
         unsafe {
             ffi::gtk_grid_set_column_homogeneous(
@@ -485,6 +501,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_grid_set_column_spacing")]
+    #[doc(alias = "column-spacing")]
     fn set_column_spacing(&self, spacing: u32) {
         unsafe {
             ffi::gtk_grid_set_column_spacing(self.as_ref().to_glib_none().0, spacing);
@@ -503,6 +520,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_grid_set_row_homogeneous")]
+    #[doc(alias = "row-homogeneous")]
     fn set_row_homogeneous(&self, homogeneous: bool) {
         unsafe {
             ffi::gtk_grid_set_row_homogeneous(
@@ -513,6 +531,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_grid_set_row_spacing")]
+    #[doc(alias = "row-spacing")]
     fn set_row_spacing(&self, spacing: u32) {
         unsafe {
             ffi::gtk_grid_set_row_spacing(self.as_ref().to_glib_none().0, spacing);
@@ -534,7 +553,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::baseline-row\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_baseline_row_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -560,7 +579,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::column-homogeneous\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_column_homogeneous_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -583,7 +602,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::column-spacing\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_column_spacing_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -609,7 +628,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::row-homogeneous\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_row_homogeneous_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -632,7 +651,7 @@ pub trait GridExt: IsA<Grid> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::row-spacing\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_row_spacing_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

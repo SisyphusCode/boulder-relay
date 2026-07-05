@@ -2,11 +2,15 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+#[cfg(feature = "v4_18")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+use crate::ListTabBehavior;
 use crate::{
-    Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, LayoutManager,
+    ffi, Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, LayoutManager,
     ListBoxRow, MovementStep, Overflow, SelectionMode, Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -97,6 +101,7 @@ impl ListBox {
 
     #[doc(alias = "gtk_list_box_get_activate_on_single_click")]
     #[doc(alias = "get_activate_on_single_click")]
+    #[doc(alias = "activate-on-single-click")]
     pub fn activates_on_single_click(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_list_box_get_activate_on_single_click(
@@ -146,14 +151,25 @@ impl ListBox {
 
     #[doc(alias = "gtk_list_box_get_selection_mode")]
     #[doc(alias = "get_selection_mode")]
+    #[doc(alias = "selection-mode")]
     pub fn selection_mode(&self) -> SelectionMode {
         unsafe { from_glib(ffi::gtk_list_box_get_selection_mode(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_list_box_get_show_separators")]
     #[doc(alias = "get_show_separators")]
+    #[doc(alias = "show-separators")]
     pub fn shows_separators(&self) -> bool {
         unsafe { from_glib(ffi::gtk_list_box_get_show_separators(self.to_glib_none().0)) }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "gtk_list_box_get_tab_behavior")]
+    #[doc(alias = "get_tab_behavior")]
+    #[doc(alias = "tab-behavior")]
+    pub fn tab_behavior(&self) -> ListTabBehavior {
+        unsafe { from_glib(ffi::gtk_list_box_get_tab_behavior(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_list_box_insert")]
@@ -230,7 +246,7 @@ impl ListBox {
 
     #[doc(alias = "gtk_list_box_selected_foreach")]
     pub fn selected_foreach<P: FnMut(&ListBox, &ListBoxRow)>(&self, func: P) {
-        let func_data: P = func;
+        let mut func_data: P = func;
         unsafe extern "C" fn func_func<P: FnMut(&ListBox, &ListBoxRow)>(
             box_: *mut ffi::GtkListBox,
             row: *mut ffi::GtkListBoxRow,
@@ -242,17 +258,18 @@ impl ListBox {
             (*callback)(&box_, &row)
         }
         let func = Some(func_func::<P> as _);
-        let super_callback0: &P = &func_data;
+        let super_callback0: &mut P = &mut func_data;
         unsafe {
             ffi::gtk_list_box_selected_foreach(
                 self.to_glib_none().0,
                 func,
-                super_callback0 as *const _ as *mut _,
+                super_callback0 as *mut _ as *mut _,
             );
         }
     }
 
     #[doc(alias = "gtk_list_box_set_activate_on_single_click")]
+    #[doc(alias = "activate-on-single-click")]
     pub fn set_activate_on_single_click(&self, single: bool) {
         unsafe {
             ffi::gtk_list_box_set_activate_on_single_click(
@@ -348,6 +365,7 @@ impl ListBox {
     }
 
     #[doc(alias = "gtk_list_box_set_selection_mode")]
+    #[doc(alias = "selection-mode")]
     pub fn set_selection_mode(&self, mode: SelectionMode) {
         unsafe {
             ffi::gtk_list_box_set_selection_mode(self.to_glib_none().0, mode.into_glib());
@@ -355,12 +373,23 @@ impl ListBox {
     }
 
     #[doc(alias = "gtk_list_box_set_show_separators")]
+    #[doc(alias = "show-separators")]
     pub fn set_show_separators(&self, show_separators: bool) {
         unsafe {
             ffi::gtk_list_box_set_show_separators(
                 self.to_glib_none().0,
                 show_separators.into_glib(),
             );
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "gtk_list_box_set_tab_behavior")]
+    #[doc(alias = "tab-behavior")]
+    pub fn set_tab_behavior(&self, behavior: ListTabBehavior) {
+        unsafe {
+            ffi::gtk_list_box_set_tab_behavior(self.to_glib_none().0, behavior.into_glib());
         }
     }
 
@@ -402,7 +431,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate-cursor-row\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_cursor_row_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -423,19 +452,19 @@ impl ListBox {
             F: Fn(&ListBox, MovementStep, i32, bool, bool) + 'static,
         >(
             this: *mut ffi::GtkListBox,
-            object: ffi::GtkMovementStep,
-            p0: libc::c_int,
-            p1: glib::ffi::gboolean,
-            p2: glib::ffi::gboolean,
+            step: ffi::GtkMovementStep,
+            count: std::ffi::c_int,
+            extend: glib::ffi::gboolean,
+            modify: glib::ffi::gboolean,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
             f(
                 &from_glib_borrow(this),
-                from_glib(object),
-                p0,
-                from_glib(p1),
-                from_glib(p2),
+                from_glib(step),
+                count,
+                from_glib(extend),
+                from_glib(modify),
             )
         }
         unsafe {
@@ -443,7 +472,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"move-cursor\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     move_cursor_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -451,8 +480,8 @@ impl ListBox {
         }
     }
 
-    pub fn emit_move_cursor(&self, object: MovementStep, p0: i32, p1: bool, p2: bool) {
-        self.emit_by_name::<()>("move-cursor", &[&object, &p0, &p1, &p2]);
+    pub fn emit_move_cursor(&self, step: MovementStep, count: i32, extend: bool, modify: bool) {
+        self.emit_by_name::<()>("move-cursor", &[&step, &count, &extend, &modify]);
     }
 
     #[doc(alias = "row-activated")]
@@ -473,7 +502,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"row-activated\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     row_activated_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -506,7 +535,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"row-selected\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     row_selected_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -528,7 +557,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"select-all\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     select_all_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -554,7 +583,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"selected-rows-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     selected_rows_changed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -576,7 +605,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"toggle-cursor-row\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     toggle_cursor_row_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -602,7 +631,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"unselect-all\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     unselect_all_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -634,7 +663,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::accept-unpaired-release\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_accept_unpaired_release_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -662,7 +691,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::activate-on-single-click\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_activate_on_single_click_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -685,7 +714,7 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::selection-mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_selection_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -708,8 +737,33 @@ impl ListBox {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-separators\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_separators_trampoline::<F> as *const (),
+                )),
+                Box_::into_raw(f),
+            )
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    #[doc(alias = "tab-behavior")]
+    pub fn connect_tab_behavior_notify<F: Fn(&Self) + 'static>(&self, f: F) -> SignalHandlerId {
+        unsafe extern "C" fn notify_tab_behavior_trampoline<F: Fn(&ListBox) + 'static>(
+            this: *mut ffi::GtkListBox,
+            _param_spec: glib::ffi::gpointer,
+            f: glib::ffi::gpointer,
+        ) {
+            let f: &F = &*(f as *const F);
+            f(&from_glib_borrow(this))
+        }
+        unsafe {
+            let f: Box_<F> = Box_::new(f);
+            connect_raw(
+                self.as_ptr() as *mut _,
+                b"notify::tab-behavior\0".as_ptr() as *const _,
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
+                    notify_tab_behavior_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
             )
@@ -764,6 +818,14 @@ impl ListBoxBuilder {
     pub fn show_separators(self, show_separators: bool) -> Self {
         Self {
             builder: self.builder.property("show-separators", show_separators),
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn tab_behavior(self, tab_behavior: ListTabBehavior) -> Self {
+        Self {
+            builder: self.builder.property("tab-behavior", tab_behavior),
         }
     }
 
@@ -844,6 +906,14 @@ impl ListBoxBuilder {
             builder: self
                 .builder
                 .property("layout-manager", layout_manager.clone().upcast()),
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
         }
     }
 
@@ -955,6 +1025,7 @@ impl ListBoxBuilder {
     /// Build the [`ListBox`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> ListBox {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

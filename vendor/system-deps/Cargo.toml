@@ -11,12 +11,19 @@
 
 [package]
 edition = "2018"
+rust-version = "1.78.0"
 name = "system-deps"
-version = "6.2.2"
+version = "7.0.8"
 authors = [
     "Guillaume Desmottes <guillaume.desmottes@collabora.com>",
     "Josh Triplett <josh@joshtriplett.org>",
 ]
+build = false
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "Discover and configure system dependencies from declarative dependencies in Cargo.toml"
 documentation = "https://docs.rs/system-deps/"
 readme = "README.md"
@@ -30,19 +37,26 @@ keywords = [
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/gdesmott/system-deps"
 
+[lib]
+name = "system_deps"
+path = "src/lib.rs"
+
 [dependencies.cfg-expr]
-version = "0.15.5"
+version = ">= 0.17, < 0.21"
 features = ["targets"]
 
 [dependencies.heck]
 version = "0.5"
 
 [dependencies.pkg-config]
-version = "0.3.23"
+version = "0.3.25"
 
 [dependencies.toml]
-version = "0.8"
-features = ["parse"]
+version = "1"
+features = [
+    "parse",
+    "std",
+]
 default-features = false
 
 [dependencies.version-compare]
@@ -52,7 +66,7 @@ version = "0.2"
 version = "1.5"
 
 [dev-dependencies.itertools]
-version = "0.12"
+version = "0.14"
 
 [dev-dependencies.lazy_static]
 version = "1"

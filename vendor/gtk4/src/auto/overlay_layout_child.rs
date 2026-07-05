@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::LayoutChild;
+use crate::{ffi, LayoutChild};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -22,6 +22,7 @@ glib::wrapper! {
 impl OverlayLayoutChild {
     #[doc(alias = "gtk_overlay_layout_child_get_clip_overlay")]
     #[doc(alias = "get_clip_overlay")]
+    #[doc(alias = "clip-overlay")]
     pub fn is_clip_overlay(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_overlay_layout_child_get_clip_overlay(
@@ -32,6 +33,7 @@ impl OverlayLayoutChild {
 
     #[doc(alias = "gtk_overlay_layout_child_get_measure")]
     #[doc(alias = "get_measure")]
+    #[doc(alias = "measure")]
     pub fn is_measure(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_overlay_layout_child_get_measure(
@@ -41,6 +43,7 @@ impl OverlayLayoutChild {
     }
 
     #[doc(alias = "gtk_overlay_layout_child_set_clip_overlay")]
+    #[doc(alias = "clip-overlay")]
     pub fn set_clip_overlay(&self, clip_overlay: bool) {
         unsafe {
             ffi::gtk_overlay_layout_child_set_clip_overlay(
@@ -51,6 +54,7 @@ impl OverlayLayoutChild {
     }
 
     #[doc(alias = "gtk_overlay_layout_child_set_measure")]
+    #[doc(alias = "measure")]
     pub fn set_measure(&self, measure: bool) {
         unsafe {
             ffi::gtk_overlay_layout_child_set_measure(self.to_glib_none().0, measure.into_glib());
@@ -74,7 +78,7 @@ impl OverlayLayoutChild {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::clip-overlay\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_clip_overlay_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -97,7 +101,7 @@ impl OverlayLayoutChild {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::measure\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_measure_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

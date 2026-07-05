@@ -7,7 +7,7 @@
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
 use crate::AccessibleRange;
 use crate::{
-    Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, LayoutManager,
+    ffi, Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, LayoutManager,
     Orientable, Orientation, Overflow, ScaleButton, Widget,
 };
 use glib::{
@@ -83,7 +83,7 @@ impl VolumeButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-symbolic\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_symbolic_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -229,6 +229,14 @@ impl VolumeButtonBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -343,6 +351,7 @@ impl VolumeButtonBuilder {
     /// Build the [`VolumeButton`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> VolumeButton {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

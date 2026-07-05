@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::Bitset;
+use crate::{ffi, Bitset};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -152,8 +153,8 @@ pub trait SelectionModelExt: IsA<SelectionModel> + sealed::Sealed + 'static {
             F: Fn(&P, u32, u32) + 'static,
         >(
             this: *mut ffi::GtkSelectionModel,
-            position: libc::c_uint,
-            n_items: libc::c_uint,
+            position: std::ffi::c_uint,
+            n_items: std::ffi::c_uint,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -168,7 +169,7 @@ pub trait SelectionModelExt: IsA<SelectionModel> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"selection-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     selection_changed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

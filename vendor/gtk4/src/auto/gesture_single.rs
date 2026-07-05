@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{EventController, Gesture};
+use crate::{ffi, EventController, Gesture};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -53,6 +53,7 @@ pub trait GestureSingleExt: IsA<GestureSingle> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_gesture_single_get_exclusive")]
     #[doc(alias = "get_exclusive")]
+    #[doc(alias = "exclusive")]
     fn is_exclusive(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_gesture_single_get_exclusive(
@@ -63,6 +64,7 @@ pub trait GestureSingleExt: IsA<GestureSingle> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_gesture_single_get_touch_only")]
     #[doc(alias = "get_touch_only")]
+    #[doc(alias = "touch-only")]
     fn is_touch_only(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_gesture_single_get_touch_only(
@@ -72,6 +74,7 @@ pub trait GestureSingleExt: IsA<GestureSingle> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_gesture_single_set_button")]
+    #[doc(alias = "button")]
     fn set_button(&self, button: u32) {
         unsafe {
             ffi::gtk_gesture_single_set_button(self.as_ref().to_glib_none().0, button);
@@ -79,6 +82,7 @@ pub trait GestureSingleExt: IsA<GestureSingle> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_gesture_single_set_exclusive")]
+    #[doc(alias = "exclusive")]
     fn set_exclusive(&self, exclusive: bool) {
         unsafe {
             ffi::gtk_gesture_single_set_exclusive(
@@ -89,6 +93,7 @@ pub trait GestureSingleExt: IsA<GestureSingle> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_gesture_single_set_touch_only")]
+    #[doc(alias = "touch-only")]
     fn set_touch_only(&self, touch_only: bool) {
         unsafe {
             ffi::gtk_gesture_single_set_touch_only(
@@ -116,7 +121,7 @@ pub trait GestureSingleExt: IsA<GestureSingle> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::button\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_button_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -142,7 +147,7 @@ pub trait GestureSingleExt: IsA<GestureSingle> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::exclusive\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_exclusive_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -168,7 +173,7 @@ pub trait GestureSingleExt: IsA<GestureSingle> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::touch-only\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_touch_only_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

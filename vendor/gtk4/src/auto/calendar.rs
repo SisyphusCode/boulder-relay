@@ -3,9 +3,11 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow, Widget,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
+    Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -78,18 +80,21 @@ impl Calendar {
 
     #[doc(alias = "gtk_calendar_get_show_day_names")]
     #[doc(alias = "get_show_day_names")]
+    #[doc(alias = "show-day-names")]
     pub fn shows_day_names(&self) -> bool {
         unsafe { from_glib(ffi::gtk_calendar_get_show_day_names(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_calendar_get_show_heading")]
     #[doc(alias = "get_show_heading")]
+    #[doc(alias = "show-heading")]
     pub fn shows_heading(&self) -> bool {
         unsafe { from_glib(ffi::gtk_calendar_get_show_heading(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_calendar_get_show_week_numbers")]
     #[doc(alias = "get_show_week_numbers")]
+    #[doc(alias = "show-week-numbers")]
     pub fn shows_week_numbers(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_calendar_get_show_week_numbers(
@@ -123,6 +128,7 @@ impl Calendar {
     #[cfg(feature = "v4_14")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
     #[doc(alias = "gtk_calendar_set_day")]
+    #[doc(alias = "day")]
     pub fn set_day(&self, day: i32) {
         unsafe {
             ffi::gtk_calendar_set_day(self.to_glib_none().0, day);
@@ -132,6 +138,7 @@ impl Calendar {
     #[cfg(feature = "v4_14")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
     #[doc(alias = "gtk_calendar_set_month")]
+    #[doc(alias = "month")]
     pub fn set_month(&self, month: i32) {
         unsafe {
             ffi::gtk_calendar_set_month(self.to_glib_none().0, month);
@@ -139,6 +146,7 @@ impl Calendar {
     }
 
     #[doc(alias = "gtk_calendar_set_show_day_names")]
+    #[doc(alias = "show-day-names")]
     pub fn set_show_day_names(&self, value: bool) {
         unsafe {
             ffi::gtk_calendar_set_show_day_names(self.to_glib_none().0, value.into_glib());
@@ -146,6 +154,7 @@ impl Calendar {
     }
 
     #[doc(alias = "gtk_calendar_set_show_heading")]
+    #[doc(alias = "show-heading")]
     pub fn set_show_heading(&self, value: bool) {
         unsafe {
             ffi::gtk_calendar_set_show_heading(self.to_glib_none().0, value.into_glib());
@@ -153,6 +162,7 @@ impl Calendar {
     }
 
     #[doc(alias = "gtk_calendar_set_show_week_numbers")]
+    #[doc(alias = "show-week-numbers")]
     pub fn set_show_week_numbers(&self, value: bool) {
         unsafe {
             ffi::gtk_calendar_set_show_week_numbers(self.to_glib_none().0, value.into_glib());
@@ -162,6 +172,7 @@ impl Calendar {
     #[cfg(feature = "v4_14")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
     #[doc(alias = "gtk_calendar_set_year")]
+    #[doc(alias = "year")]
     pub fn set_year(&self, year: i32) {
         unsafe {
             ffi::gtk_calendar_set_year(self.to_glib_none().0, year);
@@ -189,7 +200,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"day-selected\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     day_selected_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -211,7 +222,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"next-month\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     next_month_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -233,7 +244,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"next-year\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     next_year_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -255,7 +266,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"prev-month\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     prev_month_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -277,7 +288,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"prev-year\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     prev_year_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -300,7 +311,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::day\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_day_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -323,7 +334,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::month\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_month_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -346,7 +357,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-day-names\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_day_names_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -369,7 +380,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-heading\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_heading_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -395,7 +406,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-week-numbers\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_week_numbers_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -418,7 +429,7 @@ impl Calendar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::year\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_year_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -567,6 +578,14 @@ impl CalendarBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -675,6 +694,7 @@ impl CalendarBuilder {
     /// Build the [`Calendar`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Calendar {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

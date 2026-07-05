@@ -28,6 +28,9 @@ generate = [
     "Gtk.AccessibleRole",
     "Gtk.AccessibleSort",
     "Gtk.AccessibleState",
+    "Gtk.AccessibleText",
+    "Gtk.AccessibleTextContentChange",
+    "Gtk.AccessibleTextGranularity",
     "Gtk.AccessibleTristate",
     "Gtk.ActionBar",
     "Gtk.ActivateAction",
@@ -100,7 +103,6 @@ generate = [
     "Gtk.EditableProperties",
     "Gtk.EmojiChooser",
     "Gtk.EntryIconPosition",
-    "Gtk.EventController",
     "Gtk.EventControllerFocus",
     "Gtk.EventControllerMotion",
     "Gtk.EventControllerScrollFlags",
@@ -252,6 +254,7 @@ generate = [
     "Gtk.SymbolicColor",
     "Gtk.SymbolicPaintable",
     "Gtk.SystemSetting",
+    "Gtk.TextBufferNotifyFlags",
     "Gtk.TextChildAnchor",
     "Gtk.TextDirection",
     "Gtk.TextExtendSelection",
@@ -370,6 +373,7 @@ manual = [
     "Gsk.Shadow",
     "Gsk.Stroke",
     "Gsk.Transform",
+    "Gtk.AccessibleTextRange", # a plain struct
     "Gtk.Align", # as we need to handle baseline_fill = baseline for gtk >= 4.11
     "Gtk.BitsetIter",
     "Gtk.Border",
@@ -538,6 +542,9 @@ status = "generate"
     [[object.function]]
     name = "accelerator_parse"
     manual = true # to make use of gdk::Key
+    [[object.function]]
+    name = "disable_portals"
+    assertion = "not-initialized"
     [[object.function]]
     name = "disable_setlocale"
     assertion = "not-initialized"
@@ -1021,6 +1028,9 @@ generate_builder  = false # use glib::Priority
 name = "Gtk.DragIcon"
 status = "generate"
 generate_builder = false
+    [[object.function]]
+    name = "get_for_drag"
+    rename = "for_drag"
 
 [[object]]
 name = "Gtk.DrawingArea"
@@ -1164,6 +1174,14 @@ status = "generate"
     name = "get_entry"
     rename = "entry"
     manual = true # upcast to Entry
+
+[[object]]
+name = "Gtk.EventController"
+status = "generate"
+manual_traits = ["EventControllerExtManual"]
+    [[object.function]]
+    name = "set_static_name"
+    manual = true # to make use of a static lifetimed string
 
 [[object]]
 name = "Gtk.EventControllerKey"
@@ -1422,6 +1440,18 @@ status = "generate"
         [[object.function.parameter]]
         name = "pixbuf"
         nullable = false
+    # The following are more idiomatic, set_from_x are the actual setters and
+    # gir no longer generates Object::set_property("prop-name", _) setters when
+    # there is a setter in the gir annotation.
+    [[object.function]]
+    name = "set_from_paintable"
+    rename = "set_paintable"
+    [[object.function]]
+    name = "set_from_icon_name"
+    rename = "set_icon_name"
+    [[object.function]]
+    name = "set_from_resource"
+    rename = "set_resource"
 
 
 [[object]]
@@ -2061,19 +2091,20 @@ status = "generate"
 final_type = false
 manual_traits = ["SnapshotExtManual"]
     [[object.function]]
-    pattern = "free_to_(node|paintable)"
-    ignore = true # C convenience functions
-    [[object.function]]
     name = "append_border"
     manual = true
     [[object.function]]
     name = "push_debug"
     manual = true # ignore format args
     [[object.function]]
+    pattern = "free_to_node"
+    rename = "to_node"
+    [[object.function]]
+    pattern = "free_to_paintable"
+    rename = "to_paintable"
+    [[object.function]]
     pattern = "to_(node|paintable)"
-        [[object.function.parameter]]
-        name = "snapshot"
-        move = true
+    ignore = true
 
 [[object]]
 name = "Gtk.SortListModel"
@@ -2175,6 +2206,9 @@ manual_traits = ["TextBufferExtManual"]
     [[object.function]]
     name = "insert_with_tags_by_name"
     manual = true
+    [[object.function]]
+    name = "add_commit_notify"
+    manual = true # Ends up using from_glib_borrow for a TextBufferNotifyFlags
 
 [[object]]
 name = "Gtk.TextIter"

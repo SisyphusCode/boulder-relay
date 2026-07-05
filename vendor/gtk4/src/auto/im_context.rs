@@ -3,8 +3,9 @@
 // DO NOT EDIT
 #![allow(deprecated)]
 
-use crate::{InputHints, InputPurpose, Widget};
+use crate::{ffi, InputHints, InputPurpose, Widget};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -263,7 +264,7 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
     fn connect_commit<F: Fn(&Self, &str) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn commit_trampoline<P: IsA<IMContext>, F: Fn(&P, &str) + 'static>(
             this: *mut ffi::GtkIMContext,
-            str: *mut libc::c_char,
+            str: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -277,7 +278,7 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"commit\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     commit_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -295,8 +296,8 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
             F: Fn(&P, i32, i32) -> bool + 'static,
         >(
             this: *mut ffi::GtkIMContext,
-            offset: libc::c_int,
-            n_chars: libc::c_int,
+            offset: std::ffi::c_int,
+            n_chars: std::ffi::c_int,
             f: glib::ffi::gpointer,
         ) -> glib::ffi::gboolean {
             let f: &F = &*(f as *const F);
@@ -312,7 +313,7 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"delete-surrounding\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     delete_surrounding_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -334,7 +335,7 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"preedit-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     preedit_changed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -356,7 +357,7 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"preedit-end\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     preedit_end_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -378,7 +379,7 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"preedit-start\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     preedit_start_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -406,7 +407,7 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"retrieve-surrounding\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     retrieve_surrounding_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -432,7 +433,7 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::input-hints\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_input_hints_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -458,7 +459,7 @@ pub trait IMContextExt: IsA<IMContext> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::input-purpose\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_input_purpose_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

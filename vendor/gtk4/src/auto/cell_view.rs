@@ -4,7 +4,7 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, CellArea, CellAreaContext, CellLayout,
+    ffi, Accessible, AccessibleRole, Align, Buildable, CellArea, CellAreaContext, CellLayout,
     ConstraintTarget, LayoutManager, Orientable, Orientation, Overflow, TreeModel, TreePath,
     Widget,
 };
@@ -109,6 +109,7 @@ impl CellView {
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_view_get_draw_sensitive")]
     #[doc(alias = "get_draw_sensitive")]
+    #[doc(alias = "draw-sensitive")]
     pub fn draws_sensitive(&self) -> bool {
         unsafe { from_glib(ffi::gtk_cell_view_get_draw_sensitive(self.to_glib_none().0)) }
     }
@@ -117,6 +118,7 @@ impl CellView {
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_view_get_fit_model")]
     #[doc(alias = "get_fit_model")]
+    #[doc(alias = "fit-model")]
     pub fn fits_model(&self) -> bool {
         unsafe { from_glib(ffi::gtk_cell_view_get_fit_model(self.to_glib_none().0)) }
     }
@@ -144,6 +146,7 @@ impl CellView {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_view_set_draw_sensitive")]
+    #[doc(alias = "draw-sensitive")]
     pub fn set_draw_sensitive(&self, draw_sensitive: bool) {
         unsafe {
             ffi::gtk_cell_view_set_draw_sensitive(
@@ -156,6 +159,7 @@ impl CellView {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_view_set_fit_model")]
+    #[doc(alias = "fit-model")]
     pub fn set_fit_model(&self, fit_model: bool) {
         unsafe {
             ffi::gtk_cell_view_set_fit_model(self.to_glib_none().0, fit_model.into_glib());
@@ -165,6 +169,7 @@ impl CellView {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_cell_view_set_model")]
+    #[doc(alias = "model")]
     pub fn set_model(&self, model: Option<&impl IsA<TreeModel>>) {
         unsafe {
             ffi::gtk_cell_view_set_model(
@@ -199,7 +204,7 @@ impl CellView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::draw-sensitive\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_draw_sensitive_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -222,7 +227,7 @@ impl CellView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::fit-model\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_fit_model_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -245,7 +250,7 @@ impl CellView {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::model\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_model_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -390,6 +395,14 @@ impl CellViewBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -504,6 +517,7 @@ impl CellViewBuilder {
     /// Build the [`CellView`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> CellView {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

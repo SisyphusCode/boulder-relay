@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{File, FileMonitorEvent};
+use crate::{ffi, File, FileMonitorEvent};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -52,6 +53,7 @@ pub trait FileMonitorExt: IsA<FileMonitor> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "g_file_monitor_is_cancelled")]
+    #[doc(alias = "cancelled")]
     fn is_cancelled(&self) -> bool {
         unsafe {
             from_glib(ffi::g_file_monitor_is_cancelled(
@@ -61,6 +63,7 @@ pub trait FileMonitorExt: IsA<FileMonitor> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "g_file_monitor_set_rate_limit")]
+    #[doc(alias = "rate-limit")]
     fn set_rate_limit(&self, limit_msecs: i32) {
         unsafe {
             ffi::g_file_monitor_set_rate_limit(self.as_ref().to_glib_none().0, limit_msecs);

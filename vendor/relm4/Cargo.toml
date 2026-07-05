@@ -13,8 +13,22 @@
 edition = "2021"
 rust-version = "1.75"
 name = "relm4"
-version = "0.8.1"
+version = "0.9.1"
 authors = ["Aaron Erhardt <aaron.erhardt@t-online.de>"]
+build = false
+include = [
+    "src/",
+    "examples/",
+    "benches/",
+    "tests/",
+    "README.md",
+    "LICENSE-MIT",
+    "LICENSE-APACHE",
+]
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "An idiomatic GUI library inspired by Elm and based on gtk4-rs"
 homepage = "https://relm4.org"
 documentation = "https://docs.rs/relm4/"
@@ -44,15 +58,127 @@ rustdoc-args = [
     "docsrs",
 ]
 
+[lib]
+name = "relm4"
+path = "src/lib.rs"
+
+[[example]]
+name = "actions"
+path = "examples/actions.rs"
+
+[[example]]
+name = "components"
+path = "examples/components.rs"
+
+[[example]]
+name = "data_binding"
+path = "examples/data_binding.rs"
+
+[[example]]
+name = "drag_and_drop"
+path = "examples/drag_and_drop.rs"
+
+[[example]]
+name = "drawing"
+path = "examples/drawing.rs"
+
+[[example]]
+name = "drop_sub_components"
+path = "examples/drop_sub_components.rs"
+
+[[example]]
+name = "embedded_logo"
+path = "examples/embedded_logo.rs"
+
+[[example]]
+name = "entry"
+path = "examples/entry.rs"
+
+[[example]]
+name = "factory"
+path = "examples/factory.rs"
+
+[[example]]
+name = "factory_async"
+path = "examples/factory_async.rs"
+
+[[example]]
+name = "factory_hash_map"
+path = "examples/factory_hash_map.rs"
+
+[[example]]
+name = "grid_factory"
+path = "examples/grid_factory.rs"
+
+[[example]]
+name = "icons"
+path = "examples/icons.rs"
+
+[[example]]
+name = "leaflet_sidebar"
+path = "examples/leaflet_sidebar.rs"
+required-features = ["libadwaita"]
+
+[[example]]
+name = "log"
+path = "examples/log.rs"
+
+[[example]]
+name = "macro_reference"
+path = "examples/macro_reference.rs"
+
+[[example]]
+name = "menu"
+path = "examples/menu.rs"
+
+[[example]]
+name = "message_broker"
+path = "examples/message_broker.rs"
+
+[[example]]
+name = "message_stream"
+path = "examples/message_stream.rs"
+
+[[example]]
+name = "multi_window"
+path = "examples/multi_window.rs"
+
+[[example]]
+name = "non_blocking_async"
+path = "examples/non_blocking_async.rs"
+
+[[example]]
+name = "non_blocking_sync"
+path = "examples/non_blocking_sync.rs"
+
+[[example]]
+name = "popover"
+path = "examples/popover.rs"
+
+[[example]]
+name = "progress"
+path = "examples/progress.rs"
+
+[[example]]
+name = "settings_list"
+path = "examples/settings_list.rs"
+
 [[example]]
 name = "simple"
 path = "examples/simple.rs"
 doc-scrape-examples = true
 
 [[example]]
-name = "leaflet_sidebar"
-path = "examples/leaflet_sidebar.rs"
-required-features = ["libadwaita"]
+name = "simple_async"
+path = "examples/simple_async.rs"
+
+[[example]]
+name = "simple_manual"
+path = "examples/simple_manual.rs"
+
+[[example]]
+name = "state_management"
+path = "examples/state_management.rs"
 
 [[example]]
 name = "tab_factory"
@@ -65,6 +191,10 @@ path = "examples/tab_game.rs"
 required-features = ["libadwaita"]
 
 [[example]]
+name = "to_do"
+path = "examples/to_do.rs"
+
+[[example]]
 name = "toast"
 path = "examples/toast.rs"
 required-features = [
@@ -72,12 +202,53 @@ required-features = [
     "gnome_43",
 ]
 
+[[example]]
+name = "tracker"
+path = "examples/tracker.rs"
+
+[[example]]
+name = "transient_dialog"
+path = "examples/transient_dialog.rs"
+
+[[example]]
+name = "typed_column_view"
+path = "examples/typed_column_view.rs"
+
+[[example]]
+name = "typed_grid_view"
+path = "examples/typed_grid_view.rs"
+
+[[example]]
+name = "typed_list_view"
+path = "examples/typed_list_view.rs"
+
+[[example]]
+name = "typed_list_view_async"
+path = "examples/typed_list_view_async.rs"
+
+[[example]]
+name = "widget_template"
+path = "examples/widget_template.rs"
+
+[[example]]
+name = "worker"
+path = "examples/worker.rs"
+
+[[test]]
+name = "drop_after_quit"
+path = "tests/drop_after_quit.rs"
+
+[[test]]
+name = "shutdown_after_quit"
+path = "tests/shutdown_after_quit.rs"
+
 [[bench]]
 name = "stress_test"
+path = "benches/stress_test.rs"
 harness = false
 
 [dependencies.adw]
-version = "0.6"
+version = "0.7"
 optional = true
 package = "libadwaita"
 
@@ -91,23 +262,27 @@ version = "2.0.0"
 version = "0.3.30"
 
 [dependencies.gtk]
-version = "0.8"
+version = "0.9"
 package = "gtk4"
 
 [dependencies.once_cell]
 version = "1.19"
 
 [dependencies.panel]
-version = "0.4"
+version = "0.5"
 optional = true
 package = "libpanel"
 
+[dependencies.relm4-css]
+version = "0.9.0"
+optional = true
+
 [dependencies.relm4-macros]
-version = "0.8.0"
+version = "0.9.0"
 optional = true
 
 [dependencies.tokio]
-version = "1.36"
+version = "1.38"
 features = [
     "rt",
     "rt-multi-thread",
@@ -125,10 +300,10 @@ default-features = false
 version = "0.8.5"
 
 [dev-dependencies.relm4-icons]
-version = "0.8.2"
+version = "0.9.0"
 
 [dev-dependencies.reqwest]
-version = "0.11.26"
+version = "0.12.5"
 
 [dev-dependencies.serde]
 version = "1"
@@ -141,7 +316,7 @@ features = [
 version = "1"
 
 [dev-dependencies.tokio]
-version = "1.36"
+version = "1.38"
 features = [
     "rt",
     "macros",
@@ -162,7 +337,9 @@ all = [
     "panel",
     "panel/v1_4",
 ]
+css = ["relm4-css"]
 default = [
+    "css",
     "macros",
     "gnome_42",
 ]
@@ -184,8 +361,13 @@ gnome_45 = [
 ]
 gnome_46 = [
     "gnome_45",
-    "gtk/gnome_45",
+    "gtk/gnome_46",
     "adw/v1_5",
+]
+gnome_47 = [
+    "gnome_46",
+    "gtk/gnome_47",
+    "adw/v1_6",
 ]
 libadwaita = ["adw"]
 libpanel = ["panel"]

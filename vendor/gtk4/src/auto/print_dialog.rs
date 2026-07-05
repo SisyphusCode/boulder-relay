@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{PageSetup, PrintSettings, PrintSetup, Window};
+use crate::{ffi, PageSetup, PrintSettings, PrintSetup, Window};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -36,6 +36,7 @@ impl PrintDialog {
 
     #[doc(alias = "gtk_print_dialog_get_accept_label")]
     #[doc(alias = "get_accept_label")]
+    #[doc(alias = "accept-label")]
     pub fn accept_label(&self) -> glib::GString {
         unsafe {
             from_glib_none(ffi::gtk_print_dialog_get_accept_label(
@@ -46,19 +47,22 @@ impl PrintDialog {
 
     #[doc(alias = "gtk_print_dialog_get_modal")]
     #[doc(alias = "get_modal")]
+    #[doc(alias = "modal")]
     pub fn is_modal(&self) -> bool {
         unsafe { from_glib(ffi::gtk_print_dialog_get_modal(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_print_dialog_get_page_setup")]
     #[doc(alias = "get_page_setup")]
-    pub fn page_setup(&self) -> PageSetup {
+    #[doc(alias = "page-setup")]
+    pub fn page_setup(&self) -> Option<PageSetup> {
         unsafe { from_glib_none(ffi::gtk_print_dialog_get_page_setup(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_print_dialog_get_print_settings")]
     #[doc(alias = "get_print_settings")]
-    pub fn print_settings(&self) -> PrintSettings {
+    #[doc(alias = "print-settings")]
+    pub fn print_settings(&self) -> Option<PrintSettings> {
         unsafe {
             from_glib_none(ffi::gtk_print_dialog_get_print_settings(
                 self.to_glib_none().0,
@@ -73,7 +77,7 @@ impl PrintDialog {
     }
 
     #[doc(alias = "gtk_print_dialog_print")]
-    pub fn print<P: FnOnce(Result<Option<gio::OutputStream>, glib::Error>) + 'static>(
+    pub fn print<P: FnOnce(Result<gio::OutputStream, glib::Error>) + 'static>(
         &self,
         parent: Option<&impl IsA<Window>>,
         setup: Option<&PrintSetup>,
@@ -93,7 +97,7 @@ impl PrintDialog {
         let user_data: Box_<glib::thread_guard::ThreadGuard<P>> =
             Box_::new(glib::thread_guard::ThreadGuard::new(callback));
         unsafe extern "C" fn print_trampoline<
-            P: FnOnce(Result<Option<gio::OutputStream>, glib::Error>) + 'static,
+            P: FnOnce(Result<gio::OutputStream, glib::Error>) + 'static,
         >(
             _source_object: *mut glib::gobject_ffi::GObject,
             res: *mut gio::ffi::GAsyncResult,
@@ -128,12 +132,8 @@ impl PrintDialog {
         &self,
         parent: Option<&(impl IsA<Window> + Clone + 'static)>,
         setup: Option<&PrintSetup>,
-    ) -> Pin<
-        Box_<
-            dyn std::future::Future<Output = Result<Option<gio::OutputStream>, glib::Error>>
-                + 'static,
-        >,
-    > {
+    ) -> Pin<Box_<dyn std::future::Future<Output = Result<gio::OutputStream, glib::Error>> + 'static>>
+    {
         let parent = parent.map(ToOwned::to_owned);
         let setup = setup.map(ToOwned::to_owned);
         Box_::pin(gio::GioFuture::new(self, move |obj, cancellable, send| {
@@ -224,6 +224,7 @@ impl PrintDialog {
     }
 
     #[doc(alias = "gtk_print_dialog_set_accept_label")]
+    #[doc(alias = "accept-label")]
     pub fn set_accept_label(&self, accept_label: &str) {
         unsafe {
             ffi::gtk_print_dialog_set_accept_label(
@@ -234,6 +235,7 @@ impl PrintDialog {
     }
 
     #[doc(alias = "gtk_print_dialog_set_modal")]
+    #[doc(alias = "modal")]
     pub fn set_modal(&self, modal: bool) {
         unsafe {
             ffi::gtk_print_dialog_set_modal(self.to_glib_none().0, modal.into_glib());
@@ -241,6 +243,7 @@ impl PrintDialog {
     }
 
     #[doc(alias = "gtk_print_dialog_set_page_setup")]
+    #[doc(alias = "page-setup")]
     pub fn set_page_setup(&self, page_setup: &PageSetup) {
         unsafe {
             ffi::gtk_print_dialog_set_page_setup(
@@ -251,6 +254,7 @@ impl PrintDialog {
     }
 
     #[doc(alias = "gtk_print_dialog_set_print_settings")]
+    #[doc(alias = "print-settings")]
     pub fn set_print_settings(&self, print_settings: &PrintSettings) {
         unsafe {
             ffi::gtk_print_dialog_set_print_settings(
@@ -261,6 +265,7 @@ impl PrintDialog {
     }
 
     #[doc(alias = "gtk_print_dialog_set_title")]
+    #[doc(alias = "title")]
     pub fn set_title(&self, title: &str) {
         unsafe {
             ffi::gtk_print_dialog_set_title(self.to_glib_none().0, title.to_glib_none().0);
@@ -268,7 +273,7 @@ impl PrintDialog {
     }
 
     #[doc(alias = "gtk_print_dialog_setup")]
-    pub fn setup<P: FnOnce(Result<Option<PrintSetup>, glib::Error>) + 'static>(
+    pub fn setup<P: FnOnce(Result<PrintSetup, glib::Error>) + 'static>(
         &self,
         parent: Option<&impl IsA<Window>>,
         cancellable: Option<&impl IsA<gio::Cancellable>>,
@@ -287,7 +292,7 @@ impl PrintDialog {
         let user_data: Box_<glib::thread_guard::ThreadGuard<P>> =
             Box_::new(glib::thread_guard::ThreadGuard::new(callback));
         unsafe extern "C" fn setup_trampoline<
-            P: FnOnce(Result<Option<PrintSetup>, glib::Error>) + 'static,
+            P: FnOnce(Result<PrintSetup, glib::Error>) + 'static,
         >(
             _source_object: *mut glib::gobject_ffi::GObject,
             res: *mut gio::ffi::GAsyncResult,
@@ -320,9 +325,8 @@ impl PrintDialog {
     pub fn setup_future(
         &self,
         parent: Option<&(impl IsA<Window> + Clone + 'static)>,
-    ) -> Pin<
-        Box_<dyn std::future::Future<Output = Result<Option<PrintSetup>, glib::Error>> + 'static>,
-    > {
+    ) -> Pin<Box_<dyn std::future::Future<Output = Result<PrintSetup, glib::Error>> + 'static>>
+    {
         let parent = parent.map(ToOwned::to_owned);
         Box_::pin(gio::GioFuture::new(self, move |obj, cancellable, send| {
             obj.setup(
@@ -352,7 +356,7 @@ impl PrintDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::accept-label\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_accept_label_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -377,7 +381,7 @@ impl PrintDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::modal\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_modal_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -402,7 +406,7 @@ impl PrintDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::page-setup\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_page_setup_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -427,7 +431,7 @@ impl PrintDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::print-settings\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_print_settings_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -452,7 +456,7 @@ impl PrintDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::title\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_title_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -531,6 +535,7 @@ impl PrintDialogBuilder {
     /// Build the [`PrintDialog`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> PrintDialog {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

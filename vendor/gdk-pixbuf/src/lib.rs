@@ -1,13 +1,16 @@
 // Take a look at the license at the top of the repository in the LICENSE file.
 
+#![allow(clippy::manual_c_str_literals)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![doc = include_str!("../README.md")]
 
-pub use ffi;
+pub use gdk_pixbuf_sys as ffi;
 pub use gio;
 pub use glib;
 
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::manual_c_str_literals)]
+#[allow(unused_imports)]
 mod auto;
 
 pub mod subclass;

@@ -3,10 +3,11 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Actionable, Align, Buildable, ConstraintTarget, LayoutManager,
+    ffi, Accessible, AccessibleRole, Actionable, Align, Buildable, ConstraintTarget, LayoutManager,
     Overflow, Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -212,6 +213,14 @@ impl ButtonBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -334,6 +343,7 @@ impl ButtonBuilder {
     /// Build the [`Button`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Button {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }
@@ -348,6 +358,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_button_get_can_shrink")]
     #[doc(alias = "get_can_shrink")]
+    #[doc(alias = "can-shrink")]
     fn can_shrink(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_button_get_can_shrink(
@@ -364,6 +375,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_button_get_has_frame")]
     #[doc(alias = "get_has_frame")]
+    #[doc(alias = "has-frame")]
     fn has_frame(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_button_get_has_frame(
@@ -374,6 +386,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_button_get_icon_name")]
     #[doc(alias = "get_icon_name")]
+    #[doc(alias = "icon-name")]
     fn icon_name(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_button_get_icon_name(
@@ -390,6 +403,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_button_get_use_underline")]
     #[doc(alias = "get_use_underline")]
+    #[doc(alias = "use-underline")]
     fn uses_underline(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_button_get_use_underline(
@@ -401,6 +415,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
     #[cfg(feature = "v4_12")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
     #[doc(alias = "gtk_button_set_can_shrink")]
+    #[doc(alias = "can-shrink")]
     fn set_can_shrink(&self, can_shrink: bool) {
         unsafe {
             ffi::gtk_button_set_can_shrink(self.as_ref().to_glib_none().0, can_shrink.into_glib());
@@ -408,6 +423,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_button_set_child")]
+    #[doc(alias = "child")]
     fn set_child(&self, child: Option<&impl IsA<Widget>>) {
         unsafe {
             ffi::gtk_button_set_child(
@@ -418,6 +434,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_button_set_has_frame")]
+    #[doc(alias = "has-frame")]
     fn set_has_frame(&self, has_frame: bool) {
         unsafe {
             ffi::gtk_button_set_has_frame(self.as_ref().to_glib_none().0, has_frame.into_glib());
@@ -425,6 +442,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_button_set_icon_name")]
+    #[doc(alias = "icon-name")]
     fn set_icon_name(&self, icon_name: &str) {
         unsafe {
             ffi::gtk_button_set_icon_name(
@@ -435,6 +453,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_button_set_label")]
+    #[doc(alias = "label")]
     fn set_label(&self, label: &str) {
         unsafe {
             ffi::gtk_button_set_label(self.as_ref().to_glib_none().0, label.to_glib_none().0);
@@ -442,6 +461,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_button_set_use_underline")]
+    #[doc(alias = "use-underline")]
     fn set_use_underline(&self, use_underline: bool) {
         unsafe {
             ffi::gtk_button_set_use_underline(
@@ -465,7 +485,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -491,7 +511,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"clicked\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     clicked_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -520,7 +540,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::can-shrink\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_can_shrink_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -543,7 +563,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_child_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -566,7 +586,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::has-frame\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_has_frame_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -589,7 +609,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::icon-name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_icon_name_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -612,7 +632,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::label\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_label_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -638,7 +658,7 @@ pub trait ButtonExt: IsA<Button> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-underline\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_underline_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

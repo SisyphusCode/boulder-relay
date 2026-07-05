@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{ColumnViewColumn, SortType, Sorter};
+use crate::{ffi, ColumnViewColumn, SortType, Sorter};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -42,6 +42,7 @@ impl ColumnViewSorter {
 
     #[doc(alias = "gtk_column_view_sorter_get_primary_sort_column")]
     #[doc(alias = "get_primary_sort_column")]
+    #[doc(alias = "primary-sort-column")]
     pub fn primary_sort_column(&self) -> Option<ColumnViewColumn> {
         unsafe {
             from_glib_none(ffi::gtk_column_view_sorter_get_primary_sort_column(
@@ -52,6 +53,7 @@ impl ColumnViewSorter {
 
     #[doc(alias = "gtk_column_view_sorter_get_primary_sort_order")]
     #[doc(alias = "get_primary_sort_order")]
+    #[doc(alias = "primary-sort-order")]
     pub fn primary_sort_order(&self) -> SortType {
         unsafe {
             from_glib(ffi::gtk_column_view_sorter_get_primary_sort_order(
@@ -82,7 +84,7 @@ impl ColumnViewSorter {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::primary-sort-column\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_primary_sort_column_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -112,7 +114,7 @@ impl ColumnViewSorter {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::primary-sort-order\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_primary_sort_order_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

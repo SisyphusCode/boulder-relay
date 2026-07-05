@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{ResponseType, Window};
+use crate::{ffi, ResponseType, Window};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -38,6 +39,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_native_dialog_get_modal")]
     #[doc(alias = "get_modal")]
+    #[doc(alias = "modal")]
     fn is_modal(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_native_dialog_get_modal(
@@ -58,6 +60,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_native_dialog_get_transient_for")]
     #[doc(alias = "get_transient_for")]
+    #[doc(alias = "transient-for")]
     fn transient_for(&self) -> Option<Window> {
         unsafe {
             from_glib_none(ffi::gtk_native_dialog_get_transient_for(
@@ -68,6 +71,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_native_dialog_get_visible")]
     #[doc(alias = "get_visible")]
+    #[doc(alias = "visible")]
     fn is_visible(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_native_dialog_get_visible(
@@ -84,6 +88,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_native_dialog_set_modal")]
+    #[doc(alias = "modal")]
     fn set_modal(&self, modal: bool) {
         unsafe {
             ffi::gtk_native_dialog_set_modal(self.as_ref().to_glib_none().0, modal.into_glib());
@@ -91,6 +96,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_native_dialog_set_title")]
+    #[doc(alias = "title")]
     fn set_title(&self, title: &str) {
         unsafe {
             ffi::gtk_native_dialog_set_title(
@@ -101,6 +107,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_native_dialog_set_transient_for")]
+    #[doc(alias = "transient-for")]
     fn set_transient_for(&self, parent: Option<&impl IsA<Window>>) {
         unsafe {
             ffi::gtk_native_dialog_set_transient_for(
@@ -142,7 +149,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"response\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     response_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -165,7 +172,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::modal\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_modal_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -188,7 +195,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::title\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_title_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -214,7 +221,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::transient-for\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_transient_for_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -240,7 +247,7 @@ pub trait NativeDialogExt: IsA<NativeDialog> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::visible\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_visible_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

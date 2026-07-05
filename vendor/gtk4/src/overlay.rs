@@ -7,7 +7,7 @@ use glib::{
     translate::*,
 };
 
-use crate::{prelude::*, Overlay, Widget};
+use crate::{ffi, prelude::*, Overlay, Widget};
 
 impl Overlay {
     pub fn connect_get_child_position<F>(&self, f: F) -> SignalHandlerId
@@ -19,7 +19,9 @@ impl Overlay {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"get-child-position\0".as_ptr() as *mut _,
-                Some(transmute(get_child_position_trampoline::<F> as usize)),
+                Some(transmute::<usize, unsafe extern "C" fn()>(
+                    get_child_position_trampoline::<F> as usize,
+                )),
                 Box::into_raw(f),
             )
         }

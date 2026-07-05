@@ -3,10 +3,11 @@
 // DO NOT EDIT
 
 use crate::{
-    PageSetup, PrintContext, PrintOperationAction, PrintOperationPreview, PrintOperationResult,
-    PrintSettings, PrintStatus, Unit, Widget, Window,
+    ffi, PageSetup, PrintContext, PrintOperationAction, PrintOperationPreview,
+    PrintOperationResult, PrintSettings, PrintStatus, Unit, Widget, Window,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -168,6 +169,7 @@ impl PrintOperationBuilder {
     /// Build the [`PrintOperation`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> PrintOperation {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }
@@ -194,6 +196,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_print_operation_get_default_page_setup")]
     #[doc(alias = "get_default_page_setup")]
+    #[doc(alias = "default-page-setup")]
     fn default_page_setup(&self) -> PageSetup {
         unsafe {
             from_glib_none(ffi::gtk_print_operation_get_default_page_setup(
@@ -204,6 +207,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_print_operation_get_embed_page_setup")]
     #[doc(alias = "get_embed_page_setup")]
+    #[doc(alias = "embed-page-setup")]
     fn embeds_page_setup(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_print_operation_get_embed_page_setup(
@@ -214,6 +218,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_print_operation_get_has_selection")]
     #[doc(alias = "get_has_selection")]
+    #[doc(alias = "has-selection")]
     fn has_selection(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_print_operation_get_has_selection(
@@ -224,12 +229,14 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_print_operation_get_n_pages_to_print")]
     #[doc(alias = "get_n_pages_to_print")]
+    #[doc(alias = "n-pages-to-print")]
     fn n_pages_to_print(&self) -> i32 {
         unsafe { ffi::gtk_print_operation_get_n_pages_to_print(self.as_ref().to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_print_operation_get_print_settings")]
     #[doc(alias = "get_print_settings")]
+    #[doc(alias = "print-settings")]
     fn print_settings(&self) -> Option<PrintSettings> {
         unsafe {
             from_glib_none(ffi::gtk_print_operation_get_print_settings(
@@ -250,6 +257,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_print_operation_get_status_string")]
     #[doc(alias = "get_status_string")]
+    #[doc(alias = "status-string")]
     fn status_string(&self) -> glib::GString {
         unsafe {
             from_glib_none(ffi::gtk_print_operation_get_status_string(
@@ -260,6 +268,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_print_operation_get_support_selection")]
     #[doc(alias = "get_support_selection")]
+    #[doc(alias = "support-selection")]
     fn supports_selection(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_print_operation_get_support_selection(
@@ -300,6 +309,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_allow_async")]
+    #[doc(alias = "allow-async")]
     fn set_allow_async(&self, allow_async: bool) {
         unsafe {
             ffi::gtk_print_operation_set_allow_async(
@@ -310,6 +320,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_current_page")]
+    #[doc(alias = "current-page")]
     fn set_current_page(&self, current_page: i32) {
         unsafe {
             ffi::gtk_print_operation_set_current_page(self.as_ref().to_glib_none().0, current_page);
@@ -317,6 +328,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_custom_tab_label")]
+    #[doc(alias = "custom-tab-label")]
     fn set_custom_tab_label(&self, label: Option<&str>) {
         unsafe {
             ffi::gtk_print_operation_set_custom_tab_label(
@@ -327,6 +339,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_default_page_setup")]
+    #[doc(alias = "default-page-setup")]
     fn set_default_page_setup(&self, default_page_setup: Option<&PageSetup>) {
         unsafe {
             ffi::gtk_print_operation_set_default_page_setup(
@@ -344,6 +357,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_embed_page_setup")]
+    #[doc(alias = "embed-page-setup")]
     fn set_embed_page_setup(&self, embed: bool) {
         unsafe {
             ffi::gtk_print_operation_set_embed_page_setup(
@@ -354,6 +368,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_export_filename")]
+    #[doc(alias = "export-filename")]
     fn set_export_filename(&self, filename: impl AsRef<std::path::Path>) {
         unsafe {
             ffi::gtk_print_operation_set_export_filename(
@@ -364,6 +379,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_has_selection")]
+    #[doc(alias = "has-selection")]
     fn set_has_selection(&self, has_selection: bool) {
         unsafe {
             ffi::gtk_print_operation_set_has_selection(
@@ -374,6 +390,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_job_name")]
+    #[doc(alias = "job-name")]
     fn set_job_name(&self, job_name: &str) {
         unsafe {
             ffi::gtk_print_operation_set_job_name(
@@ -384,6 +401,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_n_pages")]
+    #[doc(alias = "n-pages")]
     fn set_n_pages(&self, n_pages: i32) {
         unsafe {
             ffi::gtk_print_operation_set_n_pages(self.as_ref().to_glib_none().0, n_pages);
@@ -391,6 +409,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_print_settings")]
+    #[doc(alias = "print-settings")]
     fn set_print_settings(&self, print_settings: Option<&PrintSettings>) {
         unsafe {
             ffi::gtk_print_operation_set_print_settings(
@@ -401,6 +420,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_show_progress")]
+    #[doc(alias = "show-progress")]
     fn set_show_progress(&self, show_progress: bool) {
         unsafe {
             ffi::gtk_print_operation_set_show_progress(
@@ -411,6 +431,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_support_selection")]
+    #[doc(alias = "support-selection")]
     fn set_support_selection(&self, support_selection: bool) {
         unsafe {
             ffi::gtk_print_operation_set_support_selection(
@@ -421,6 +442,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_track_print_status")]
+    #[doc(alias = "track-print-status")]
     fn set_track_print_status(&self, track_status: bool) {
         unsafe {
             ffi::gtk_print_operation_set_track_print_status(
@@ -431,6 +453,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_unit")]
+    #[doc(alias = "unit")]
     fn set_unit(&self, unit: Unit) {
         unsafe {
             ffi::gtk_print_operation_set_unit(self.as_ref().to_glib_none().0, unit.into_glib());
@@ -438,6 +461,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_print_operation_set_use_full_page")]
+    #[doc(alias = "use-full-page")]
     fn set_use_full_page(&self, full_page: bool) {
         unsafe {
             ffi::gtk_print_operation_set_use_full_page(
@@ -517,7 +541,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"begin-print\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     begin_print_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -547,7 +571,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"create-custom-widget\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     create_custom_widget_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -579,7 +603,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"custom-widget-apply\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     custom_widget_apply_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -608,7 +632,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"done\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     done_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -627,7 +651,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
         >(
             this: *mut ffi::GtkPrintOperation,
             context: *mut ffi::GtkPrintContext,
-            page_nr: libc::c_int,
+            page_nr: std::ffi::c_int,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -642,7 +666,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"draw-page\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     draw_page_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -671,7 +695,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"end-print\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     end_print_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -704,7 +728,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"paginate\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     paginate_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -743,7 +767,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"preview\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     preview_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -762,7 +786,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
         >(
             this: *mut ffi::GtkPrintOperation,
             context: *mut ffi::GtkPrintContext,
-            page_nr: libc::c_int,
+            page_nr: std::ffi::c_int,
             setup: *mut ffi::GtkPageSetup,
             f: glib::ffi::gpointer,
         ) {
@@ -779,7 +803,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"request-page-setup\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     request_page_setup_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -804,7 +828,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"status-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     status_changed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -840,7 +864,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"update-custom-widget\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     update_custom_widget_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -866,7 +890,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::allow-async\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_allow_async_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -892,7 +916,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::current-page\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_current_page_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -918,7 +942,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::custom-tab-label\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_custom_tab_label_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -944,7 +968,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::default-page-setup\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_default_page_setup_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -970,7 +994,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::embed-page-setup\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_embed_page_setup_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -996,7 +1020,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::export-filename\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_export_filename_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1022,7 +1046,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::has-selection\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_has_selection_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1048,7 +1072,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::job-name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_job_name_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1074,7 +1098,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::n-pages\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_n_pages_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1100,7 +1124,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::n-pages-to-print\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_n_pages_to_print_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1126,7 +1150,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::print-settings\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_print_settings_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1152,7 +1176,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-progress\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_progress_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1178,7 +1202,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::status\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_status_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1204,7 +1228,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::status-string\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_status_string_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1230,7 +1254,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::support-selection\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_support_selection_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1256,7 +1280,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::track-print-status\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_track_print_status_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1279,7 +1303,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::unit\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_unit_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1305,7 +1329,7 @@ pub trait PrintOperationExt: IsA<PrintOperation> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::use-full-page\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_use_full_page_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

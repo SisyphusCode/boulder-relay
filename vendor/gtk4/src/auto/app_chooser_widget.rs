@@ -4,10 +4,11 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AccessibleRole, Align, AppChooser, Buildable, ConstraintTarget, LayoutManager,
+    ffi, Accessible, AccessibleRole, Align, AppChooser, Buildable, ConstraintTarget, LayoutManager,
     Overflow, Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -49,6 +50,7 @@ impl AppChooserWidget {
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_get_default_text")]
     #[doc(alias = "get_default_text")]
+    #[doc(alias = "default-text")]
     pub fn default_text(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_app_chooser_widget_get_default_text(
@@ -61,6 +63,7 @@ impl AppChooserWidget {
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_get_show_all")]
     #[doc(alias = "get_show_all")]
+    #[doc(alias = "show-all")]
     pub fn shows_all(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_app_chooser_widget_get_show_all(
@@ -73,6 +76,7 @@ impl AppChooserWidget {
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_get_show_default")]
     #[doc(alias = "get_show_default")]
+    #[doc(alias = "show-default")]
     pub fn shows_default(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_app_chooser_widget_get_show_default(
@@ -85,6 +89,7 @@ impl AppChooserWidget {
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_get_show_fallback")]
     #[doc(alias = "get_show_fallback")]
+    #[doc(alias = "show-fallback")]
     pub fn shows_fallback(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_app_chooser_widget_get_show_fallback(
@@ -97,6 +102,7 @@ impl AppChooserWidget {
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_get_show_other")]
     #[doc(alias = "get_show_other")]
+    #[doc(alias = "show-other")]
     pub fn shows_other(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_app_chooser_widget_get_show_other(
@@ -109,6 +115,7 @@ impl AppChooserWidget {
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_get_show_recommended")]
     #[doc(alias = "get_show_recommended")]
+    #[doc(alias = "show-recommended")]
     pub fn shows_recommended(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_app_chooser_widget_get_show_recommended(
@@ -120,6 +127,7 @@ impl AppChooserWidget {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_set_default_text")]
+    #[doc(alias = "default-text")]
     pub fn set_default_text(&self, text: &str) {
         unsafe {
             ffi::gtk_app_chooser_widget_set_default_text(
@@ -132,6 +140,7 @@ impl AppChooserWidget {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_set_show_all")]
+    #[doc(alias = "show-all")]
     pub fn set_show_all(&self, setting: bool) {
         unsafe {
             ffi::gtk_app_chooser_widget_set_show_all(self.to_glib_none().0, setting.into_glib());
@@ -141,6 +150,7 @@ impl AppChooserWidget {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_set_show_default")]
+    #[doc(alias = "show-default")]
     pub fn set_show_default(&self, setting: bool) {
         unsafe {
             ffi::gtk_app_chooser_widget_set_show_default(
@@ -153,6 +163,7 @@ impl AppChooserWidget {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_set_show_fallback")]
+    #[doc(alias = "show-fallback")]
     pub fn set_show_fallback(&self, setting: bool) {
         unsafe {
             ffi::gtk_app_chooser_widget_set_show_fallback(
@@ -165,6 +176,7 @@ impl AppChooserWidget {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_set_show_other")]
+    #[doc(alias = "show-other")]
     pub fn set_show_other(&self, setting: bool) {
         unsafe {
             ffi::gtk_app_chooser_widget_set_show_other(self.to_glib_none().0, setting.into_glib());
@@ -174,6 +186,7 @@ impl AppChooserWidget {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_widget_set_show_recommended")]
+    #[doc(alias = "show-recommended")]
     pub fn set_show_recommended(&self, setting: bool) {
         unsafe {
             ffi::gtk_app_chooser_widget_set_show_recommended(
@@ -203,7 +216,7 @@ impl AppChooserWidget {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"application-activated\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     application_activated_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -231,7 +244,7 @@ impl AppChooserWidget {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"application-selected\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     application_selected_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -254,7 +267,7 @@ impl AppChooserWidget {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::default-text\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_default_text_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -277,7 +290,7 @@ impl AppChooserWidget {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-all\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_all_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -300,7 +313,7 @@ impl AppChooserWidget {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-default\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_default_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -323,7 +336,7 @@ impl AppChooserWidget {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-fallback\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_fallback_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -346,7 +359,7 @@ impl AppChooserWidget {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-other\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_other_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -371,7 +384,7 @@ impl AppChooserWidget {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-recommended\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_recommended_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -518,6 +531,14 @@ impl AppChooserWidgetBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -632,6 +653,7 @@ impl AppChooserWidgetBuilder {
     /// Build the [`AppChooserWidget`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> AppChooserWidget {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

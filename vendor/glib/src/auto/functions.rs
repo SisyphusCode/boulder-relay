@@ -6,8 +6,8 @@
 #[cfg_attr(docsrs, doc(cfg(feature = "v2_66")))]
 use crate::FileSetContentsFlags;
 use crate::{
-    translate::*, Bytes, ChecksumType, Error, FileTest, FormatSizeFlags, Pid, Source, SpawnFlags,
-    UserDirectory,
+    ffi, translate::*, Bytes, ChecksumType, Error, FileTest, FormatSizeFlags, Pid, Source,
+    SpawnFlags, UserDirectory,
 };
 use std::boxed::Box as Box_;
 
@@ -559,7 +559,7 @@ pub fn on_error_query(prg_name: &str) {
 }
 
 #[doc(alias = "g_on_error_stack_trace")]
-pub fn on_error_stack_trace(prg_name: &str) {
+pub fn on_error_stack_trace(prg_name: Option<&str>) {
     unsafe {
         ffi::g_on_error_stack_trace(prg_name.to_glib_none().0);
     }
@@ -694,6 +694,13 @@ pub fn shell_unquote(
         }
     }
 }
+
+//#[cfg(feature = "v2_82")]
+//#[cfg_attr(docsrs, doc(cfg(feature = "v2_82")))]
+//#[doc(alias = "g_sort_array")]
+//pub fn sort_array(array: /*Unimplemented*/&[&Basic: Pointer], element_size: usize, compare_func: /*Unimplemented*/FnMut(/*Unimplemented*/Option<Basic: Pointer>, /*Unimplemented*/Option<Basic: Pointer>) -> i32, user_data: /*Unimplemented*/Option<Basic: Pointer>) {
+//    unsafe { TODO: call ffi:g_sort_array() }
+//}
 
 #[doc(alias = "g_spaced_primes_closest")]
 pub fn spaced_primes_closest(num: u32) -> u32 {

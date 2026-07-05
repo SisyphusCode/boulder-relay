@@ -2,10 +2,10 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::Filter;
 #[cfg(feature = "v4_12")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_12")))]
 use crate::SectionModel;
+use crate::{ffi, Filter};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -65,6 +65,7 @@ impl FilterListModel {
 
     #[doc(alias = "gtk_filter_list_model_get_incremental")]
     #[doc(alias = "get_incremental")]
+    #[doc(alias = "incremental")]
     pub fn is_incremental(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_filter_list_model_get_incremental(
@@ -86,6 +87,7 @@ impl FilterListModel {
     }
 
     #[doc(alias = "gtk_filter_list_model_set_filter")]
+    #[doc(alias = "filter")]
     pub fn set_filter(&self, filter: Option<&impl IsA<Filter>>) {
         unsafe {
             ffi::gtk_filter_list_model_set_filter(
@@ -96,6 +98,7 @@ impl FilterListModel {
     }
 
     #[doc(alias = "gtk_filter_list_model_set_incremental")]
+    #[doc(alias = "incremental")]
     pub fn set_incremental(&self, incremental: bool) {
         unsafe {
             ffi::gtk_filter_list_model_set_incremental(
@@ -106,6 +109,7 @@ impl FilterListModel {
     }
 
     #[doc(alias = "gtk_filter_list_model_set_model")]
+    #[doc(alias = "model")]
     pub fn set_model(&self, model: Option<&impl IsA<gio::ListModel>>) {
         unsafe {
             ffi::gtk_filter_list_model_set_model(
@@ -130,7 +134,7 @@ impl FilterListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::filter\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_filter_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -153,7 +157,7 @@ impl FilterListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::incremental\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_incremental_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -176,7 +180,7 @@ impl FilterListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::model\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_model_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -199,7 +203,7 @@ impl FilterListModel {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::pending\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_pending_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -252,6 +256,7 @@ impl FilterListModelBuilder {
     /// Build the [`FilterListModel`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> FilterListModel {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

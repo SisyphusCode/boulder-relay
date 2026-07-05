@@ -13,12 +13,18 @@
 edition = "2021"
 rust-version = "1.70"
 name = "glib-sys"
-version = "0.19.8"
+version = "0.20.10"
 authors = ["The gtk-rs Project Developers"]
 build = "build.rs"
 exclude = ["gir-files/*"]
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "FFI bindings to libglib-2.0"
 homepage = "https://gtk-rs.org/"
+readme = false
 keywords = [
     "glib",
     "ffi",
@@ -78,7 +84,16 @@ version = "2.76"
 version = "2.77"
 
 [package.metadata.system-deps.glib_2_0.v2_80]
-version = "2.79"
+version = "2.80"
+
+[package.metadata.system-deps.glib_2_0.v2_82]
+version = "2.82"
+
+[package.metadata.system-deps.glib_2_0.v2_84]
+version = "2.84"
+
+[package.metadata.system-deps.glib_2_0.v2_86]
+version = "2.85"
 
 [package.metadata.system-deps.gobject_2_0]
 name = "gobject-2.0"
@@ -89,21 +104,6 @@ version = "2.58"
 
 [package.metadata.system-deps.gobject_2_0.v2_62]
 version = "2.62"
-
-[lib]
-name = "glib_sys"
-
-[dependencies.libc]
-version = "0.2"
-
-[dev-dependencies.shell-words]
-version = "1.0.0"
-
-[dev-dependencies.tempfile]
-version = "3"
-
-[build-dependencies.system-deps]
-version = "6"
 
 [features]
 v2_58 = []
@@ -118,3 +118,26 @@ v2_74 = ["v2_72"]
 v2_76 = ["v2_74"]
 v2_78 = ["v2_76"]
 v2_80 = ["v2_78"]
+v2_82 = ["v2_80"]
+v2_84 = ["v2_82"]
+v2_86 = ["v2_84"]
+
+[lib]
+name = "glib_sys"
+path = "src/lib.rs"
+
+[[test]]
+name = "abi"
+path = "tests/abi.rs"
+
+[dependencies.libc]
+version = "0.2"
+
+[dev-dependencies.shell-words]
+version = "1.0.0"
+
+[dev-dependencies.tempfile]
+version = "3"
+
+[build-dependencies.system-deps]
+version = "7"

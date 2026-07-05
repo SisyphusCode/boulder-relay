@@ -5,8 +5,9 @@
 #[cfg(feature = "v2_60")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v2_60")))]
 use crate::ResolverNameLookupFlags;
-use crate::{AsyncResult, Cancellable, InetAddress, ResolverRecordType, SrvTarget};
+use crate::{ffi, AsyncResult, Cancellable, InetAddress, ResolverRecordType, SrvTarget};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -557,6 +558,7 @@ pub trait ResolverExt: IsA<Resolver> + sealed::Sealed + 'static {
     #[cfg(feature = "v2_78")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v2_78")))]
     #[doc(alias = "g_resolver_set_timeout")]
+    #[doc(alias = "timeout")]
     fn set_timeout(&self, timeout_ms: u32) {
         unsafe {
             ffi::g_resolver_set_timeout(self.as_ref().to_glib_none().0, timeout_ms);

@@ -13,12 +13,18 @@
 edition = "2021"
 rust-version = "1.70"
 name = "gio-sys"
-version = "0.19.8"
+version = "0.20.10"
 authors = ["The gtk-rs Project Developers"]
 build = "build.rs"
 exclude = ["gir-files/*"]
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "FFI bindings to libgio-2.0"
 homepage = "https://gtk-rs.org/"
+readme = false
 keywords = [
     "gio",
     "ffi",
@@ -78,28 +84,16 @@ version = "2.76"
 version = "2.77"
 
 [package.metadata.system-deps.gio_2_0.v2_80]
-version = "2.79"
+version = "2.80"
 
-[lib]
-name = "gio_sys"
+[package.metadata.system-deps.gio_2_0.v2_82]
+version = "2.82"
 
-[dependencies.glib-sys]
-version = "0.19"
+[package.metadata.system-deps.gio_2_0.v2_84]
+version = "2.84"
 
-[dependencies.gobject-sys]
-version = "0.19"
-
-[dependencies.libc]
-version = "0.2"
-
-[dev-dependencies.shell-words]
-version = "1.0.0"
-
-[dev-dependencies.tempfile]
-version = "3"
-
-[build-dependencies.system-deps]
-version = "6"
+[package.metadata.system-deps.gio_2_0.v2_86]
+version = "2.85"
 
 [features]
 v2_58 = []
@@ -114,7 +108,36 @@ v2_74 = ["v2_72"]
 v2_76 = ["v2_74"]
 v2_78 = ["v2_76"]
 v2_80 = ["v2_78"]
+v2_82 = ["v2_80"]
+v2_84 = ["v2_82"]
+v2_86 = ["v2_84"]
+
+[lib]
+name = "gio_sys"
+path = "src/lib.rs"
+
+[[test]]
+name = "abi"
+path = "tests/abi.rs"
+
+[dependencies.glib-sys]
+version = "0.20.6"
+
+[dependencies.gobject-sys]
+version = "0.20"
+
+[dependencies.libc]
+version = "0.2"
+
+[dev-dependencies.shell-words]
+version = "1.0.0"
+
+[dev-dependencies.tempfile]
+version = "3"
+
+[build-dependencies.system-deps]
+version = "7"
 
 [target."cfg(windows)".dependencies.windows-sys]
-version = "0.52"
+version = ">=0.52, <=0.59"
 features = ["Win32_Networking_WinSock"]

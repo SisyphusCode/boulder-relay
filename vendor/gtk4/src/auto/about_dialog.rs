@@ -3,10 +3,11 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Application, Buildable, ConstraintTarget, LayoutManager,
-    License, Native, Overflow, Root, ShortcutManager, Widget, Window,
+    ffi, Accessible, AccessibleRole, Align, Application, Buildable, ConstraintTarget,
+    LayoutManager, License, Native, Overflow, Root, ShortcutManager, Widget, Window,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -98,6 +99,7 @@ impl AboutDialog {
 
     #[doc(alias = "gtk_about_dialog_get_license_type")]
     #[doc(alias = "get_license_type")]
+    #[doc(alias = "license-type")]
     pub fn license_type(&self) -> License {
         unsafe {
             from_glib(ffi::gtk_about_dialog_get_license_type(
@@ -114,6 +116,7 @@ impl AboutDialog {
 
     #[doc(alias = "gtk_about_dialog_get_logo_icon_name")]
     #[doc(alias = "get_logo_icon_name")]
+    #[doc(alias = "logo-icon-name")]
     pub fn logo_icon_name(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_about_dialog_get_logo_icon_name(
@@ -124,6 +127,7 @@ impl AboutDialog {
 
     #[doc(alias = "gtk_about_dialog_get_program_name")]
     #[doc(alias = "get_program_name")]
+    #[doc(alias = "program-name")]
     pub fn program_name(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_about_dialog_get_program_name(
@@ -134,6 +138,7 @@ impl AboutDialog {
 
     #[doc(alias = "gtk_about_dialog_get_system_information")]
     #[doc(alias = "get_system_information")]
+    #[doc(alias = "system-information")]
     pub fn system_information(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_about_dialog_get_system_information(
@@ -144,6 +149,7 @@ impl AboutDialog {
 
     #[doc(alias = "gtk_about_dialog_get_translator_credits")]
     #[doc(alias = "get_translator_credits")]
+    #[doc(alias = "translator-credits")]
     pub fn translator_credits(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_about_dialog_get_translator_credits(
@@ -166,6 +172,7 @@ impl AboutDialog {
 
     #[doc(alias = "gtk_about_dialog_get_website_label")]
     #[doc(alias = "get_website_label")]
+    #[doc(alias = "website-label")]
     pub fn website_label(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_about_dialog_get_website_label(
@@ -176,6 +183,7 @@ impl AboutDialog {
 
     #[doc(alias = "gtk_about_dialog_get_wrap_license")]
     #[doc(alias = "get_wrap_license")]
+    #[doc(alias = "wrap-license")]
     pub fn wraps_license(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_about_dialog_get_wrap_license(
@@ -185,6 +193,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_artists")]
+    #[doc(alias = "artists")]
     pub fn set_artists(&self, artists: &[&str]) {
         unsafe {
             ffi::gtk_about_dialog_set_artists(self.to_glib_none().0, artists.to_glib_none().0);
@@ -192,6 +201,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_authors")]
+    #[doc(alias = "authors")]
     pub fn set_authors(&self, authors: &[&str]) {
         unsafe {
             ffi::gtk_about_dialog_set_authors(self.to_glib_none().0, authors.to_glib_none().0);
@@ -199,6 +209,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_comments")]
+    #[doc(alias = "comments")]
     pub fn set_comments(&self, comments: Option<&str>) {
         unsafe {
             ffi::gtk_about_dialog_set_comments(self.to_glib_none().0, comments.to_glib_none().0);
@@ -206,6 +217,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_copyright")]
+    #[doc(alias = "copyright")]
     pub fn set_copyright(&self, copyright: Option<&str>) {
         unsafe {
             ffi::gtk_about_dialog_set_copyright(self.to_glib_none().0, copyright.to_glib_none().0);
@@ -213,6 +225,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_documenters")]
+    #[doc(alias = "documenters")]
     pub fn set_documenters(&self, documenters: &[&str]) {
         unsafe {
             ffi::gtk_about_dialog_set_documenters(
@@ -223,6 +236,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_license")]
+    #[doc(alias = "license")]
     pub fn set_license(&self, license: Option<&str>) {
         unsafe {
             ffi::gtk_about_dialog_set_license(self.to_glib_none().0, license.to_glib_none().0);
@@ -230,6 +244,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_license_type")]
+    #[doc(alias = "license-type")]
     pub fn set_license_type(&self, license_type: License) {
         unsafe {
             ffi::gtk_about_dialog_set_license_type(self.to_glib_none().0, license_type.into_glib());
@@ -237,6 +252,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_logo")]
+    #[doc(alias = "logo")]
     pub fn set_logo(&self, logo: Option<&impl IsA<gdk::Paintable>>) {
         unsafe {
             ffi::gtk_about_dialog_set_logo(
@@ -247,6 +263,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_logo_icon_name")]
+    #[doc(alias = "logo-icon-name")]
     pub fn set_logo_icon_name(&self, icon_name: Option<&str>) {
         unsafe {
             ffi::gtk_about_dialog_set_logo_icon_name(
@@ -257,6 +274,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_program_name")]
+    #[doc(alias = "program-name")]
     pub fn set_program_name(&self, name: Option<&str>) {
         unsafe {
             ffi::gtk_about_dialog_set_program_name(self.to_glib_none().0, name.to_glib_none().0);
@@ -264,6 +282,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_system_information")]
+    #[doc(alias = "system-information")]
     pub fn set_system_information(&self, system_information: Option<&str>) {
         unsafe {
             ffi::gtk_about_dialog_set_system_information(
@@ -274,6 +293,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_translator_credits")]
+    #[doc(alias = "translator-credits")]
     pub fn set_translator_credits(&self, translator_credits: Option<&str>) {
         unsafe {
             ffi::gtk_about_dialog_set_translator_credits(
@@ -284,6 +304,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_version")]
+    #[doc(alias = "version")]
     pub fn set_version(&self, version: Option<&str>) {
         unsafe {
             ffi::gtk_about_dialog_set_version(self.to_glib_none().0, version.to_glib_none().0);
@@ -291,6 +312,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_website")]
+    #[doc(alias = "website")]
     pub fn set_website(&self, website: Option<&str>) {
         unsafe {
             ffi::gtk_about_dialog_set_website(self.to_glib_none().0, website.to_glib_none().0);
@@ -298,6 +320,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_website_label")]
+    #[doc(alias = "website-label")]
     pub fn set_website_label(&self, website_label: &str) {
         unsafe {
             ffi::gtk_about_dialog_set_website_label(
@@ -308,6 +331,7 @@ impl AboutDialog {
     }
 
     #[doc(alias = "gtk_about_dialog_set_wrap_license")]
+    #[doc(alias = "wrap-license")]
     pub fn set_wrap_license(&self, wrap_license: bool) {
         unsafe {
             ffi::gtk_about_dialog_set_wrap_license(self.to_glib_none().0, wrap_license.into_glib());
@@ -323,7 +347,7 @@ impl AboutDialog {
             F: Fn(&AboutDialog, &str) -> glib::Propagation + 'static,
         >(
             this: *mut ffi::GtkAboutDialog,
-            uri: *mut libc::c_char,
+            uri: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) -> glib::ffi::gboolean {
             let f: &F = &*(f as *const F);
@@ -338,7 +362,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate-link\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_link_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -361,7 +385,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::artists\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_artists_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -384,7 +408,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::authors\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_authors_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -407,7 +431,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::comments\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_comments_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -430,7 +454,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::copyright\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_copyright_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -453,7 +477,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::documenters\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_documenters_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -476,7 +500,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::license\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_license_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -499,7 +523,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::license-type\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_license_type_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -522,7 +546,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::logo\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_logo_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -545,7 +569,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::logo-icon-name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_logo_icon_name_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -568,7 +592,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::program-name\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_program_name_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -594,7 +618,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::system-information\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_system_information_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -620,7 +644,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::translator-credits\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_translator_credits_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -643,7 +667,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::version\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_version_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -666,7 +690,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::website\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_website_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -689,7 +713,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::website-label\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_website_label_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -712,7 +736,7 @@ impl AboutDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::wrap-license\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_wrap_license_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -1081,6 +1105,14 @@ impl AboutDialogBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -1189,6 +1221,7 @@ impl AboutDialogBuilder {
     /// Build the [`AboutDialog`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> AboutDialog {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

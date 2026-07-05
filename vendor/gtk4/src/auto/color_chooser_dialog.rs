@@ -4,7 +4,7 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AccessibleRole, Align, Application, Buildable, ColorChooser, ConstraintTarget,
+    ffi, Accessible, AccessibleRole, Align, Application, Buildable, ColorChooser, ConstraintTarget,
     Dialog, LayoutManager, Native, Overflow, Root, ShortcutManager, Widget, Window,
 };
 use glib::{
@@ -71,7 +71,7 @@ impl ColorChooserDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-editor\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_editor_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -351,6 +351,14 @@ impl ColorChooserDialogBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -473,6 +481,7 @@ impl ColorChooserDialogBuilder {
     /// Build the [`ColorChooserDialog`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> ColorChooserDialog {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

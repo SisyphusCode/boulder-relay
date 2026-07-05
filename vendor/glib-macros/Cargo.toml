@@ -13,12 +13,19 @@
 edition = "2021"
 rust-version = "1.70"
 name = "glib-macros"
-version = "0.19.9"
+version = "0.20.12"
 authors = ["The gtk-rs Project Developers"]
+build = false
 exclude = ["gir-files/*"]
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "Rust bindings for the GLib library, proc macros crate"
 homepage = "https://gtk-rs.org/"
 documentation = "https://gtk-rs.org/gtk-rs-core/stable/latest/docs/glib_macros/"
+readme = false
 keywords = [
     "glib",
     "gtk-rs",
@@ -29,7 +36,41 @@ license = "MIT"
 repository = "https://github.com/gtk-rs/gtk-rs-core"
 
 [lib]
+name = "glib_macros"
+path = "src/lib.rs"
 proc-macro = true
+
+[[test]]
+name = "clone"
+path = "tests/clone.rs"
+
+[[test]]
+name = "closure"
+path = "tests/closure.rs"
+
+[[test]]
+name = "enum_dynamic"
+path = "tests/enum_dynamic.rs"
+
+[[test]]
+name = "flags_dynamic"
+path = "tests/flags_dynamic.rs"
+
+[[test]]
+name = "object_subclass_dynamic"
+path = "tests/object_subclass_dynamic.rs"
+
+[[test]]
+name = "properties"
+path = "tests/properties.rs"
+
+[[test]]
+name = "test"
+path = "tests/test.rs"
+
+[[test]]
+name = "value_delegate_derive"
+path = "tests/value_delegate_derive.rs"
 
 [dependencies.heck]
 version = "0.5"
@@ -44,14 +85,11 @@ version = "1.0"
 version = "1.0"
 
 [dependencies.syn]
-version = "2.0.32"
+version = "2.0.68"
 features = ["full"]
 
 [dev-dependencies.glib]
-version = "0.19"
+version = "0.20.3"
 
 [dev-dependencies.trybuild2]
 version = "1.2"
-
-[features]
-unstable-clone-syntax = []

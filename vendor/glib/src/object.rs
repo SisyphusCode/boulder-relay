@@ -7,6 +7,7 @@ use std::{cmp, fmt, hash, marker::PhantomData, mem, mem::ManuallyDrop, ops, pin:
 
 use crate::{
     closure::TryFromClosureReturnValue,
+    ffi, gobject_ffi,
     prelude::*,
     quark::Quark,
     subclass::{prelude::*, SignalId, SignalQuery},
@@ -47,7 +48,7 @@ pub unsafe trait ObjectType:
     fn as_object_ref(&self) -> &ObjectRef;
     fn as_ptr(&self) -> *mut Self::GlibType;
 
-    unsafe fn from_glib_ptr_borrow<'a>(ptr: *const *const Self::GlibType) -> &'a Self;
+    unsafe fn from_glib_ptr_borrow(ptr: &*mut Self::GlibType) -> &Self;
 }
 
 // rustdoc-stripper-ignore-next
@@ -730,8 +731,14 @@ macro_rules! glib_object_wrapper {
             }
 
             #[inline]
-            unsafe fn from_glib_ptr_borrow<'a>(ptr: *const *const Self::GlibType) -> &'a Self {
-                &*(ptr as *const Self)
+            unsafe fn from_glib_ptr_borrow(ptr: &*mut Self::GlibType) -> &Self {
+                debug_assert_eq!(
+                    std::mem::size_of::<Self>(),
+                    std::mem::size_of::<$crate::ffi::gpointer>()
+                );
+                debug_assert!(!ptr.is_null());
+                debug_assert_ne!((*(*ptr as *const $crate::gobject_ffi::GObject)).ref_count, 0);
+                &*(ptr as *const *mut $ffi_name as *const Self)
             }
         }
 
@@ -1036,6 +1043,7 @@ macro_rules! glib_object_wrapper {
             #[inline]
             fn static_type() -> $crate::types::Type {
                 #[allow(unused_unsafe)]
+                #[allow(clippy::macro_metavars_in_unsafe)]
                 unsafe { $crate::translate::from_glib($get_type_expr) }
             }
         }
@@ -1067,11 +1075,8 @@ macro_rules! glib_object_wrapper {
 
             #[inline]
             unsafe fn from_value(value: &'a $crate::Value) -> Self {
-                debug_assert_eq!(std::mem::size_of::<Self>(), std::mem::size_of::<$crate::ffi::gpointer>());
                 let value = &*(value as *const $crate::Value as *const $crate::gobject_ffi::GValue);
-                debug_assert!(!value.data[0].v_pointer.is_null());
-                debug_assert_ne!((*(value.data[0].v_pointer as *const $crate::gobject_ffi::GObject)).ref_count, 0);
-                <$name $(<$($generic),+>)? as $crate::object::ObjectType>::from_glib_ptr_borrow(&value.data[0].v_pointer as *const $crate::ffi::gpointer as *const *const $ffi_name)
+                <$name $(<$($generic),+>)? as $crate::object::ObjectType>::from_glib_ptr_borrow(&*(&value.data[0].v_pointer as *const $crate::ffi::gpointer as *const *mut $ffi_name))
             }
         }
 
@@ -1314,6 +1319,15 @@ macro_rules! glib_object_wrapper {
         );
     };
 
+    (@object_interface [$($attr:meta)*] $visibility:vis $name:ident $(<$($generic:ident $(: $bound:tt $(+ $bound2:tt)*)?),+>)?, $iface:ty,
+    @type_ $get_type_expr:expr, @requires [$($requires:tt)*]) => {
+       $crate::glib_object_wrapper!(
+           @interface [$($attr)*] $visibility $name $(<$($generic $(: $bound $(+ $bound2)*)?),+>)?, $iface, <$iface as $crate::subclass::interface::ObjectInterface>::Instance,
+           @ffi_class  <$iface as $crate::subclass::interface::ObjectInterface>::Interface,
+           @type_ $get_type_expr, @requires [$($requires)*]
+       );
+   };
+
     (@interface [$($attr:meta)*] $visibility:vis $name:ident $(<$($generic:ident $(: $bound:tt $(+ $bound2:tt)*)?),+>)?, $impl_type:ty, $ffi_name:ty, @ffi_class $ffi_class_name:ty,
      @type_ $get_type_expr:expr, @requires [$($requires:tt)*]) => {
         $crate::glib_object_wrapper!(
@@ -1399,11 +1413,11 @@ impl Object {
     pub fn with_mut_values(type_: Type, properties: &mut [(&str, Value)]) -> Object {
         #[cfg(feature = "gio")]
         unsafe {
-            let iface_type = from_glib(gio_ffi::g_initable_get_type());
+            let iface_type = from_glib(gio_sys::g_initable_get_type());
             if type_.is_a(iface_type) {
                 panic!("Can't instantiate type '{type_}' implementing `gio::Initable`. Use `gio::Initable::new()`");
             }
-            let iface_type = from_glib(gio_ffi::g_async_initable_get_type());
+            let iface_type = from_glib(gio_sys::g_async_initable_get_type());
             if type_.is_a(iface_type) {
                 panic!("Can't instantiate type '{type_}' implementing `gio::AsyncInitable`. Use `gio::AsyncInitable::new()`");
             }
@@ -1529,8 +1543,9 @@ impl<'a, O: IsA<Object> + IsClass> ObjectBuilder<'a, O> {
     }
 
     // rustdoc-stripper-ignore-next
-    /// Set property `name` to the given value `value`.
-    #[inline]
+    /// Sets property `name` to the given value `value`.
+    ///
+    /// Overrides any default or previously defined value for `name`.
     pub fn property(self, name: &'a str, value: impl Into<Value>) -> Self {
         let ObjectBuilder {
             type_,
@@ -1543,6 +1558,67 @@ impl<'a, O: IsA<Object> + IsClass> ObjectBuilder<'a, O> {
             type_,
             properties,
             phantom: PhantomData,
+        }
+    }
+
+    // rustdoc-stripper-ignore-next
+    /// Sets property `name` to the given inner value if the `predicate` evaluates to `true`.
+    ///
+    /// This has no effect if the `predicate` evaluates to `false`,
+    /// i.e. default or previous value for `name` is kept.
+    #[inline]
+    pub fn property_if(self, name: &'a str, value: impl Into<Value>, predicate: bool) -> Self {
+        if predicate {
+            self.property(name, value)
+        } else {
+            self
+        }
+    }
+
+    // rustdoc-stripper-ignore-next
+    /// Sets property `name` to the given inner value if `value` is `Some`.
+    ///
+    /// This has no effect if the value is `None`, i.e. default or previous value for `name` is kept.
+    #[inline]
+    pub fn property_if_some(self, name: &'a str, value: Option<impl Into<Value>>) -> Self {
+        if let Some(value) = value {
+            self.property(name, value)
+        } else {
+            self
+        }
+    }
+
+    // rustdoc-stripper-ignore-next
+    /// Sets property `name` using the given `ValueType` `V` built from `iter`'s the `Item`s.
+    ///
+    /// Overrides any default or previously defined value for `name`.
+    #[inline]
+    pub fn property_from_iter<V: ValueType + Into<Value> + FromIterator<Value>>(
+        self,
+        name: &'a str,
+        iter: impl IntoIterator<Item = impl Into<Value>>,
+    ) -> Self {
+        let iter = iter.into_iter().map(|item| item.into());
+        self.property(name, V::from_iter(iter))
+    }
+
+    // rustdoc-stripper-ignore-next
+    /// Sets property `name` using the given `ValueType` `V` built from `iter`'s Item`s,
+    /// if `iter` is not empty.
+    ///
+    /// This has no effect if `iter` is empty, i.e. previous property value for `name` is unchanged.
+    #[inline]
+    pub fn property_if_not_empty<V: ValueType + Into<Value> + FromIterator<Value>>(
+        self,
+        name: &'a str,
+        iter: impl IntoIterator<Item = impl Into<Value>>,
+    ) -> Self {
+        let mut iter = iter.into_iter().peekable();
+        if iter.peek().is_some() {
+            let iter = iter.map(|item| item.into());
+            self.property(name, V::from_iter(iter))
+        } else {
+            self
         }
     }
 
@@ -1607,7 +1683,7 @@ pub trait ObjectExt: ObjectType {
     ///
     /// `None` is returned if the object does not implement the interface `T`.
     #[doc(alias = "get_interface")]
-    fn interface<T: IsInterface>(&self) -> Option<InterfaceRef<T>>;
+    fn interface<T: IsInterface>(&self) -> Option<InterfaceRef<'_, T>>;
 
     // rustdoc-stripper-ignore-next
     /// Sets the property `property_name` of the object to value `value`.
@@ -2224,7 +2300,7 @@ impl<T: ObjectType> ObjectExt for T {
     }
 
     #[inline]
-    fn interface<U: IsInterface>(&self) -> Option<InterfaceRef<U>> {
+    fn interface<U: IsInterface>(&self) -> Option<InterfaceRef<'_, U>> {
         Interface::from_class(self.object_class())
     }
 
@@ -3117,7 +3193,7 @@ impl<T: ObjectType> Watchable<T> for T {
 }
 
 #[doc(hidden)]
-impl<'a, T: ObjectType> Watchable<T> for BorrowedObject<'a, T> {
+impl<T: ObjectType> Watchable<T> for BorrowedObject<'_, T> {
     fn watched_object(&self) -> WatchedObject<T> {
         WatchedObject::new(self)
     }
@@ -3499,6 +3575,7 @@ pub struct SendWeakRef<T: ObjectType>(WeakRef<T>, Option<usize>);
 
 impl<T: ObjectType> SendWeakRef<T> {
     #[inline]
+    #[deprecated = "Use from() instead. See https://github.com/gtk-rs/gtk-rs-core/issues/1617"]
     pub fn new() -> SendWeakRef<T> {
         SendWeakRef(WeakRef::new(), None)
     }
@@ -3539,6 +3616,7 @@ impl<T: ObjectType> Clone for SendWeakRef<T> {
 impl<T: ObjectType> Default for SendWeakRef<T> {
     #[inline]
     fn default() -> Self {
+        #[allow(deprecated)]
         Self::new()
     }
 }
@@ -3569,7 +3647,7 @@ pub struct BindingBuilder<'a, 'f, 't> {
     transform_to: TransformFn<'t>,
 }
 
-impl<'a, 'f, 't> fmt::Debug for BindingBuilder<'a, 'f, 't> {
+impl fmt::Debug for BindingBuilder<'_, '_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("BindingBuilder")
             .field("source", &self.source)
@@ -3954,7 +4032,7 @@ impl<T: IsClass> Class<T> {
     /// Gets the parent class struct, if any.
     #[doc(alias = "g_type_class_peek_parent")]
     #[inline]
-    pub fn parent(&self) -> Option<ClassRef<T>> {
+    pub fn parent(&self) -> Option<ClassRef<'_, T>> {
         unsafe {
             let ptr = gobject_ffi::g_type_class_peek_parent(&self.0 as *const _ as *mut _);
             if ptr.is_null() {
@@ -3992,7 +4070,7 @@ impl<T: IsClass> AsMut<T::GlibClassType> for Class<T> {
 #[derive(Debug)]
 pub struct ClassRef<'a, T: IsClass>(ptr::NonNull<Class<T>>, bool, PhantomData<&'a ()>);
 
-impl<'a, T: IsClass> ops::Deref for ClassRef<'a, T> {
+impl<T: IsClass> ops::Deref for ClassRef<'_, T> {
     type Target = Class<T>;
 
     #[inline]
@@ -4001,7 +4079,7 @@ impl<'a, T: IsClass> ops::Deref for ClassRef<'a, T> {
     }
 }
 
-impl<'a, T: IsClass> Drop for ClassRef<'a, T> {
+impl<T: IsClass> Drop for ClassRef<'_, T> {
     #[inline]
     fn drop(&mut self) {
         if self.1 {
@@ -4012,8 +4090,8 @@ impl<'a, T: IsClass> Drop for ClassRef<'a, T> {
     }
 }
 
-unsafe impl<'a, T: IsClass> Send for ClassRef<'a, T> {}
-unsafe impl<'a, T: IsClass> Sync for ClassRef<'a, T> {}
+unsafe impl<T: IsClass> Send for ClassRef<'_, T> {}
+unsafe impl<T: IsClass> Sync for ClassRef<'_, T> {}
 
 // This should require Self: IsA<Self::Super>, but that seems to cause a cycle error
 pub unsafe trait ParentClassIs: IsClass {
@@ -4093,7 +4171,7 @@ impl<T: IsInterface> Interface<T> {
     ///
     /// This will return `None` if `klass` is not implementing `Self`.
     #[inline]
-    pub fn from_class<U: IsClass>(klass: &Class<U>) -> Option<InterfaceRef<T>> {
+    pub fn from_class<U: IsClass>(klass: &Class<U>) -> Option<InterfaceRef<'_, T>> {
         if !klass.type_().is_a(T::static_type()) {
             return None;
         }
@@ -4163,7 +4241,7 @@ impl<T: IsInterface> Interface<T> {
     /// interface.
     #[doc(alias = "g_type_interface_peek_parent")]
     #[inline]
-    pub fn parent(&self) -> Option<InterfaceRef<T>> {
+    pub fn parent(&self) -> Option<InterfaceRef<'_, T>> {
         unsafe {
             let ptr = gobject_ffi::g_type_interface_peek_parent(&self.0 as *const _ as *mut _);
             if ptr.is_null() {
@@ -4258,7 +4336,7 @@ impl<T: IsInterface> AsMut<T::GlibClassType> for Interface<T> {
 #[derive(Debug)]
 pub struct InterfaceRef<'a, T: IsInterface>(ptr::NonNull<Interface<T>>, bool, PhantomData<&'a ()>);
 
-impl<'a, T: IsInterface> Drop for InterfaceRef<'a, T> {
+impl<T: IsInterface> Drop for InterfaceRef<'_, T> {
     #[inline]
     fn drop(&mut self) {
         if self.1 {
@@ -4269,7 +4347,7 @@ impl<'a, T: IsInterface> Drop for InterfaceRef<'a, T> {
     }
 }
 
-impl<'a, T: IsInterface> ops::Deref for InterfaceRef<'a, T> {
+impl<T: IsInterface> ops::Deref for InterfaceRef<'_, T> {
     type Target = Interface<T>;
 
     #[inline]
@@ -4278,8 +4356,8 @@ impl<'a, T: IsInterface> ops::Deref for InterfaceRef<'a, T> {
     }
 }
 
-unsafe impl<'a, T: IsInterface> Send for InterfaceRef<'a, T> {}
-unsafe impl<'a, T: IsInterface> Sync for InterfaceRef<'a, T> {}
+unsafe impl<T: IsInterface> Send for InterfaceRef<'_, T> {}
+unsafe impl<T: IsInterface> Sync for InterfaceRef<'_, T> {}
 
 // rustdoc-stripper-ignore-next
 /// Trait implemented by interface types.
@@ -4354,8 +4432,8 @@ pub struct BorrowedObject<'a, T> {
     phantom: PhantomData<&'a T>,
 }
 
-unsafe impl<'a, T: Send + Sync> Send for BorrowedObject<'a, T> {}
-unsafe impl<'a, T: Send + Sync> Sync for BorrowedObject<'a, T> {}
+unsafe impl<T: Send + Sync> Send for BorrowedObject<'_, T> {}
+unsafe impl<T: Send + Sync> Sync for BorrowedObject<'_, T> {}
 
 impl<'a, T: ObjectType> BorrowedObject<'a, T> {
     // rustdoc-stripper-ignore-next
@@ -4383,7 +4461,7 @@ impl<'a, T: ObjectType> BorrowedObject<'a, T> {
     }
 }
 
-impl<'a, T> ops::Deref for BorrowedObject<'a, T> {
+impl<T> ops::Deref for BorrowedObject<'_, T> {
     type Target = T;
 
     #[inline]
@@ -4392,30 +4470,28 @@ impl<'a, T> ops::Deref for BorrowedObject<'a, T> {
     }
 }
 
-impl<'a, T> AsRef<T> for BorrowedObject<'a, T> {
+impl<T> AsRef<T> for BorrowedObject<'_, T> {
     #[inline]
     fn as_ref(&self) -> &T {
         unsafe { &*(&self.ptr as *const _ as *const T) }
     }
 }
 
-impl<'a, T: PartialEq> PartialEq<T> for BorrowedObject<'a, T> {
+impl<T: PartialEq> PartialEq<T> for BorrowedObject<'_, T> {
     #[inline]
     fn eq(&self, other: &T) -> bool {
         <T as PartialEq>::eq(self, other)
     }
 }
 
-impl<'a, T: PartialOrd> PartialOrd<T> for BorrowedObject<'a, T> {
+impl<T: PartialOrd> PartialOrd<T> for BorrowedObject<'_, T> {
     #[inline]
     fn partial_cmp(&self, other: &T) -> Option<cmp::Ordering> {
         <T as PartialOrd>::partial_cmp(self, other)
     }
 }
 
-impl<'a, T: crate::clone::Downgrade + ObjectType> crate::clone::Downgrade
-    for BorrowedObject<'a, T>
-{
+impl<T: crate::clone::Downgrade + ObjectType> crate::clone::Downgrade for BorrowedObject<'_, T> {
     type Weak = <T as crate::clone::Downgrade>::Weak;
 
     #[inline]

@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Subprocess, SubprocessFlags};
+use crate::{ffi, Subprocess, SubprocessFlags};
 use glib::translate::*;
 #[cfg(unix)]
 #[cfg_attr(docsrs, doc(cfg(unix)))]
@@ -76,13 +76,6 @@ impl SubprocessLauncher {
                 self.to_glib_none().0,
                 cwd.as_ref().to_glib_none().0,
             );
-        }
-    }
-
-    #[doc(alias = "g_subprocess_launcher_set_environ")]
-    pub fn set_environ(&self, env: &[&std::path::Path]) {
-        unsafe {
-            ffi::g_subprocess_launcher_set_environ(self.to_glib_none().0, env.to_glib_none().0);
         }
     }
 

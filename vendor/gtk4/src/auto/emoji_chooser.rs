@@ -3,10 +3,11 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Native,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Native,
     Overflow, Popover, PositionType, ShortcutManager, Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -41,7 +42,7 @@ impl EmojiChooser {
     pub fn connect_emoji_picked<F: Fn(&Self, &str) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn emoji_picked_trampoline<F: Fn(&EmojiChooser, &str) + 'static>(
             this: *mut ffi::GtkEmojiChooser,
-            text: *mut libc::c_char,
+            text: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -55,7 +56,7 @@ impl EmojiChooser {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"emoji-picked\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     emoji_picked_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -218,6 +219,14 @@ impl EmojiChooserBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -326,6 +335,7 @@ impl EmojiChooserBuilder {
     /// Build the [`EmojiChooser`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> EmojiChooser {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

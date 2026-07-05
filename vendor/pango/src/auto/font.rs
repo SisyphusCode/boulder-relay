@@ -8,7 +8,7 @@ use crate::Context;
 #[cfg(feature = "v1_46")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v1_46")))]
 use crate::FontFace;
-use crate::{Coverage, FontDescription, FontMap, FontMetrics, Glyph, Language, Rectangle};
+use crate::{ffi, Coverage, FontDescription, FontMap, FontMetrics, Glyph, Language, Rectangle};
 use glib::{prelude::*, translate::*};
 
 glib::wrapper! {
@@ -122,6 +122,18 @@ pub trait FontExt: IsA<Font> + sealed::Sealed + 'static {
     //fn hb_font(&self) -> /*Ignored*/Option<harf_buzz::font_t> {
     //    unsafe { TODO: call ffi:pango_font_get_hb_font() }
     //}
+
+    #[cfg(feature = "v1_50")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v1_50")))]
+    #[doc(alias = "pango_font_get_languages")]
+    #[doc(alias = "get_languages")]
+    fn languages(&self) -> Vec<Language> {
+        unsafe {
+            FromGlibPtrContainer::from_glib_none(ffi::pango_font_get_languages(
+                self.as_ref().to_glib_none().0,
+            ))
+        }
+    }
 
     #[doc(alias = "pango_font_get_metrics")]
     #[doc(alias = "get_metrics")]

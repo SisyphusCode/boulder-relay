@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::SocketConnectable;
+use crate::{ffi, SocketConnectable};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -81,6 +81,7 @@ pub trait NetworkServiceExt: IsA<NetworkService> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "g_network_service_set_scheme")]
+    #[doc(alias = "scheme")]
     fn set_scheme(&self, scheme: &str) {
         unsafe {
             ffi::g_network_service_set_scheme(

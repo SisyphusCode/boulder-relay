@@ -6,7 +6,7 @@
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
 use crate::AccessibleRange;
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Orientable,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Orientable,
     Orientation, Overflow, Widget,
 };
 use glib::{
@@ -66,18 +66,21 @@ impl ProgressBar {
 
     #[doc(alias = "gtk_progress_bar_get_inverted")]
     #[doc(alias = "get_inverted")]
+    #[doc(alias = "inverted")]
     pub fn is_inverted(&self) -> bool {
         unsafe { from_glib(ffi::gtk_progress_bar_get_inverted(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_progress_bar_get_pulse_step")]
     #[doc(alias = "get_pulse_step")]
+    #[doc(alias = "pulse-step")]
     pub fn pulse_step(&self) -> f64 {
         unsafe { ffi::gtk_progress_bar_get_pulse_step(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_progress_bar_get_show_text")]
     #[doc(alias = "get_show_text")]
+    #[doc(alias = "show-text")]
     pub fn shows_text(&self) -> bool {
         unsafe { from_glib(ffi::gtk_progress_bar_get_show_text(self.to_glib_none().0)) }
     }
@@ -96,6 +99,7 @@ impl ProgressBar {
     }
 
     #[doc(alias = "gtk_progress_bar_set_ellipsize")]
+    #[doc(alias = "ellipsize")]
     pub fn set_ellipsize(&self, mode: pango::EllipsizeMode) {
         unsafe {
             ffi::gtk_progress_bar_set_ellipsize(self.to_glib_none().0, mode.into_glib());
@@ -103,6 +107,7 @@ impl ProgressBar {
     }
 
     #[doc(alias = "gtk_progress_bar_set_fraction")]
+    #[doc(alias = "fraction")]
     pub fn set_fraction(&self, fraction: f64) {
         unsafe {
             ffi::gtk_progress_bar_set_fraction(self.to_glib_none().0, fraction);
@@ -110,6 +115,7 @@ impl ProgressBar {
     }
 
     #[doc(alias = "gtk_progress_bar_set_inverted")]
+    #[doc(alias = "inverted")]
     pub fn set_inverted(&self, inverted: bool) {
         unsafe {
             ffi::gtk_progress_bar_set_inverted(self.to_glib_none().0, inverted.into_glib());
@@ -117,6 +123,7 @@ impl ProgressBar {
     }
 
     #[doc(alias = "gtk_progress_bar_set_pulse_step")]
+    #[doc(alias = "pulse-step")]
     pub fn set_pulse_step(&self, fraction: f64) {
         unsafe {
             ffi::gtk_progress_bar_set_pulse_step(self.to_glib_none().0, fraction);
@@ -124,6 +131,7 @@ impl ProgressBar {
     }
 
     #[doc(alias = "gtk_progress_bar_set_show_text")]
+    #[doc(alias = "show-text")]
     pub fn set_show_text(&self, show_text: bool) {
         unsafe {
             ffi::gtk_progress_bar_set_show_text(self.to_glib_none().0, show_text.into_glib());
@@ -131,6 +139,7 @@ impl ProgressBar {
     }
 
     #[doc(alias = "gtk_progress_bar_set_text")]
+    #[doc(alias = "text")]
     pub fn set_text(&self, text: Option<&str>) {
         unsafe {
             ffi::gtk_progress_bar_set_text(self.to_glib_none().0, text.to_glib_none().0);
@@ -152,7 +161,7 @@ impl ProgressBar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::ellipsize\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_ellipsize_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -175,7 +184,7 @@ impl ProgressBar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::fraction\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_fraction_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -198,7 +207,7 @@ impl ProgressBar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::inverted\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_inverted_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -221,7 +230,7 @@ impl ProgressBar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::pulse-step\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_pulse_step_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -244,7 +253,7 @@ impl ProgressBar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-text\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_text_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -267,7 +276,7 @@ impl ProgressBar {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::text\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_text_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -414,6 +423,14 @@ impl ProgressBarBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -528,6 +545,7 @@ impl ProgressBarBuilder {
     /// Build the [`ProgressBar`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> ProgressBar {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

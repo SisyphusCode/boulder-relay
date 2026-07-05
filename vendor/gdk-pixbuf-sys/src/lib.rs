@@ -15,14 +15,15 @@ use gio_sys as gio;
 use glib_sys as glib;
 use gobject_sys as gobject;
 
-#[allow(unused_imports)]
-use libc::{
-    c_char, c_double, c_float, c_int, c_long, c_short, c_uchar, c_uint, c_ulong, c_ushort, c_void,
-    intptr_t, off_t, size_t, ssize_t, time_t, uintptr_t, FILE,
-};
 #[cfg(unix)]
 #[allow(unused_imports)]
 use libc::{dev_t, gid_t, pid_t, socklen_t, uid_t};
+#[allow(unused_imports)]
+use libc::{intptr_t, off_t, size_t, ssize_t, time_t, uintptr_t, FILE};
+#[allow(unused_imports)]
+use std::ffi::{
+    c_char, c_double, c_float, c_int, c_long, c_short, c_uchar, c_uint, c_ulong, c_ushort, c_void,
+};
 
 #[allow(unused_imports)]
 use glib::{gboolean, gconstpointer, gpointer, GType};
@@ -290,6 +291,7 @@ impl ::std::fmt::Debug for GdkPixbufModulePattern {
 }
 
 #[repr(C)]
+#[allow(dead_code)]
 pub struct _GdkPixbufSimpleAnimClass {
     _data: [u8; 0],
     _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
@@ -299,6 +301,7 @@ pub type GdkPixbufSimpleAnimClass = _GdkPixbufSimpleAnimClass;
 
 // Classes
 #[repr(C)]
+#[allow(dead_code)]
 pub struct GdkPixbuf {
     _data: [u8; 0],
     _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
@@ -353,6 +356,7 @@ impl ::std::fmt::Debug for GdkPixbufLoader {
 }
 
 #[repr(C)]
+#[allow(dead_code)]
 pub struct GdkPixbufNonAnim {
     _data: [u8; 0],
     _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
@@ -366,6 +370,7 @@ impl ::std::fmt::Debug for GdkPixbufNonAnim {
 }
 
 #[repr(C)]
+#[allow(dead_code)]
 pub struct GdkPixbufSimpleAnim {
     _data: [u8; 0],
     _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
@@ -379,6 +384,7 @@ impl ::std::fmt::Debug for GdkPixbufSimpleAnim {
 }
 
 #[repr(C)]
+#[allow(dead_code)]
 pub struct GdkPixbufSimpleAnimIter {
     _data: [u8; 0],
     _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
@@ -391,7 +397,6 @@ impl ::std::fmt::Debug for GdkPixbufSimpleAnimIter {
     }
 }
 
-#[link(name = "gdk_pixbuf-2.0")]
 extern "C" {
 
     //=========================================================================

@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Accessible, Buildable, ConstraintTarget, Native, Root, Widget};
+use crate::{ffi, Accessible, Buildable, ConstraintTarget, Native, Root, Widget};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -20,6 +20,16 @@ glib::wrapper! {
 }
 
 impl DragIcon {
+    #[doc(alias = "gtk_drag_icon_get_for_drag")]
+    #[doc(alias = "get_for_drag")]
+    pub fn for_drag(drag: &gdk::Drag) -> DragIcon {
+        assert_initialized_main_thread!();
+        unsafe {
+            Widget::from_glib_none(ffi::gtk_drag_icon_get_for_drag(drag.to_glib_none().0))
+                .unsafe_cast()
+        }
+    }
+
     #[doc(alias = "gtk_drag_icon_get_child")]
     #[doc(alias = "get_child")]
     pub fn child(&self) -> Option<Widget> {
@@ -27,6 +37,7 @@ impl DragIcon {
     }
 
     #[doc(alias = "gtk_drag_icon_set_child")]
+    #[doc(alias = "child")]
     pub fn set_child(&self, child: Option<&impl IsA<Widget>>) {
         unsafe {
             ffi::gtk_drag_icon_set_child(
@@ -44,13 +55,6 @@ impl DragIcon {
                 value.to_glib_none().0,
             ))
         }
-    }
-
-    #[doc(alias = "gtk_drag_icon_get_for_drag")]
-    #[doc(alias = "get_for_drag")]
-    pub fn for_drag(drag: &gdk::Drag) -> Widget {
-        assert_initialized_main_thread!();
-        unsafe { from_glib_none(ffi::gtk_drag_icon_get_for_drag(drag.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_drag_icon_set_from_paintable")]
@@ -86,7 +90,7 @@ impl DragIcon {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::child\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_child_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

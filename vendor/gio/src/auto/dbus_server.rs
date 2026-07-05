@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Cancellable, DBusAuthObserver, DBusConnection, DBusServerFlags, Initable};
+use crate::{ffi, Cancellable, DBusAuthObserver, DBusConnection, DBusServerFlags, Initable};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -48,6 +49,7 @@ impl DBusServer {
 
     #[doc(alias = "g_dbus_server_get_client_address")]
     #[doc(alias = "get_client_address")]
+    #[doc(alias = "client-address")]
     pub fn client_address(&self) -> glib::GString {
         unsafe { from_glib_none(ffi::g_dbus_server_get_client_address(self.to_glib_none().0)) }
     }
@@ -65,6 +67,7 @@ impl DBusServer {
     }
 
     #[doc(alias = "g_dbus_server_is_active")]
+    #[doc(alias = "active")]
     pub fn is_active(&self) -> bool {
         unsafe { from_glib(ffi::g_dbus_server_is_active(self.to_glib_none().0)) }
     }

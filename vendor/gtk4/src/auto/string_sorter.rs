@@ -5,7 +5,7 @@
 #[cfg(feature = "v4_10")]
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
 use crate::Collation;
-use crate::{Expression, Sorter};
+use crate::{ffi, Expression, Sorter};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -59,6 +59,7 @@ impl StringSorter {
 
     #[doc(alias = "gtk_string_sorter_get_ignore_case")]
     #[doc(alias = "get_ignore_case")]
+    #[doc(alias = "ignore-case")]
     pub fn ignores_case(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_string_sorter_get_ignore_case(
@@ -70,6 +71,7 @@ impl StringSorter {
     #[cfg(feature = "v4_10")]
     #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
     #[doc(alias = "gtk_string_sorter_set_collation")]
+    #[doc(alias = "collation")]
     pub fn set_collation(&self, collation: Collation) {
         unsafe {
             ffi::gtk_string_sorter_set_collation(self.to_glib_none().0, collation.into_glib());
@@ -77,6 +79,7 @@ impl StringSorter {
     }
 
     #[doc(alias = "gtk_string_sorter_set_expression")]
+    #[doc(alias = "expression")]
     pub fn set_expression(&self, expression: Option<impl AsRef<Expression>>) {
         unsafe {
             ffi::gtk_string_sorter_set_expression(
@@ -87,6 +90,7 @@ impl StringSorter {
     }
 
     #[doc(alias = "gtk_string_sorter_set_ignore_case")]
+    #[doc(alias = "ignore-case")]
     pub fn set_ignore_case(&self, ignore_case: bool) {
         unsafe {
             ffi::gtk_string_sorter_set_ignore_case(self.to_glib_none().0, ignore_case.into_glib());
@@ -110,7 +114,7 @@ impl StringSorter {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::collation\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_collation_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -133,7 +137,7 @@ impl StringSorter {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::expression\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_expression_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -156,7 +160,7 @@ impl StringSorter {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::ignore-case\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_ignore_case_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -213,6 +217,7 @@ impl StringSorterBuilder {
     /// Build the [`StringSorter`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> StringSorter {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

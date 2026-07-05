@@ -13,8 +13,14 @@
 edition = "2021"
 rust-version = "1.70"
 name = "gsk4"
-version = "0.8.2"
+version = "0.9.6"
 authors = ["The gtk-rs Project Developers"]
+build = false
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "Rust bindings of the GSK 4 library"
 homepage = "https://gtk-rs.org/gtk4-rs"
 documentation = "https://gtk-rs.org/gtk4-rs/stable/latest/docs/gsk4"
@@ -47,60 +53,75 @@ rustdoc-args = [
 
 [lib]
 name = "gsk4"
+path = "src/lib.rs"
+
+[[test]]
+name = "check_gir"
+path = "tests/check_gir.rs"
 
 [dependencies.cairo-rs]
-version = "0.19"
+version = "0.20"
 features = ["use_glib"]
 
-[dependencies.ffi]
-version = "0.8"
-package = "gsk4-sys"
-
 [dependencies.gdk]
-version = "0.8"
+version = "0.9"
 package = "gdk4"
 
 [dependencies.glib]
-version = "0.19"
+version = "0.20"
 features = ["v2_66"]
 
 [dependencies.graphene]
-version = "0.19"
+version = "0.20"
 package = "graphene-rs"
+
+[dependencies.gsk4-sys]
+version = "0.9.4"
 
 [dependencies.libc]
 version = "0.2"
 
 [dependencies.pango]
-version = "0.19"
+version = "0.20"
 features = ["v1_46"]
 
 [dev-dependencies.gir-format-check]
 version = "^0.1"
 
 [features]
-broadway = ["ffi/broadway"]
+broadway = ["gsk4-sys/broadway"]
 v4_10 = [
-    "ffi/v4_10",
+    "gsk4-sys/v4_10",
     "gdk/v4_10",
     "v4_6",
 ]
 v4_14 = [
-    "ffi/v4_14",
+    "gsk4-sys/v4_14",
+    "gdk/v4_14",
     "v4_10",
 ]
+v4_16 = [
+    "gsk4-sys/v4_16",
+    "gdk/v4_16",
+    "v4_14",
+]
+v4_18 = [
+    "gsk4-sys/v4_18",
+    "gdk/v4_18",
+    "v4_16",
+]
 v4_2 = [
-    "ffi/v4_2",
+    "gsk4-sys/v4_2",
     "gdk/v4_2",
 ]
 v4_4 = [
-    "ffi/v4_4",
+    "gsk4-sys/v4_4",
     "gdk/v4_4",
     "v4_2",
 ]
 v4_6 = [
-    "ffi/v4_6",
+    "gsk4-sys/v4_6",
     "gdk/v4_6",
     "v4_4",
 ]
-vulkan = ["ffi/vulkan"]
+vulkan = ["gsk4-sys/vulkan"]

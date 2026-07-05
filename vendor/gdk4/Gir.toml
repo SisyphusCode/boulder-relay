@@ -19,6 +19,9 @@ generate = [
     "Gdk.AxisFlags",
     "Gdk.ButtonEvent",
     "Gdk.CairoContext",
+    "Gdk.CicpParams",
+    "Gdk.CicpRange",
+    "Gdk.ColorState",
     "Gdk.CrossingEvent",
     "Gdk.CrossingMode",
     "Gdk.DeleteEvent",
@@ -121,7 +124,7 @@ status = "generate"
     [[object.function]]
     name = "cairo_set_source_rgba"
     manual = true
-    rename = "set_source_rgba"
+    rename = "set_source_color"
     doc_trait_name = "GdkCairoContextExt"
     [[object.function]]
     name = "cairo_set_source_pixbuf"
@@ -485,7 +488,7 @@ status = "generate"
     version = "4.8"
     [[object.member]]
     name = "event_last"
-    alias = true # not useful
+    ignore = true # not useful
 
 [[object]]
 name = "Gdk.FileList"
@@ -556,12 +559,22 @@ status = "generate"
     version = "4.6"
     [[object.member]]
     name = "n_formats"
-    alias = true # not useful
+    ignore = true # not useful
 
 [[object]]
 name = "Gdk.MemoryTexture"
 status = "generate"
 concurrency = "send+sync"
+
+[[object]]
+name = "Gdk.MemoryTextureBuilder"
+status = "generate"
+concurrency = "send+sync"
+    [[object.function]]
+    name = "set_update_region"
+        [[object.function.parameter]]
+        name = "region"
+        const = true
 
 [[object]]
 name = "Gdk.Monitor"

@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::MediaStream;
+use crate::{ffi, MediaStream};
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -100,6 +100,7 @@ pub trait MediaFileExt: IsA<MediaFile> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_media_file_get_input_stream")]
     #[doc(alias = "get_input_stream")]
+    #[doc(alias = "input-stream")]
     fn input_stream(&self) -> Option<gio::InputStream> {
         unsafe {
             from_glib_none(ffi::gtk_media_file_get_input_stream(
@@ -109,6 +110,7 @@ pub trait MediaFileExt: IsA<MediaFile> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_media_file_set_file")]
+    #[doc(alias = "file")]
     fn set_file(&self, file: Option<&impl IsA<gio::File>>) {
         unsafe {
             ffi::gtk_media_file_set_file(
@@ -129,6 +131,7 @@ pub trait MediaFileExt: IsA<MediaFile> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_media_file_set_input_stream")]
+    #[doc(alias = "input-stream")]
     fn set_input_stream(&self, stream: Option<&impl IsA<gio::InputStream>>) {
         unsafe {
             ffi::gtk_media_file_set_input_stream(
@@ -163,7 +166,7 @@ pub trait MediaFileExt: IsA<MediaFile> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::file\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_file_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -189,7 +192,7 @@ pub trait MediaFileExt: IsA<MediaFile> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::input-stream\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_input_stream_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

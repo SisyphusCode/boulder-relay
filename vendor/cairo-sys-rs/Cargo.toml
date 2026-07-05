@@ -13,12 +13,18 @@
 edition = "2021"
 rust-version = "1.70"
 name = "cairo-sys-rs"
-version = "0.19.2"
+version = "0.20.10"
 authors = ["The gtk-rs Project Developers"]
 build = "build.rs"
 exclude = ["gir-files/*"]
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "FFI bindings to libcairo"
 homepage = "https://gtk-rs.org/"
+readme = false
 keywords = [
     "cairo",
     "ffi",
@@ -61,24 +67,6 @@ version = "1.16"
 [package.metadata.system-deps.cairo-gobject.v1_18]
 version = "1.18"
 
-[lib]
-name = "cairo_sys"
-
-[dependencies.glib-sys]
-version = "0.19"
-optional = true
-
-[dependencies.libc]
-version = "0.2"
-
-[dependencies.x11]
-version = "2.16"
-features = ["xlib"]
-optional = true
-
-[build-dependencies.system-deps]
-version = "6"
-
 [features]
 freetype = []
 pdf = []
@@ -93,7 +81,26 @@ win32-surface = ["windows-sys"]
 xcb = []
 xlib = ["x11"]
 
+[lib]
+name = "cairo_sys"
+path = "src/lib.rs"
+
+[dependencies.glib-sys]
+version = "0.20.6"
+optional = true
+
+[dependencies.libc]
+version = "0.2"
+
+[dependencies.x11]
+version = "2.16"
+features = ["xlib"]
+optional = true
+
+[build-dependencies.system-deps]
+version = "7"
+
 [target."cfg(windows)".dependencies.windows-sys]
-version = "0.52"
+version = ">=0.52, <=0.59"
 features = ["Win32_Graphics_Gdi"]
 optional = true

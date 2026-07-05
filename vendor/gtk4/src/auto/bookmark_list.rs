@@ -2,6 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use crate::ffi;
 use glib::{
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
@@ -46,11 +47,13 @@ impl BookmarkList {
     }
 
     #[doc(alias = "gtk_bookmark_list_is_loading")]
+    #[doc(alias = "loading")]
     pub fn is_loading(&self) -> bool {
         unsafe { from_glib(ffi::gtk_bookmark_list_is_loading(self.to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_bookmark_list_set_attributes")]
+    #[doc(alias = "attributes")]
     pub fn set_attributes(&self, attributes: Option<&str>) {
         unsafe {
             ffi::gtk_bookmark_list_set_attributes(
@@ -75,7 +78,7 @@ impl BookmarkList {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::attributes\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_attributes_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -98,7 +101,7 @@ impl BookmarkList {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::io-priority\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_io_priority_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -121,7 +124,7 @@ impl BookmarkList {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::loading\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_loading_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

@@ -4,7 +4,7 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AppChooser, Buildable, ConstraintTarget, Dialog, DialogFlags, Native, Root,
+    ffi, Accessible, AppChooser, Buildable, ConstraintTarget, Dialog, DialogFlags, Native, Root,
     ShortcutManager, Widget, Window,
 };
 use glib::{
@@ -90,6 +90,7 @@ impl AppChooserDialog {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_dialog_set_heading")]
+    #[doc(alias = "heading")]
     pub fn set_heading(&self, heading: &str) {
         unsafe {
             ffi::gtk_app_chooser_dialog_set_heading(
@@ -118,7 +119,7 @@ impl AppChooserDialog {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::heading\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_heading_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

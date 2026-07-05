@@ -3,8 +3,9 @@
 // DO NOT EDIT
 #![allow(deprecated)]
 
-use crate::{SelectionMode, TreeIter, TreeModel, TreePath, TreeView};
+use crate::{ffi, SelectionMode, TreeIter, TreeModel, TreePath, TreeView};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -153,7 +154,7 @@ impl TreeSelection {
     #[allow(deprecated)]
     #[doc(alias = "gtk_tree_selection_selected_foreach")]
     pub fn selected_foreach<P: FnMut(&TreeModel, &TreePath, &TreeIter)>(&self, func: P) {
-        let func_data: P = func;
+        let mut func_data: P = func;
         unsafe extern "C" fn func_func<P: FnMut(&TreeModel, &TreePath, &TreeIter)>(
             model: *mut ffi::GtkTreeModel,
             path: *mut ffi::GtkTreePath,
@@ -167,12 +168,12 @@ impl TreeSelection {
             (*callback)(&model, &path, &iter)
         }
         let func = Some(func_func::<P> as _);
-        let super_callback0: &P = &func_data;
+        let super_callback0: &mut P = &mut func_data;
         unsafe {
             ffi::gtk_tree_selection_selected_foreach(
                 self.to_glib_none().0,
                 func,
-                super_callback0 as *const _ as *mut _,
+                super_callback0 as *mut _ as *mut _,
             );
         }
     }
@@ -180,6 +181,7 @@ impl TreeSelection {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_tree_selection_set_mode")]
+    #[doc(alias = "mode")]
     pub fn set_mode(&self, type_: SelectionMode) {
         unsafe {
             ffi::gtk_tree_selection_set_mode(self.to_glib_none().0, type_.into_glib());
@@ -292,7 +294,7 @@ impl TreeSelection {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     changed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -315,7 +317,7 @@ impl TreeSelection {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

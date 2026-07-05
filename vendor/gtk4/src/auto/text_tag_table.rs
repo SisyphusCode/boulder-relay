@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{Buildable, TextTag};
+use crate::{ffi, Buildable, TextTag};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -38,7 +39,7 @@ impl TextTagTable {
 
     #[doc(alias = "gtk_text_tag_table_foreach")]
     pub fn foreach<P: FnMut(&TextTag)>(&self, func: P) {
-        let func_data: P = func;
+        let mut func_data: P = func;
         unsafe extern "C" fn func_func<P: FnMut(&TextTag)>(
             tag: *mut ffi::GtkTextTag,
             data: glib::ffi::gpointer,
@@ -48,12 +49,12 @@ impl TextTagTable {
             (*callback)(&tag)
         }
         let func = Some(func_func::<P> as _);
-        let super_callback0: &P = &func_data;
+        let super_callback0: &mut P = &mut func_data;
         unsafe {
             ffi::gtk_text_tag_table_foreach(
                 self.to_glib_none().0,
                 func,
-                super_callback0 as *const _ as *mut _,
+                super_callback0 as *mut _ as *mut _,
             );
         }
     }
@@ -96,7 +97,7 @@ impl TextTagTable {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"tag-added\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     tag_added_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -129,7 +130,7 @@ impl TextTagTable {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"tag-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     tag_changed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -152,7 +153,7 @@ impl TextTagTable {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"tag-removed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     tag_removed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),

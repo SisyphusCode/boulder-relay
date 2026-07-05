@@ -5,6 +5,7 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
 };
 
+use crate::ffi;
 use glib::translate::*;
 
 #[cfg(target_os = "macos")]
@@ -13,7 +14,7 @@ extern "C" {
 }
 
 thread_local! {
-    static IS_MAIN_THREAD: Cell<bool> = Cell::new(false)
+    static IS_MAIN_THREAD: Cell<bool> = const{Cell::new(false)}
 }
 
 static INITIALIZED: AtomicBool = AtomicBool::new(false);

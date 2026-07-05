@@ -7,7 +7,10 @@ use std::{ops::Deref, ptr};
 #[cfg(feature = "use_glib")]
 use glib::translate::*;
 
-use crate::{Error, Surface, SurfaceType};
+#[cfg(not(feature = "use_glib"))]
+use crate::Borrowed;
+
+use crate::{ffi, Error, Surface, SurfaceType};
 
 #[derive(Debug)]
 pub struct XCBDrawable(pub u32);

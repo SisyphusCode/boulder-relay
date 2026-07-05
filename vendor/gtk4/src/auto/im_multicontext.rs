@@ -2,7 +2,7 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{IMContext, InputHints, InputPurpose};
+use crate::{ffi, IMContext, InputHints, InputPurpose};
 use glib::{prelude::*, translate::*};
 
 glib::wrapper! {
@@ -70,6 +70,7 @@ impl IMMulticontextBuilder {
     /// Build the [`IMMulticontext`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> IMMulticontext {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

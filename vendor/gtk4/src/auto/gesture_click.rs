@@ -2,8 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
-use crate::{EventController, Gesture, GestureSingle, PropagationLimit, PropagationPhase};
+use crate::{ffi, EventController, Gesture, GestureSingle, PropagationLimit, PropagationPhase};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -38,9 +39,9 @@ impl GestureClick {
     pub fn connect_pressed<F: Fn(&Self, i32, f64, f64) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn pressed_trampoline<F: Fn(&GestureClick, i32, f64, f64) + 'static>(
             this: *mut ffi::GtkGestureClick,
-            n_press: libc::c_int,
-            x: libc::c_double,
-            y: libc::c_double,
+            n_press: std::ffi::c_int,
+            x: std::ffi::c_double,
+            y: std::ffi::c_double,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -51,7 +52,7 @@ impl GestureClick {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"pressed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     pressed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -63,9 +64,9 @@ impl GestureClick {
     pub fn connect_released<F: Fn(&Self, i32, f64, f64) + 'static>(&self, f: F) -> SignalHandlerId {
         unsafe extern "C" fn released_trampoline<F: Fn(&GestureClick, i32, f64, f64) + 'static>(
             this: *mut ffi::GtkGestureClick,
-            n_press: libc::c_int,
-            x: libc::c_double,
-            y: libc::c_double,
+            n_press: std::ffi::c_int,
+            x: std::ffi::c_double,
+            y: std::ffi::c_double,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -76,7 +77,7 @@ impl GestureClick {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"released\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     released_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -98,7 +99,7 @@ impl GestureClick {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"stopped\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     stopped_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -117,9 +118,9 @@ impl GestureClick {
             F: Fn(&GestureClick, f64, f64, u32, Option<&gdk::EventSequence>) + 'static,
         >(
             this: *mut ffi::GtkGestureClick,
-            x: libc::c_double,
-            y: libc::c_double,
-            button: libc::c_uint,
+            x: std::ffi::c_double,
+            y: std::ffi::c_double,
+            button: std::ffi::c_uint,
             sequence: *mut gdk::ffi::GdkEventSequence,
             f: glib::ffi::gpointer,
         ) {
@@ -139,7 +140,7 @@ impl GestureClick {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"unpaired-release\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     unpaired_release_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -220,6 +221,7 @@ impl GestureClickBuilder {
     /// Build the [`GestureClick`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> GestureClick {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

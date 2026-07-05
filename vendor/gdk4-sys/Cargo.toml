@@ -13,12 +13,18 @@
 edition = "2021"
 rust-version = "1.70"
 name = "gdk4-sys"
-version = "0.8.2"
+version = "0.9.6"
 authors = ["The gtk-rs Project Developers"]
 build = "build.rs"
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
 description = "FFI bindings of GDK 4"
 homepage = "https://gtk-rs.org/gtk4-rs"
 documentation = "https://gtk-rs.org/gtk4-rs/stable/latest/docs/gdk4_sys"
+readme = false
 keywords = [
     "gdk",
     "gdk4",
@@ -59,7 +65,10 @@ version = "4.12"
 version = "4.14"
 
 [package.metadata.system-deps.gtk4.v4_16]
-version = "4.15"
+version = "4.16"
+
+[package.metadata.system-deps.gtk4.v4_18]
+version = "4.17"
 
 [package.metadata.system-deps.gtk4.v4_2]
 version = "4.2"
@@ -75,30 +84,35 @@ version = "4.8"
 
 [lib]
 name = "gdk4_sys"
+path = "src/lib.rs"
+
+[[test]]
+name = "abi"
+path = "tests/abi.rs"
 
 [dependencies.cairo-sys-rs]
-version = "0.19"
+version = "0.20"
 
 [dependencies.gdk-pixbuf-sys]
-version = "0.19"
+version = "0.20"
 
 [dependencies.gio-sys]
-version = "0.19"
+version = "0.20"
 features = ["v2_66"]
 
 [dependencies.glib-sys]
-version = "0.19"
+version = "0.20"
 features = ["v2_66"]
 
 [dependencies.gobject-sys]
-version = "0.19"
+version = "0.20"
 features = ["v2_66"]
 
 [dependencies.libc]
 version = "0.2"
 
 [dependencies.pango-sys]
-version = "0.19"
+version = "0.20"
 features = ["v1_46"]
 
 [dev-dependencies.shell-words]
@@ -108,16 +122,17 @@ version = "1.0.0"
 version = "3"
 
 [build-dependencies.pkg-config]
-version = "0.3.24"
+version = "0.3.30"
 
 [build-dependencies.system-deps]
-version = "6"
+version = "7"
 
 [features]
 v4_10 = ["v4_8"]
 v4_12 = ["v4_10"]
 v4_14 = ["v4_12"]
 v4_16 = ["v4_14"]
+v4_18 = ["v4_16"]
 v4_2 = []
 v4_4 = ["v4_2"]
 v4_6 = ["v4_4"]

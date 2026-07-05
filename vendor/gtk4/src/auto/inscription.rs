@@ -2,8 +2,11 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+use crate::AccessibleText;
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, InscriptionOverflow,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, InscriptionOverflow,
     LayoutManager, Overflow, Widget,
 };
 use glib::{
@@ -13,6 +16,18 @@ use glib::{
 };
 use std::boxed::Box as Box_;
 
+#[cfg(feature = "v4_14")]
+#[cfg_attr(docsrs, doc(cfg(feature = "v4_14")))]
+glib::wrapper! {
+    #[doc(alias = "GtkInscription")]
+    pub struct Inscription(Object<ffi::GtkInscription, ffi::GtkInscriptionClass>) @extends Widget, @implements Accessible, Buildable, ConstraintTarget, AccessibleText;
+
+    match fn {
+        type_ => || ffi::gtk_inscription_get_type(),
+    }
+}
+
+#[cfg(not(any(feature = "v4_14")))]
 glib::wrapper! {
     #[doc(alias = "GtkInscription")]
     pub struct Inscription(Object<ffi::GtkInscription, ffi::GtkInscriptionClass>) @extends Widget, @implements Accessible, Buildable, ConstraintTarget;
@@ -47,24 +62,28 @@ impl Inscription {
 
     #[doc(alias = "gtk_inscription_get_min_chars")]
     #[doc(alias = "get_min_chars")]
+    #[doc(alias = "min-chars")]
     pub fn min_chars(&self) -> u32 {
         unsafe { ffi::gtk_inscription_get_min_chars(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_inscription_get_min_lines")]
     #[doc(alias = "get_min_lines")]
+    #[doc(alias = "min-lines")]
     pub fn min_lines(&self) -> u32 {
         unsafe { ffi::gtk_inscription_get_min_lines(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_inscription_get_nat_chars")]
     #[doc(alias = "get_nat_chars")]
+    #[doc(alias = "nat-chars")]
     pub fn nat_chars(&self) -> u32 {
         unsafe { ffi::gtk_inscription_get_nat_chars(self.to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_inscription_get_nat_lines")]
     #[doc(alias = "get_nat_lines")]
+    #[doc(alias = "nat-lines")]
     pub fn nat_lines(&self) -> u32 {
         unsafe { ffi::gtk_inscription_get_nat_lines(self.to_glib_none().0) }
     }
@@ -77,6 +96,7 @@ impl Inscription {
 
     #[doc(alias = "gtk_inscription_get_text_overflow")]
     #[doc(alias = "get_text_overflow")]
+    #[doc(alias = "text-overflow")]
     pub fn text_overflow(&self) -> InscriptionOverflow {
         unsafe {
             from_glib(ffi::gtk_inscription_get_text_overflow(
@@ -87,6 +107,7 @@ impl Inscription {
 
     #[doc(alias = "gtk_inscription_get_wrap_mode")]
     #[doc(alias = "get_wrap_mode")]
+    #[doc(alias = "wrap-mode")]
     pub fn wrap_mode(&self) -> pango::WrapMode {
         unsafe { from_glib(ffi::gtk_inscription_get_wrap_mode(self.to_glib_none().0)) }
     }
@@ -104,6 +125,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_attributes")]
+    #[doc(alias = "attributes")]
     pub fn set_attributes(&self, attrs: Option<&pango::AttrList>) {
         unsafe {
             ffi::gtk_inscription_set_attributes(self.to_glib_none().0, attrs.to_glib_none().0);
@@ -111,6 +133,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_markup")]
+    #[doc(alias = "markup")]
     pub fn set_markup(&self, markup: Option<&str>) {
         unsafe {
             ffi::gtk_inscription_set_markup(self.to_glib_none().0, markup.to_glib_none().0);
@@ -118,6 +141,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_min_chars")]
+    #[doc(alias = "min-chars")]
     pub fn set_min_chars(&self, min_chars: u32) {
         unsafe {
             ffi::gtk_inscription_set_min_chars(self.to_glib_none().0, min_chars);
@@ -125,6 +149,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_min_lines")]
+    #[doc(alias = "min-lines")]
     pub fn set_min_lines(&self, min_lines: u32) {
         unsafe {
             ffi::gtk_inscription_set_min_lines(self.to_glib_none().0, min_lines);
@@ -132,6 +157,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_nat_chars")]
+    #[doc(alias = "nat-chars")]
     pub fn set_nat_chars(&self, nat_chars: u32) {
         unsafe {
             ffi::gtk_inscription_set_nat_chars(self.to_glib_none().0, nat_chars);
@@ -139,6 +165,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_nat_lines")]
+    #[doc(alias = "nat-lines")]
     pub fn set_nat_lines(&self, nat_lines: u32) {
         unsafe {
             ffi::gtk_inscription_set_nat_lines(self.to_glib_none().0, nat_lines);
@@ -146,6 +173,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_text")]
+    #[doc(alias = "text")]
     pub fn set_text(&self, text: Option<&str>) {
         unsafe {
             ffi::gtk_inscription_set_text(self.to_glib_none().0, text.to_glib_none().0);
@@ -153,6 +181,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_text_overflow")]
+    #[doc(alias = "text-overflow")]
     pub fn set_text_overflow(&self, overflow: InscriptionOverflow) {
         unsafe {
             ffi::gtk_inscription_set_text_overflow(self.to_glib_none().0, overflow.into_glib());
@@ -160,6 +189,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_wrap_mode")]
+    #[doc(alias = "wrap-mode")]
     pub fn set_wrap_mode(&self, wrap_mode: pango::WrapMode) {
         unsafe {
             ffi::gtk_inscription_set_wrap_mode(self.to_glib_none().0, wrap_mode.into_glib());
@@ -167,6 +197,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_xalign")]
+    #[doc(alias = "xalign")]
     pub fn set_xalign(&self, xalign: f32) {
         unsafe {
             ffi::gtk_inscription_set_xalign(self.to_glib_none().0, xalign);
@@ -174,6 +205,7 @@ impl Inscription {
     }
 
     #[doc(alias = "gtk_inscription_set_yalign")]
+    #[doc(alias = "yalign")]
     pub fn set_yalign(&self, yalign: f32) {
         unsafe {
             ffi::gtk_inscription_set_yalign(self.to_glib_none().0, yalign);
@@ -197,7 +229,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::attributes\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_attributes_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -222,7 +254,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::markup\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_markup_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -247,7 +279,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::min-chars\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_min_chars_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -272,7 +304,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::min-lines\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_min_lines_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -297,7 +329,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::nat-chars\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_nat_chars_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -322,7 +354,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::nat-lines\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_nat_lines_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -347,7 +379,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::text\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_text_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -372,7 +404,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::text-overflow\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_text_overflow_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -397,7 +429,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::wrap-mode\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_wrap_mode_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -422,7 +454,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::xalign\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_xalign_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -447,7 +479,7 @@ impl Inscription {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::yalign\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_yalign_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -648,6 +680,14 @@ impl InscriptionBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -756,6 +796,7 @@ impl InscriptionBuilder {
     /// Build the [`Inscription`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Inscription {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

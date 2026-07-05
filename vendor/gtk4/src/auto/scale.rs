@@ -6,7 +6,7 @@
 #[cfg_attr(docsrs, doc(cfg(feature = "v4_10")))]
 use crate::AccessibleRange;
 use crate::{
-    Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, LayoutManager,
+    ffi, Accessible, AccessibleRole, Adjustment, Align, Buildable, ConstraintTarget, LayoutManager,
     Orientable, Orientation, Overflow, PositionType, Range, Widget,
 };
 use glib::{
@@ -242,6 +242,14 @@ impl ScaleBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -356,6 +364,7 @@ impl ScaleBuilder {
     /// Build the [`Scale`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Scale {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }
@@ -393,6 +402,7 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_scale_get_draw_value")]
     #[doc(alias = "get_draw_value")]
+    #[doc(alias = "draw-value")]
     fn draws_value(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_scale_get_draw_value(
@@ -403,6 +413,7 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_scale_get_has_origin")]
     #[doc(alias = "get_has_origin")]
+    #[doc(alias = "has-origin")]
     fn has_origin(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_scale_get_has_origin(
@@ -434,11 +445,13 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_scale_get_value_pos")]
     #[doc(alias = "get_value_pos")]
+    #[doc(alias = "value-pos")]
     fn value_pos(&self) -> PositionType {
         unsafe { from_glib(ffi::gtk_scale_get_value_pos(self.as_ref().to_glib_none().0)) }
     }
 
     #[doc(alias = "gtk_scale_set_digits")]
+    #[doc(alias = "digits")]
     fn set_digits(&self, digits: i32) {
         unsafe {
             ffi::gtk_scale_set_digits(self.as_ref().to_glib_none().0, digits);
@@ -446,6 +459,7 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_scale_set_draw_value")]
+    #[doc(alias = "draw-value")]
     fn set_draw_value(&self, draw_value: bool) {
         unsafe {
             ffi::gtk_scale_set_draw_value(self.as_ref().to_glib_none().0, draw_value.into_glib());
@@ -457,9 +471,9 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
         let func_data: Box_<P> = Box_::new(func);
         unsafe extern "C" fn func_func<P: Fn(&Scale, f64) -> String + 'static>(
             scale: *mut ffi::GtkScale,
-            value: libc::c_double,
+            value: std::ffi::c_double,
             user_data: glib::ffi::gpointer,
-        ) -> *mut libc::c_char {
+        ) -> *mut std::ffi::c_char {
             let scale = from_glib_borrow(scale);
             let callback = &*(user_data as *mut P);
             (*callback)(&scale, value).to_glib_full()
@@ -483,6 +497,7 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_scale_set_has_origin")]
+    #[doc(alias = "has-origin")]
     fn set_has_origin(&self, has_origin: bool) {
         unsafe {
             ffi::gtk_scale_set_has_origin(self.as_ref().to_glib_none().0, has_origin.into_glib());
@@ -490,6 +505,7 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_scale_set_value_pos")]
+    #[doc(alias = "value-pos")]
     fn set_value_pos(&self, pos: PositionType) {
         unsafe {
             ffi::gtk_scale_set_value_pos(self.as_ref().to_glib_none().0, pos.into_glib());
@@ -511,7 +527,7 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::digits\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_digits_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -534,7 +550,7 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::draw-value\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_draw_value_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -557,7 +573,7 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::has-origin\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_has_origin_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -580,7 +596,7 @@ pub trait ScaleExt: IsA<Scale> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::value-pos\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_value_pos_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

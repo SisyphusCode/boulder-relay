@@ -2,7 +2,9 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use crate::ffi;
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -114,6 +116,7 @@ impl AdjustmentBuilder {
     /// Build the [`Adjustment`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> Adjustment {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }
@@ -168,18 +171,21 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
 
     #[doc(alias = "gtk_adjustment_get_page_increment")]
     #[doc(alias = "get_page_increment")]
+    #[doc(alias = "page-increment")]
     fn page_increment(&self) -> f64 {
         unsafe { ffi::gtk_adjustment_get_page_increment(self.as_ref().to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_adjustment_get_page_size")]
     #[doc(alias = "get_page_size")]
+    #[doc(alias = "page-size")]
     fn page_size(&self) -> f64 {
         unsafe { ffi::gtk_adjustment_get_page_size(self.as_ref().to_glib_none().0) }
     }
 
     #[doc(alias = "gtk_adjustment_get_step_increment")]
     #[doc(alias = "get_step_increment")]
+    #[doc(alias = "step-increment")]
     fn step_increment(&self) -> f64 {
         unsafe { ffi::gtk_adjustment_get_step_increment(self.as_ref().to_glib_none().0) }
     }
@@ -197,6 +203,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_adjustment_set_lower")]
+    #[doc(alias = "lower")]
     fn set_lower(&self, lower: f64) {
         unsafe {
             ffi::gtk_adjustment_set_lower(self.as_ref().to_glib_none().0, lower);
@@ -204,6 +211,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_adjustment_set_page_increment")]
+    #[doc(alias = "page-increment")]
     fn set_page_increment(&self, page_increment: f64) {
         unsafe {
             ffi::gtk_adjustment_set_page_increment(self.as_ref().to_glib_none().0, page_increment);
@@ -211,6 +219,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_adjustment_set_page_size")]
+    #[doc(alias = "page-size")]
     fn set_page_size(&self, page_size: f64) {
         unsafe {
             ffi::gtk_adjustment_set_page_size(self.as_ref().to_glib_none().0, page_size);
@@ -218,6 +227,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_adjustment_set_step_increment")]
+    #[doc(alias = "step-increment")]
     fn set_step_increment(&self, step_increment: f64) {
         unsafe {
             ffi::gtk_adjustment_set_step_increment(self.as_ref().to_glib_none().0, step_increment);
@@ -225,6 +235,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_adjustment_set_upper")]
+    #[doc(alias = "upper")]
     fn set_upper(&self, upper: f64) {
         unsafe {
             ffi::gtk_adjustment_set_upper(self.as_ref().to_glib_none().0, upper);
@@ -232,6 +243,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
     }
 
     #[doc(alias = "gtk_adjustment_set_value")]
+    #[doc(alias = "value")]
     fn set_value(&self, value: f64) {
         unsafe {
             ffi::gtk_adjustment_set_value(self.as_ref().to_glib_none().0, value);
@@ -252,7 +264,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     changed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -274,7 +286,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"value-changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     value_changed_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -297,7 +309,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::lower\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_lower_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -323,7 +335,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::page-increment\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_page_increment_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -349,7 +361,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::page-size\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_page_size_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -375,7 +387,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::step-increment\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_step_increment_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -398,7 +410,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::upper\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_upper_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -421,7 +433,7 @@ pub trait AdjustmentExt: IsA<Adjustment> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::value\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_value_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

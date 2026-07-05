@@ -2,7 +2,7 @@
 
 use glib::{prelude::*, translate::*, BoolError, StrV, Variant};
 
-use crate::{prelude::*, Settings, SettingsBindFlags};
+use crate::{ffi, prelude::*, Settings, SettingsBindFlags};
 
 #[must_use = "The builder must be built to be used"]
 pub struct BindingBuilder<'a> {
@@ -17,7 +17,7 @@ pub struct BindingBuilder<'a> {
     set_mapping: Option<Box<dyn Fn(&glib::Value, glib::VariantType) -> Option<glib::Variant>>>,
 }
 
-impl<'a> BindingBuilder<'a> {
+impl BindingBuilder<'_> {
     pub fn flags(mut self, flags: SettingsBindFlags) -> Self {
         self.flags = flags;
         self

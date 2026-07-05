@@ -3,8 +3,9 @@
 // DO NOT EDIT
 #![allow(deprecated)]
 
-use crate::FontChooserLevel;
+use crate::{ffi, FontChooserLevel};
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -46,6 +47,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_get_font_desc")]
     #[doc(alias = "get_font_desc")]
+    #[doc(alias = "font-desc")]
     fn font_desc(&self) -> Option<pango::FontDescription> {
         unsafe {
             from_glib_full(ffi::gtk_font_chooser_get_font_desc(
@@ -82,6 +84,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_get_font_features")]
     #[doc(alias = "get_font_features")]
+    #[doc(alias = "font-features")]
     fn font_features(&self) -> glib::GString {
         unsafe {
             from_glib_full(ffi::gtk_font_chooser_get_font_features(
@@ -138,6 +141,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_get_preview_text")]
     #[doc(alias = "get_preview_text")]
+    #[doc(alias = "preview-text")]
     fn preview_text(&self) -> glib::GString {
         unsafe {
             from_glib_full(ffi::gtk_font_chooser_get_preview_text(
@@ -150,6 +154,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_get_show_preview_entry")]
     #[doc(alias = "get_show_preview_entry")]
+    #[doc(alias = "show-preview-entry")]
     fn shows_preview_entry(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_font_chooser_get_show_preview_entry(
@@ -201,6 +206,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_set_font")]
+    #[doc(alias = "font")]
     fn set_font(&self, fontname: &str) {
         unsafe {
             ffi::gtk_font_chooser_set_font(
@@ -213,6 +219,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_set_font_desc")]
+    #[doc(alias = "font-desc")]
     fn set_font_desc(&self, font_desc: &pango::FontDescription) {
         unsafe {
             ffi::gtk_font_chooser_set_font_desc(
@@ -237,6 +244,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_set_language")]
+    #[doc(alias = "language")]
     fn set_language(&self, language: &str) {
         unsafe {
             ffi::gtk_font_chooser_set_language(
@@ -249,6 +257,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_set_level")]
+    #[doc(alias = "level")]
     fn set_level(&self, level: FontChooserLevel) {
         unsafe {
             ffi::gtk_font_chooser_set_level(self.as_ref().to_glib_none().0, level.into_glib());
@@ -258,6 +267,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_set_preview_text")]
+    #[doc(alias = "preview-text")]
     fn set_preview_text(&self, text: &str) {
         unsafe {
             ffi::gtk_font_chooser_set_preview_text(
@@ -270,6 +280,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_font_chooser_set_show_preview_entry")]
+    #[doc(alias = "show-preview-entry")]
     fn set_show_preview_entry(&self, show_preview_entry: bool) {
         unsafe {
             ffi::gtk_font_chooser_set_show_preview_entry(
@@ -287,7 +298,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
             F: Fn(&P, &str) + 'static,
         >(
             this: *mut ffi::GtkFontChooser,
-            fontname: *mut libc::c_char,
+            fontname: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -301,7 +312,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"font-activated\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     font_activated_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -325,7 +336,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::font\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_font_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -352,7 +363,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::font-desc\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_font_desc_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -379,7 +390,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::font-features\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_font_features_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -406,7 +417,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::language\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_language_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -430,7 +441,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::level\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_level_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -457,7 +468,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::preview-text\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_preview_text_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -484,7 +495,7 @@ pub trait FontChooserExt: IsA<FontChooser> + sealed::Sealed + 'static {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-preview-entry\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_preview_entry_trampoline::<Self, F> as *const (),
                 )),
                 Box_::into_raw(f),

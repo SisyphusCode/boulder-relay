@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Orientable,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Orientable,
     Orientation, Overflow, Stack, Widget,
 };
 use glib::{
@@ -44,6 +44,7 @@ impl StackSwitcher {
     }
 
     #[doc(alias = "gtk_stack_switcher_set_stack")]
+    #[doc(alias = "stack")]
     pub fn set_stack(&self, stack: Option<&Stack>) {
         unsafe {
             ffi::gtk_stack_switcher_set_stack(self.to_glib_none().0, stack.to_glib_none().0);
@@ -65,7 +66,7 @@ impl StackSwitcher {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::stack\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_stack_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -179,6 +180,14 @@ impl StackSwitcherBuilder {
             builder: self
                 .builder
                 .property("layout-manager", layout_manager.clone().upcast()),
+        }
+    }
+
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
         }
     }
 
@@ -296,6 +305,7 @@ impl StackSwitcherBuilder {
     /// Build the [`StackSwitcher`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> StackSwitcher {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

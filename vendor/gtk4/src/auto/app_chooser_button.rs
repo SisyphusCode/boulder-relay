@@ -4,10 +4,11 @@
 #![allow(deprecated)]
 
 use crate::{
-    Accessible, AccessibleRole, Align, AppChooser, Buildable, ConstraintTarget, LayoutManager,
+    ffi, Accessible, AccessibleRole, Align, AppChooser, Buildable, ConstraintTarget, LayoutManager,
     Overflow, Widget,
 };
 use glib::{
+    object::ObjectType as _,
     prelude::*,
     signal::{connect_raw, SignalHandlerId},
     translate::*,
@@ -84,6 +85,7 @@ impl AppChooserButton {
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_button_get_modal")]
     #[doc(alias = "get_modal")]
+    #[doc(alias = "modal")]
     pub fn is_modal(&self) -> bool {
         unsafe { from_glib(ffi::gtk_app_chooser_button_get_modal(self.to_glib_none().0)) }
     }
@@ -92,6 +94,7 @@ impl AppChooserButton {
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_button_get_show_default_item")]
     #[doc(alias = "get_show_default_item")]
+    #[doc(alias = "show-default-item")]
     pub fn shows_default_item(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_app_chooser_button_get_show_default_item(
@@ -104,6 +107,7 @@ impl AppChooserButton {
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_button_get_show_dialog_item")]
     #[doc(alias = "get_show_dialog_item")]
+    #[doc(alias = "show-dialog-item")]
     pub fn shows_dialog_item(&self) -> bool {
         unsafe {
             from_glib(ffi::gtk_app_chooser_button_get_show_dialog_item(
@@ -127,6 +131,7 @@ impl AppChooserButton {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_button_set_heading")]
+    #[doc(alias = "heading")]
     pub fn set_heading(&self, heading: &str) {
         unsafe {
             ffi::gtk_app_chooser_button_set_heading(
@@ -139,6 +144,7 @@ impl AppChooserButton {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_button_set_modal")]
+    #[doc(alias = "modal")]
     pub fn set_modal(&self, modal: bool) {
         unsafe {
             ffi::gtk_app_chooser_button_set_modal(self.to_glib_none().0, modal.into_glib());
@@ -148,6 +154,7 @@ impl AppChooserButton {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_button_set_show_default_item")]
+    #[doc(alias = "show-default-item")]
     pub fn set_show_default_item(&self, setting: bool) {
         unsafe {
             ffi::gtk_app_chooser_button_set_show_default_item(
@@ -160,6 +167,7 @@ impl AppChooserButton {
     #[cfg_attr(feature = "v4_10", deprecated = "Since 4.10")]
     #[allow(deprecated)]
     #[doc(alias = "gtk_app_chooser_button_set_show_dialog_item")]
+    #[doc(alias = "show-dialog-item")]
     pub fn set_show_dialog_item(&self, setting: bool) {
         unsafe {
             ffi::gtk_app_chooser_button_set_show_dialog_item(
@@ -185,7 +193,7 @@ impl AppChooserButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"activate\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     activate_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -213,7 +221,7 @@ impl AppChooserButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"changed\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     changed_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -231,7 +239,7 @@ impl AppChooserButton {
             F: Fn(&AppChooserButton, &str) + 'static,
         >(
             this: *mut ffi::GtkAppChooserButton,
-            item_name: *mut libc::c_char,
+            item_name: *mut std::ffi::c_char,
             f: glib::ffi::gpointer,
         ) {
             let f: &F = &*(f as *const F);
@@ -250,7 +258,7 @@ impl AppChooserButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 signal_name.as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     custom_item_activated_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -273,7 +281,7 @@ impl AppChooserButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::heading\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_heading_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -296,7 +304,7 @@ impl AppChooserButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::modal\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_modal_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -324,7 +332,7 @@ impl AppChooserButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-default-item\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_default_item_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -349,7 +357,7 @@ impl AppChooserButton {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::show-dialog-item\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_show_dialog_item_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -486,6 +494,14 @@ impl AppChooserButtonBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -600,6 +616,7 @@ impl AppChooserButtonBuilder {
     /// Build the [`AppChooserButton`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> AppChooserButton {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

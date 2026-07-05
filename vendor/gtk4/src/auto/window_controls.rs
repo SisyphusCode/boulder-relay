@@ -3,7 +3,7 @@
 // DO NOT EDIT
 
 use crate::{
-    Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
+    ffi, Accessible, AccessibleRole, Align, Buildable, ConstraintTarget, LayoutManager, Overflow,
     PackType, Widget,
 };
 use glib::{
@@ -41,6 +41,7 @@ impl WindowControls {
 
     #[doc(alias = "gtk_window_controls_get_decoration_layout")]
     #[doc(alias = "get_decoration_layout")]
+    #[doc(alias = "decoration-layout")]
     pub fn decoration_layout(&self) -> Option<glib::GString> {
         unsafe {
             from_glib_none(ffi::gtk_window_controls_get_decoration_layout(
@@ -51,6 +52,7 @@ impl WindowControls {
 
     #[doc(alias = "gtk_window_controls_get_empty")]
     #[doc(alias = "get_empty")]
+    #[doc(alias = "empty")]
     pub fn is_empty(&self) -> bool {
         unsafe { from_glib(ffi::gtk_window_controls_get_empty(self.to_glib_none().0)) }
     }
@@ -62,6 +64,7 @@ impl WindowControls {
     }
 
     #[doc(alias = "gtk_window_controls_set_decoration_layout")]
+    #[doc(alias = "decoration-layout")]
     pub fn set_decoration_layout(&self, layout: Option<&str>) {
         unsafe {
             ffi::gtk_window_controls_set_decoration_layout(
@@ -72,6 +75,7 @@ impl WindowControls {
     }
 
     #[doc(alias = "gtk_window_controls_set_side")]
+    #[doc(alias = "side")]
     pub fn set_side(&self, side: PackType) {
         unsafe {
             ffi::gtk_window_controls_set_side(self.to_glib_none().0, side.into_glib());
@@ -98,7 +102,7 @@ impl WindowControls {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::decoration-layout\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_decoration_layout_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -121,7 +125,7 @@ impl WindowControls {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::empty\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_empty_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -144,7 +148,7 @@ impl WindowControls {
             connect_raw(
                 self.as_ptr() as *mut _,
                 b"notify::side\0".as_ptr() as *const _,
-                Some(std::mem::transmute::<_, unsafe extern "C" fn()>(
+                Some(std::mem::transmute::<*const (), unsafe extern "C" fn()>(
                     notify_side_trampoline::<F> as *const (),
                 )),
                 Box_::into_raw(f),
@@ -269,6 +273,14 @@ impl WindowControlsBuilder {
         }
     }
 
+    #[cfg(feature = "v4_18")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "v4_18")))]
+    pub fn limit_events(self, limit_events: bool) -> Self {
+        Self {
+            builder: self.builder.property("limit-events", limit_events),
+        }
+    }
+
     pub fn margin_bottom(self, margin_bottom: i32) -> Self {
         Self {
             builder: self.builder.property("margin-bottom", margin_bottom),
@@ -377,6 +389,7 @@ impl WindowControlsBuilder {
     /// Build the [`WindowControls`].
     #[must_use = "Building the object from the builder is usually expensive and is not expected to have side effects"]
     pub fn build(self) -> WindowControls {
+        assert_initialized_main_thread!();
         self.builder.build()
     }
 }

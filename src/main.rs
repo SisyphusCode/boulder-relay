@@ -1160,7 +1160,7 @@ impl SimpleComponent for AppModel {
 
                     #[wrap(Some)]
                     set_start_child = &gtk::Box {
-                    set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_width_request: 200, set_hexpand: false,
+                    set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_width_request: 200, set_hexpand: true,
                     add_css_class: "sidebar", set_margin_all: 0,
 
                     gtk::Label { set_label: "BOULDER RELAY", add_css_class: "sidebar-title", set_margin_top: 16 },
@@ -1353,7 +1353,7 @@ impl SimpleComponent for AppModel {
 
                     #[wrap(Some)]
                     set_start_child = &gtk::Box {
-                        set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_margin_all: 16, set_width_request: 300, set_hexpand: false,
+                        set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_margin_all: 16, set_width_request: 300, set_hexpand: true,
                         add_css_class: "chat-panel",
 
                         gtk::Label { #[watch] set_label: &format!("Active: {}", model.active_channel), set_halign: gtk::Align::Start },
@@ -1396,7 +1396,7 @@ impl SimpleComponent for AppModel {
 
                     #[wrap(Some)]
                     set_end_child = &gtk::Box {
-                        set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_width_request: 200, set_hexpand: false,
+                        set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_width_request: 200, set_hexpand: true,
                         add_css_class: "sidebar", set_margin_all: 0,
 
                         gtk::Label { set_label: "USERS IN CHANNEL", add_css_class: "sidebar-title", set_margin_top: 16, set_margin_bottom: 8 },

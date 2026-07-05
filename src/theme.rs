@@ -5,6 +5,24 @@ pub const GRUVBOX_CSS: &str = r#"
 window.boulder-relay {
     background-color: #282828;
     color: #ebdbb2;
+    min-width: 800px;
+    min-height: 500px;
+}
+
+paned {
+    /* Prevent panes from being dragged to extreme positions */
+    /* This works with the width_request settings on child widgets */
+    min-width: 50px;
+}
+
+paned > box.sidebar,
+paned > box.chat-panel {
+    min-width: 150px;
+}
+
+box.sidebar,
+box.chat-panel {
+    min-width: 150px;
 }
 
 headerbar.boulder-header {
@@ -264,6 +282,10 @@ pub fn attach_window(window: &gtk::Window) {
     window.add_css_class("boulder-relay");
     window.set_title(Some(""));
     window.set_icon_name(Some("boulder-relay"));
+    
+    // Set minimum window size to prevent excessive shrinking
+    // In GTK4, set_size_request sets the minimum size
+    window.set_size_request(800, 500);
 }
 
 pub fn attach_adw_window(window: &adw::Window) {

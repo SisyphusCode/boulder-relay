@@ -1145,7 +1145,7 @@ impl SimpleComponent for AppModel {
 
             #[wrap(Some)]
             set_content = &adw::ToolbarView {
-                add_top_bar = &theme::build_titlebar(),
+                add_top_bar: &theme::build_titlebar(),
 
                 #[wrap(Some)]
                 set_content = &gtk::Paned {
@@ -1400,6 +1400,7 @@ impl SimpleComponent for AppModel {
                             #[local_ref] user_box_ref -> gtk::ListBox {}
                         }
                     }
+                }
                 }
             }
         }

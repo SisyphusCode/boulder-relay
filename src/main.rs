@@ -2406,9 +2406,12 @@ impl SimpleComponent for AppModel {
 }
 
 fn main() {
+    gtk::init().expect("Failed to initialize GTK");
     let app = adw::Application::new(Some(notify::APP_ID), Default::default());
-    theme::load_css();
-    notify::setup_application_icon();
+    app.connect_startup(|_| {
+        theme::load_css();
+        notify::setup_application_icon();
+    });
     let relm_app = relm4::RelmApp::from_app(app);
     relm_app.run::<AppModel>(());
 }

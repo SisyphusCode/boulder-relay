@@ -13,6 +13,7 @@ paned {
     /* Prevent panes from being dragged to extreme positions */
     /* This works with the width_request settings on child widgets */
     min-width: 50px;
+    min-height: 50px;
 }
 
 paned > box.sidebar,
@@ -23,6 +24,7 @@ paned > box.chat-panel {
 box.sidebar,
 box.chat-panel {
     min-width: 150px;
+    min-height: 100px;
 }
 
 headerbar.boulder-header {

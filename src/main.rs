@@ -1154,13 +1154,13 @@ impl SimpleComponent for AppModel {
 
                 #[wrap(Some)]
                 set_content = &gtk::Paned {
-                    set_hexpand: true,
+                    set_hexpand: true, set_vexpand: true,
                     set_orientation: gtk::Orientation::Horizontal,
                     set_position: 240,
 
                     #[wrap(Some)]
                     set_start_child = &gtk::Box {
-                    set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_width_request: 200, set_hexpand: true,
+                    set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_width_request: 200, set_hexpand: true, set_vexpand: true,
                     add_css_class: "sidebar", set_margin_all: 0,
 
                     gtk::Label { set_label: "BOULDER RELAY", add_css_class: "sidebar-title", set_margin_top: 16 },
@@ -1349,11 +1349,11 @@ impl SimpleComponent for AppModel {
                 set_end_child = &gtk::Paned {
                     set_orientation: gtk::Orientation::Horizontal,
                     set_position: 680,
-                    set_hexpand: true,
+                    set_hexpand: true, set_vexpand: true,
 
                     #[wrap(Some)]
                     set_start_child = &gtk::Box {
-                        set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_margin_all: 16, set_width_request: 300, set_hexpand: true,
+                        set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_margin_all: 16, set_width_request: 300, set_hexpand: true, set_vexpand: true,
                         add_css_class: "chat-panel",
 
                         gtk::Label { #[watch] set_label: &format!("Active: {}", model.active_channel), set_halign: gtk::Align::Start },
@@ -1396,7 +1396,7 @@ impl SimpleComponent for AppModel {
 
                     #[wrap(Some)]
                     set_end_child = &gtk::Box {
-                        set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_width_request: 200, set_hexpand: true,
+                        set_orientation: gtk::Orientation::Vertical, set_spacing: 12, set_width_request: 200, set_hexpand: true, set_vexpand: true,
                         add_css_class: "sidebar", set_margin_all: 0,
 
                         gtk::Label { set_label: "USERS IN CHANNEL", add_css_class: "sidebar-title", set_margin_top: 16, set_margin_bottom: 8 },

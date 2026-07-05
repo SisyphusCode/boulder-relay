@@ -26,8 +26,8 @@ pub struct Settings {
     pub nick_colors_enabled: bool,
     pub timestamp_format: String,
     pub account_service: String,
-    pub accounts: std::collections::HashMap<String, ServerAccount>, // per-server: key = server
-    pub auth_method: String, // current: "nickserv", "sasl_plain"
+    pub accounts: std::collections::HashMap<String, ServerAccount>,
+    pub auth_method: String,
 }
 
 impl Default for Settings {
@@ -108,20 +108,21 @@ impl Settings {
                 settings.auth_method = method;
             }
         }
+        // Accounts are stored as: server\0nick\0password\0service\0method entries joined by \n
         if let Some(accounts_str) = values.remove("accounts") {
-            for entry in accounts_str.split(',') {
-                if entry.is_empty() { continue; }
-                if let Some((server, data)) = entry.split_once(':') {
-                    let parts: Vec<&str> = data.split('|').collect();
-                    if parts.len() >= 4 {
-                        let acc = ServerAccount {
-                            nick: parts[0].to_string(),
-                            password: parts[1].to_string(),
-                            service: parts[2].to_string(),
-                            auth_method: parts[3].to_string(),
-                        };
-                        settings.accounts.insert(server.to_string(), acc);
-                    }
+            for entry in accounts_str.split('\n') {
+                if entry.is_empty() {
+                    continue;
+                }
+                let parts: Vec<&str> = entry.splitn(5, '\0').collect();
+                if parts.len() == 5 {
+                    let acc = ServerAccount {
+                        nick: parts[1].to_string(),
+                        password: parts[2].to_string(),
+                        service: parts[3].to_string(),
+                        auth_method: parts[4].to_string(),
+                    };
+                    settings.accounts.insert(parts[0].to_string(), acc);
                 }
             }
         }
@@ -137,9 +138,21 @@ impl Settings {
 
         let favorites = self.favorites.join("|");
         let extra_channels = self.extra_channels.join("|");
-        let accounts_str = self.accounts.iter().map(|(s, a)| {
-            format!("{}:{}|{}|{}|{}", s, a.nick, a.password, a.service, a.auth_method)
-        }).collect::<Vec<_>>().join(",");
+
+        // Accounts encoded as null-separated fields, one entry per line.
+        // Null bytes are safe here since server/nick/service cannot contain them.
+        let accounts_str = self
+            .accounts
+            .iter()
+            .map(|(s, a)| {
+                format!(
+                    "{}\0{}\0{}\0{}\0{}",
+                    s, a.nick, a.password, a.service, a.auth_method
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+
         let body = format!(
             "nickname={}\nserver={}\npassword={}\nfavorites={}\nextra_channels={}\nlast_channel={}\nnotifications_enabled={}\nbackground_on_close={}\nnick_colors_enabled={}\ntimestamp_format={}\naccount_service={}\nauth_method={}\naccounts={}\n",
             escape_value(&self.nickname),
@@ -156,7 +169,17 @@ impl Settings {
             escape_value(&self.auth_method),
             escape_value(&accounts_str),
         );
-        fs::write(path, body)
+
+        fs::write(&path, body)?;
+
+        // Restrict config file to owner read/write only (contains passwords).
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&path, fs::Permissions::from_mode(0o600))?;
+        }
+
+        Ok(())
     }
 }
 
@@ -226,13 +249,8 @@ mod tests {
     fn round_trips_escaped_values() {
         let settings = Settings {
             nickname: String::from("test\\nick"),
-            server: String::from("irc.libera.chat"),
             password: String::from("sec\\ret"),
-            favorites: vec![String::from("#gentoo")],
-            extra_channels: vec![String::from("#archlinux")],
-            last_channel: String::from("#gentoo"),
-            notifications_enabled: true,
-            background_on_close: false,
+            ..Settings::default()
         };
         let encoded = format!(
             "nickname={}\npassword={}\n",
@@ -242,5 +260,41 @@ mod tests {
         let parsed = parse_key_values(&encoded);
         assert_eq!(parsed["nickname"], "test\\nick");
         assert_eq!(parsed["password"], "sec\\ret");
+    }
+
+    #[test]
+    fn accounts_round_trip_special_chars() {
+        let mut settings = Settings::default();
+        settings.accounts.insert(
+            "irc.libera.chat".to_string(),
+            ServerAccount {
+                nick: "testnick".to_string(),
+                password: "p@ss|word,with,commas".to_string(),
+                service: "NickServ".to_string(),
+                auth_method: "nickserv".to_string(),
+            },
+        );
+
+        let accounts_str = settings
+            .accounts
+            .iter()
+            .map(|(s, a)| {
+                format!("{}\0{}\0{}\0{}\0{}", s, a.nick, a.password, a.service, a.auth_method)
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        let encoded = format!("accounts={}\n", escape_value(&accounts_str));
+        let parsed = parse_key_values(&encoded);
+
+        let raw = parsed["accounts"].as_str();
+        for entry in raw.split('\n') {
+            if entry.is_empty() {
+                continue;
+            }
+            let parts: Vec<&str> = entry.splitn(5, '\0').collect();
+            assert_eq!(parts.len(), 5);
+            assert_eq!(parts[2], "p@ss|word,with,commas");
+        }
     }
 }

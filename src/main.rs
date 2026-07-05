@@ -2290,10 +2290,11 @@ impl SimpleComponent for AppModel {
                             if let Some(target) = parts.next() {
                                 let body = parts.next().unwrap_or("");
                                 if !body.is_empty() {
-                                    if let Some(irc_tx) = &self.irc_sender {
+                                    let tx_opt = self.irc_sender.clone();
+                                    if let Some(irc_tx) = tx_opt {
                                         let _ = irc_tx.send_privmsg(target, body);
                                         let my_nick = self.nickname.clone();
-                        self.append_message(target, &my_nick, body, LineStyle::SelfMsg);
+                                        self.append_message(target, &my_nick, body, LineStyle::SelfMsg);
                                     }
                                 } else {
                                     sender.input(AppInput::JoinChannel(target.to_string()));
@@ -2382,7 +2383,8 @@ impl SimpleComponent for AppModel {
                     return;
                 }
 
-                if let Some(irc_tx) = &self.irc_sender {
+                let tx_opt = self.irc_sender.clone();
+                if let Some(irc_tx) = tx_opt {
                     if irc_tx.send_privmsg(&self.active_channel, text).is_ok() {
                         let channel = self.active_channel.clone();
                         let my_nick = self.nickname.clone();

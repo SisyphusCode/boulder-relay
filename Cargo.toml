@@ -13,7 +13,7 @@ futures = "0.3"
 base64 = "0.21.7"
 serde = { version = "1", features = ["derive"] }
 toml = "1.1"
-keyring = "2"
+#keyring = "2"
 
 [profile.release]
 opt-level = 3

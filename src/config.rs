@@ -1,4 +1,3 @@
-use keyring::Entry;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -6,42 +5,21 @@ use std::path::PathBuf;
 
 const CONFIG_DIR: &str = "boulder-relay";
 const CONFIG_FILE: &str = "settings.toml";
-const KEYRING_SERVICE: &str = "boulder-relay";
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ServerAccount {
     pub nick: String,
-    /// Password is NOT serialized to disk — stored in keyring.
-    #[serde(skip)]
     pub password: String,
     pub service: String,
-    pub auth_method: String, // "nickserv", "sasl_plain", "sasl_external"
+    pub auth_method: String,
 }
 
 impl ServerAccount {
-    /// Keyring key for this account: "boulder-relay/<server>/<nick>"
-    fn keyring_key(server: &str, nick: &str) -> String {
-        format!("{}/{}", server, nick)
+    pub fn load_password(_server: &str, _nick: &str) -> String {
+        String::new()
     }
 
-    /// Load password from keyring. Returns empty string on any error.
-    pub fn load_password(server: &str, nick: &str) -> String {
-        let key = Self::keyring_key(server, nick);
-        Entry::new(KEYRING_SERVICE, &key)
-            .and_then(|e| e.get_password())
-            .unwrap_or_default()
-    }
-
-    /// Save password to keyring. Silently ignores errors (keyring may not be available).
-    pub fn save_password(server: &str, nick: &str, password: &str) {
-        let key = Self::keyring_key(server, nick);
-        if let Ok(entry) = Entry::new(KEYRING_SERVICE, &key) {
-            if password.is_empty() {
-                let _ = entry.delete_credential();
-            } else {
-                let _ = entry.set_password(password);
-            }
-        }
+    pub fn save_password(_server: &str, _nick: &str, _password: &str) {
     }
 }
 
@@ -49,8 +27,6 @@ impl ServerAccount {
 pub struct Settings {
     pub nickname: String,
     pub server: String,
-    /// Legacy plain-text password field — only used as fallback if keyring unavailable.
-    #[serde(default)]
     pub password: String,
     pub favorites: Vec<String>,
     pub extra_channels: Vec<String>,
@@ -91,19 +67,7 @@ impl Settings {
             Ok(c) => c,
             Err(_) => return Self::default(),
         };
-        let mut settings: Self = toml::from_str(&content).unwrap_or_default();
-        // Reload passwords from keyring for each account
-        for (server, acc) in settings.accounts.iter_mut() {
-            if acc.password.is_empty() {
-                acc.password = ServerAccount::load_password(server, &acc.nick);
-            }
-        }
-        // Also load top-level password from keyring
-        if settings.password.is_empty() {
-            settings.password =
-                ServerAccount::load_password(&settings.server, &settings.nickname);
-        }
-        settings
+        toml::from_str(&content).unwrap_or_default()
     }
 
     pub fn save(&self) -> std::io::Result<()> {
@@ -112,25 +76,11 @@ impl Settings {
             fs::create_dir_all(parent)?;
         }
 
-        // Save passwords to keyring, strip them from the on-disk struct
-        ServerAccount::save_password(&self.server, &self.nickname, &self.password);
-        for (server, acc) in &self.accounts {
-            ServerAccount::save_password(server, &acc.nick, &acc.password);
-        }
-
-        // Build a sanitized copy with passwords zeroed out
-        let mut on_disk = self.clone();
-        on_disk.password = String::new();
-        for acc in on_disk.accounts.values_mut() {
-            acc.password = String::new();
-        }
-
-        let body = toml::to_string_pretty(&on_disk)
+        let body = toml::to_string_pretty(&self)
             .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
 
         fs::write(&path, body)?;
 
-        // Restrict permissions to owner-only on Unix
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
@@ -176,11 +126,5 @@ mod tests {
         assert!(s.notifications_enabled);
         assert!(s.nick_colors_enabled);
         assert_eq!(s.timestamp_format, "%H:%M");
-    }
-
-    #[test]
-    fn account_keyring_key_format() {
-        let key = ServerAccount::keyring_key("irc.libera.chat", "alice");
-        assert_eq!(key, "irc.libera.chat/alice");
     }
 }

@@ -1598,13 +1598,13 @@ impl SimpleComponent for AppModel {
                         "/list" => { sender.input(AppInput::BrowseChannels); return; }
                         "/whois" => {
                             if let Some(target) = parts.next() {
-                                if let Some(irc_tx) = &self.irc_sender { let _ = irc_tx.send(Message::from(&format!("WHOIS {}", target))); }
+                                if let Some(irc_tx) = &self.irc_sender { let _ = irc_tx.send(Message::from(format!("WHOIS {}", target).as_str())); }
                             }
                             return;
                         }
                         "/away" => {
                             let msg = parts.next().unwrap_or("Away");
-                            if let Some(irc_tx) = &self.irc_sender { let _ = irc_tx.send(Message::from(&format!("AWAY :{}", msg))); }
+                            if let Some(irc_tx) = &self.irc_sender { let _ = irc_tx.send(Message::from(format!("AWAY :{}", msg).as_str())); }
                             return;
                         }
                         "/back" => {
@@ -1615,8 +1615,8 @@ impl SimpleComponent for AppModel {
                             let new_topic = parts.next().unwrap_or("");
                             let chan = self.active_channel.clone();
                             if let Some(irc_tx) = &self.irc_sender {
-                                if new_topic.is_empty() { let _ = irc_tx.send(Message::from(&format!("TOPIC {}", chan))); }
-                                else { let _ = irc_tx.send(Message::from(&format!("TOPIC {} :{}", chan, new_topic))); }
+                                if new_topic.is_empty() { let _ = irc_tx.send(Message::from(format!("TOPIC {}", chan).as_str())); }
+                                else { let _ = irc_tx.send(Message::from(format!("TOPIC {} :{}", chan, new_topic).as_str())); }
                             }
                             return;
                         }

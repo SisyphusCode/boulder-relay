@@ -1445,8 +1445,8 @@ impl SimpleComponent for AppModel {
             }
 
             AppInput::ToggleMute { channel, user } => {
-                let list = self.muted_users.entry(channel.clone()).or_insert_with(Vec::new);
                 let ts = self.timestamp_prefix();
+                let list = self.muted_users.entry(channel.clone()).or_insert_with(Vec::new);
                 if list.contains(&user) {
                     list.retain(|u| u != &user);
                     self.append_line(&channel, ts, None, format!("Unmuted {}", user), LineStyle::System);

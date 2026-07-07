@@ -250,9 +250,11 @@ pub fn load_css() {
     gtk::style_context_add_provider_for_display(&display, &provider, STYLE_PROVIDER_PRIORITY_USER);
 }
 
-pub fn build_titlebar() -> adw::HeaderBar {
-    let header = adw::HeaderBar::new();
+pub fn build_titlebar() -> gtk::HeaderBar {
+    let header = gtk::HeaderBar::new();
     header.add_css_class("boulder-header");
+    header.set_show_title_buttons(true);
+    header.set_decoration_layout(Some("close,minimize,maximize:"));
     let title = gtk::Label::builder()
         .label("Boulder Relay")
         .css_classes(["title"])
@@ -263,7 +265,7 @@ pub fn build_titlebar() -> adw::HeaderBar {
 
 pub fn attach_window(window: &gtk::Window) {
     window.add_css_class("boulder-relay");
-    window.set_title(Some(""));
+    window.set_title(Some("Boulder Relay"));
     window.set_icon_name(Some("boulder-relay"));
     window.set_size_request(800, 500);
 }

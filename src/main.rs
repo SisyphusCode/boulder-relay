@@ -141,7 +141,7 @@ struct AppModel {
     channel_box: gtk::ListBox,
     user_box: gtk::ListBox,
     chat_view: gtk::TextView,
-    window: adw::Window,
+    window: gtk::Window,
     notifications_enabled: bool,
     background_on_close: bool,
     channel_filter: String,
@@ -781,13 +781,15 @@ impl SimpleComponent for AppModel {
     type Output = ();
 
     view! {
-        adw::Window {
+        gtk::Window {
             set_default_size: (1200, 700),
             set_size_request: (800, 500),
             set_resizable: true,
+            set_decorated: true,
             set_hexpand: true,
             set_vexpand: true,
             add_css_class: "boulder-relay",
+            set_titlebar: Some(&theme::build_titlebar()),
 
             connect_close_request[sender] => move |window| {
                 sender.input(AppInput::SaveSettings);
@@ -800,13 +802,7 @@ impl SimpleComponent for AppModel {
             },
 
             #[wrap(Some)]
-            set_content = &adw::ToolbarView {
-                add_top_bar: &theme::build_titlebar(),
-                set_hexpand: true,
-                set_vexpand: true,
-
-                #[wrap(Some)]
-                set_content = &gtk::Paned {
+            set_child = &gtk::Paned {
                     set_hexpand: true, set_vexpand: true,
                     set_orientation: gtk::Orientation::Horizontal,
                     set_position: 240,
@@ -962,7 +958,6 @@ impl SimpleComponent for AppModel {
                 }
             }
         }
-    }
 
     fn init(_init: Self::Init, root: Self::Root, sender: ComponentSender<Self>) -> ComponentParts<Self> {
         theme::attach_window(root.upcast_ref::<gtk::Window>());

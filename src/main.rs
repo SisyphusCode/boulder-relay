@@ -134,7 +134,26 @@ struct AppModel {
     mention_counts: HashMap<String, u32>,
     chat_histories: HashMap<String, Vec<ChatLine>>,
     channel_users: HashMap<String, Vec<String>>,
-    irc_sender: Option<irc::client::Sender>,\n    nickname: String,\n    server: String,\n    password: String,\n    channel_box: gtk::ListBox,\n    user_box: gtk::ListBox,\n    chat_view: gtk::TextView,\n    window: gtk::Window,\n    notifications_enabled: bool,\n    background_on_close: bool,\n    channel_filter: String,\n    channel_list_results: Vec<(String, u32, String)>,\n    channel_topics: HashMap<String, String>,\n    nick_colors_enabled: bool,\n    timestamp_format: String,\n    account_service: String,\n    auth_method: String,\n    accounts: HashMap<String, config::ServerAccount>,\n    pending_register_email: Option<String>,\n}
+    irc_sender: Option<irc::client::Sender>,
+    nickname: String,
+    server: String,
+    password: String,
+    channel_box: gtk::ListBox,
+    user_box: gtk::ListBox,
+    chat_view: gtk::TextView,
+    window: gtk::Window,
+    notifications_enabled: bool,
+    background_on_close: bool,
+    channel_filter: String,
+    channel_list_results: Vec<(String, u32, String)>,
+    channel_topics: HashMap<String, String>,
+    nick_colors_enabled: bool,
+    timestamp_format: String,
+    account_service: String,
+    auth_method: String,
+    accounts: HashMap<String, config::ServerAccount>,
+    pending_register_email: Option<String>,
+}
 
 impl AppModel {
     fn normalized_nick(user: &str) -> String {

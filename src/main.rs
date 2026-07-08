@@ -70,7 +70,7 @@ pub enum AppInput {
     UpdatePassword(String),
     Connect,
     Disconnect,
-    /// Intentional user-initiated disconnect â�� suppresses auto-reconnect.
+    /// Intentional user-initiated disconnect — suppresses auto-reconnect.
     UserDisconnect,
     NetworkStatus(String),
     NetworkConnected(irc::client::Sender),
@@ -122,7 +122,7 @@ struct AppModel {
     senders: HashMap<String, Option<irc::client::Sender>>,
     server_states: HashMap<String, ConnectionState>,
     connection: ConnectionState,
-    /// True when the user explicitly clicked Disconnect â�� suppresses auto-reconnect.
+    /// True when the user explicitly clicked Disconnect — suppresses auto-reconnect.
     user_disconnected: bool,
     status: String,
     active_channel: String,
@@ -402,7 +402,7 @@ impl AppModel {
         let s1 = sender.clone();
         let ch1 = channel.to_string();
         select_btn.connect_clicked(move |_| { s1.input(AppInput::SelectChannel(ch1.clone())); });
-        let fav_btn = gtk::Button::with_label(if is_favorite { "â��" } else { "â��" });
+        let fav_btn = gtk::Button::with_label(if is_favorite { "★" } else { "☆" });
         fav_btn.add_css_class("fav-btn");
         fav_btn.set_tooltip_text(Some(if is_favorite { "Remove from favorites" } else { "Add to favorites" }));
         let s2 = sender.clone();
@@ -445,7 +445,7 @@ impl AppModel {
             }
         }
         if !favorites.is_empty() {
-            self.append_section_header("â�� Favorites");
+            self.append_section_header("— Favorites");
             for channel in &favorites { self.append_channel_row(sender, channel); }
         }
         if !others.is_empty() {
@@ -479,10 +479,10 @@ impl AppModel {
         let vbox = gtk::Box::new(gtk::Orientation::Vertical, 8);
         vbox.set_margin_all(12);
         let header = gtk::Label::builder()
-            .label(format!("{} channels â�� type to filter", sorted.len()))
+            .label(format!("{} channels — type to filter", sorted.len()))
             .halign(gtk::Align::Start).css_classes(["sidebar-subtitle"]).build();
         vbox.append(&header);
-        let search = gtk::SearchEntry::builder().placeholder_text("Filter by name or topicâ�¦").hexpand(true).build();
+        let search = gtk::SearchEntry::builder().placeholder_text("Filter by name or topic…").hexpand(true).build();
         vbox.append(&search);
         let scrolled = gtk::ScrolledWindow::builder().vexpand(true).build();
         let list_container = gtk::Box::new(gtk::Orientation::Vertical, 4);
@@ -699,7 +699,7 @@ impl AppModel {
         dialog.add_css_class("boulder-relay");
         let vbox = gtk::Box::new(gtk::Orientation::Vertical, 8);
         vbox.set_margin_all(12);
-        let search = gtk::Entry::builder().placeholder_text("Search logsâ�¦").build();
+        let search = gtk::Entry::builder().placeholder_text("Search logs…").build();
         vbox.append(&search);
         let scrolled = gtk::ScrolledWindow::new();
         scrolled.set_vexpand(true);
@@ -758,7 +758,7 @@ impl AppModel {
                 let s1 = sender.clone();
                 let u1 = clean_user.clone();
                 dm_btn.connect_clicked(move |_| { s1.input(AppInput::JoinChannel(u1.clone())); });
-                let mute_btn = gtk::Button::with_label(if muted { "ð���" } else { "ð���" });
+                let mute_btn = gtk::Button::with_label(if muted { "🔇" } else { "🔊" });
                 mute_btn.add_css_class("mute-btn");
                 let s2 = sender.clone();
                 let c2 = self.active_channel.clone();
@@ -822,7 +822,7 @@ impl SimpleComponent for AppModel {
                             add_css_class: "sidebar", set_margin_all: 0,
 
                     gtk::Label { set_label: "BOULDER RELAY", add_css_class: "sidebar-title", set_margin_top: 16 },
-                    gtk::Label { set_label: "GTK4 IRC Client â�� any network, any channel", set_margin_start: 12, set_margin_end: 12 },
+                    gtk::Label { set_label: "GTK4 IRC Client — any network, any channel", set_margin_start: 12, set_margin_end: 12 },
                     gtk::Separator { set_orientation: gtk::Orientation::Horizontal },
                     gtk::Label { set_label: "Network Configuration", add_css_class: "sidebar-subtitle", set_halign: gtk::Align::Start, set_margin_start: 12 },
                     gtk::Entry {
@@ -836,7 +836,7 @@ impl SimpleComponent for AppModel {
                             connect_changed[sender] => move |entry| { sender.input(AppInput::UpdatePassword(entry.text().to_string())); }
                         },
                         gtk::Button {
-                            set_label: "ð���", set_tooltip_text: Some("Show or hide password"),
+                            set_label: "👁", set_tooltip_text: Some("Show or hide password"),
                             connect_clicked => move |button| {
                                 if let Some(entry) = button.prev_sibling().and_downcast::<gtk::Entry>() {
                                     let visible = entry.property::<bool>("visibility");
@@ -845,7 +845,7 @@ impl SimpleComponent for AppModel {
                             }
                         },
                     },
-                    gtk::Button { set_label: "Register new accountâ�¦", set_margin_start: 12, set_margin_end: 12, connect_clicked => AppInput::OpenRegisterDialog },
+                    gtk::Button { set_label: "Register new account…", set_margin_start: 12, set_margin_end: 12, connect_clicked => AppInput::OpenRegisterDialog },
                     gtk::Button { set_label: "Manage Accounts", set_margin_start: 12, set_margin_end: 12, connect_clicked => AppInput::OpenAccountManager },
                     gtk::Entry {
                         set_text: &model.server, set_placeholder_text: Some("Server address"), set_margin_start: 12, set_margin_end: 12,
@@ -892,7 +892,7 @@ impl SimpleComponent for AppModel {
                         set_margin_start: 12, set_margin_end: 12,
                         connect_toggled[sender] => move |check| { sender.input(AppInput::UpdateNotificationsEnabled(check.is_active())); }
                     },
-                    gtk::Button { set_label: "Preferencesâ�¦", set_margin_start: 12, set_margin_end: 12, connect_clicked => AppInput::OpenPreferences },
+                    gtk::Button { set_label: "Preferences…", set_margin_start: 12, set_margin_end: 12, connect_clicked => AppInput::OpenPreferences },
                     gtk::Separator { set_orientation: gtk::Orientation::Horizontal },
                     gtk::Label { set_label: "Channels & DMs", add_css_class: "sidebar-subtitle", set_halign: gtk::Align::Start, set_margin_start: 12 },
                     gtk::Entry {
@@ -903,9 +903,9 @@ impl SimpleComponent for AppModel {
                             if !text.is_empty() { entry.set_text(""); sender.input(AppInput::JoinEntry(text)); }
                         }
                     },
-                    gtk::Button { set_label: "ð��� Browse server channelsâ�¦", set_margin_start: 12, set_margin_end: 12, connect_clicked => AppInput::BrowseChannels },
+                    gtk::Button { set_label: "🔍 Browse server channels…", set_margin_start: 12, set_margin_end: 12, connect_clicked => AppInput::BrowseChannels },
                     gtk::SearchEntry {
-                        set_placeholder_text: Some("Filter your joined channelsâ�¦"), set_margin_start: 12, set_margin_end: 12,
+                        set_placeholder_text: Some("Filter your joined channels…"), set_margin_start: 12, set_margin_end: 12,
                         connect_changed[sender] => move |entry| { sender.input(AppInput::UpdateChannelFilter(entry.text().to_string())); }
                     },
                     gtk::ScrolledWindow {
@@ -947,7 +947,7 @@ impl SimpleComponent for AppModel {
                             }
                         },
                         gtk::Entry {
-                            set_placeholder_text: Some("Message, /join #chan, /msg nick text, /helpâ�¦"), set_hexpand: true,
+                            set_placeholder_text: Some("Message, /join #chan, /msg nick text, /help…"), set_hexpand: true,
                             connect_activate[sender] => move |entry| {
                                 let text = entry.text().to_string();
                                 if !text.is_empty() { entry.set_text(""); sender.input(AppInput::SendMessage(text)); }
@@ -1094,7 +1094,7 @@ impl SimpleComponent for AppModel {
                 if let Some(irc_tx) = &self.irc_sender {
                     let _ = irc_tx.send(Message::from("LIST"));
                     let ts = self.timestamp_prefix();
-                    self.append_line(SERVER_TAB, ts, None, "Requesting channel listâ�¦".to_string(), LineStyle::System);
+                    self.append_line(SERVER_TAB, ts, None, "Requesting channel list…".to_string(), LineStyle::System);
                 }
             }
 
@@ -1197,7 +1197,7 @@ impl SimpleComponent for AppModel {
                 if self.connection != ConnectionState::Offline { return; }
                 self.connection = ConnectionState::Connecting;
                 self.user_disconnected = false;
-                self.status = String::from("Connectingâ�¦");
+                self.status = String::from("Connecting…");
                 self.persist_settings();
                 let sender_clone = sender.clone();
                 let channels_to_join: Vec<String> = self.channels.iter().filter(|c| channels::is_channel_target(c)).cloned().collect();

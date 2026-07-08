@@ -412,7 +412,7 @@ impl AppModel {
         content.append(&fav_btn);
         // Part button only for channels, not DMs or Server tab
         if channels::is_channel_target(channel) {
-            let part_btn = gtk::Button::with_label("Ã�");
+            let part_btn = gtk::Button::with_label("×");
             part_btn.add_css_class("part-btn");
             part_btn.set_tooltip_text(Some("Leave channel"));
             let s3 = sender.clone();
@@ -433,34 +433,44 @@ impl AppModel {
             self.channel_box.remove(&child);
         }
         let filter = self.channel_filter.to_lowercase();
-        let matches_filter = |name: &str| filter.is_empty() || name.to_lowercase().contains(&filter);
-        let mut favorites = Vec::new();
-        let mut others = Vec::new();
-        for channel in &self.channels {
-            if !matches_filter(channel) { continue; }
-            if self.favorite_channels.contains(channel) {
-                favorites.push(channel.clone());
-            } else {
-                others.push(channel.clone());
+        let mut channels: Vec<&String> = self.channels.iter().filter(|channel| {
+            if filter.is_empty() { return true; }
+            let name = channel.to_lowercase();
+            if name.contains(&filter) { return true; }
+            self.channel_topics.get(*channel)
+                .map(|t| t.to_lowercase().contains(&filter))
+                .unwrap_or(false)
+        }).collect();
+        
+        channels.sort_by(|a, b| {
+            let a_fav = self.favorite_channels.contains(a);
+            let b_fav = self.favorite_channels.contains(b);
+            match (a_fav, b_fav) {
+                (true, false) => std::cmp::Ordering::Less,
+                (false, true) => std::cmp::Ordering::Greater,
+                _ => a.to_lowercase().cmp(&b.to_lowercase()),
             }
+        });
+        
+        if !filter.is_empty() {
+            self.append_section_header(&format!("Filtered: {}", self.channel_filter));
         }
-        if !favorites.is_empty() {
-            self.append_section_header("— Favorites");
-            for channel in &favorites { self.append_channel_row(sender, channel); }
-        }
-        if !others.is_empty() {
-            others.sort_by_key(|name| name.to_lowercase());
-            self.append_section_header("Channels & DMs");
-            for channel in &others { self.append_channel_row(sender, channel); }
-        } else if !filter.is_empty() && favorites.is_empty() {
-            let hint = gtk::Label::builder()
-                .label(format!("No matches for \u{201c}{}\u{201d}", self.channel_filter))
-                .halign(gtk::Align::Start).margin_start(12).margin_top(4)
-                .css_classes(["channel-section"]).build();
-            let row = gtk::ListBoxRow::new();
-            row.set_activatable(false);
-            row.set_child(Some(&hint));
-            self.channel_box.append(&row);
+        
+        if channels.is_empty() {
+            if !filter.is_empty() {
+                let hint = gtk::Label::builder()
+                    .label("No matches found")
+                    .halign(gtk::Align::Start).margin_start(12).margin_top(4)
+                    .css_classes(["channel-section"]).build();
+                let row = gtk::ListBoxRow::new();
+                row.set_activatable(false);
+                row.set_child(Some(&hint));
+                self.channel_box.append(&row);
+            }
+        } else {
+            for channel in channels {
+                self.append_channel_row(sender, channel);
+            }
         }
     }
 
@@ -910,6 +920,8 @@ impl SimpleComponent for AppModel {
                     },
                     gtk::ScrolledWindow {
                         set_vexpand: true, set_hexpand: true,
+                        set_vscrollbar_policy: gtk::PolicyType::Automatic,
+                        set_hscrollbar_policy: gtk::PolicyType::Never,
                         #[local_ref] channel_box_ref -> gtk::ListBox {}
                     }
                     }

@@ -1,5 +1,6 @@
 use gtk::prelude::*;
 use relm4::{gtk, ComponentSender};
+use relm4::RelmWidgetExt;
 use crate::app::{AppInput, AppModel};
 
 pub fn show_matrix_login_dialog(parent: &gtk::Window, sender: &ComponentSender<AppModel>) {
@@ -44,7 +45,7 @@ pub fn show_matrix_login_dialog(parent: &gtk::Window, sender: &ComponentSender<A
         if homeserver.is_empty() || username.is_empty() || password.is_empty() {
             st.set_label("All fields required."); return;
         }
-        st.set_label("Connecting…");
+        st.set_label("Connecting\u{2026}");
         s.input(AppInput::MatrixLogin { homeserver, username, password });
         d2.close();
     });

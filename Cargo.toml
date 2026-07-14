@@ -23,6 +23,7 @@ serde = { version = "1", features = ["derive"] }
 toml = "1.1"
 matrix-sdk = { version = "0.10", features = ["e2e-encryption", "sqlite"] }
 uuid = { version = "1", features = ["v4"] }
+anyhow = "1"
 
 [profile.release]
 opt-level = 3

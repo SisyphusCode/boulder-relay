@@ -3,7 +3,7 @@ use matrix_sdk::{
     config::SyncSettings,
     room::Room,
     ruma::{
-        events::room::message::{RoomMessageEventContent, MessageType},
+        events::room::message::{RoomMessageEventContent, MessageType, SyncRoomMessageEvent},
         OwnedRoomId, OwnedUserId,
     },
 };
@@ -29,8 +29,7 @@ impl MatrixClient {
     pub async fn new(homeserver: &str) -> anyhow::Result<Self> {
         let client = Client::builder()
             .homeserver_url(homeserver)
-            .sqlite_store("boulder-relay-matrix", None)
-            .await
+            .sqlite_store("boulderX-matrix", None)
             .build()
             .await?;
         Ok(Self { inner: client })
@@ -40,7 +39,7 @@ impl MatrixClient {
         self.inner
             .matrix_auth()
             .login_username(username, password)
-            .initial_device_display_name("Boulder Relay")
+            .initial_device_display_name("boulderX")
             .await?;
         Ok(())
     }
@@ -84,11 +83,10 @@ impl MatrixClient {
 
             self.inner.add_event_handler({
                 let tx2 = tx.clone();
-                move |ev: matrix_sdk::ruma::events::SyncRoomMessageEvent,
-                      room: Room| {
+                move |ev: SyncRoomMessageEvent, room: Room| {
                     let tx3 = tx2.clone();
                     async move {
-                        if let matrix_sdk::ruma::events::SyncRoomMessageEvent::Original(orig) = ev {
+                        if let SyncRoomMessageEvent::Original(orig) = ev {
                             let sender = orig.sender.to_string();
                             let room_id = room.room_id().to_string();
                             let room_name = room.name().unwrap_or_else(|| room_id.clone());

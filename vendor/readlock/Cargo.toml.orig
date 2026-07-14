@@ -1,0 +1,20 @@
+[package]
+name = "readlock"
+version = "0.1.11"
+description = "A weird alternative to Arc<RwLock<T>>"
+repository.workspace = true
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+lite = ["dep:rclite"]
+
+[dependencies]
+rclite = { workspace = true, optional = true }
+
+[lints]
+workspace = true

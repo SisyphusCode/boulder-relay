@@ -1,0 +1,41 @@
+name: Code coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  code_coverage:
+    name: Code Coverage
+    runs-on: "ubuntu-latest"
+    if: github.event_name == 'push' || !github.event.pull_request.draft
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: stable
+
+    - name: Load cache
+      uses: Swatinem/rust-cache@v2
+
+    - name: Install tarpaulin
+      run: cargo install cargo-tarpaulin
+
+    - name: Run tarpaulin
+      run: cargo tarpaulin --out Xml
+
+    - name: Upload to codecov.io
+      uses: codecov/codecov-action@v5
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

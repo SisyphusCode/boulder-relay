@@ -1,0 +1,6 @@
+{
+  "git": {
+    "sha1": "fcbfed20a27fbb43aaac45dddd476f844b19e7b8"
+  },
+  "path_in_vcs": "crates/ruma-identifiers-validation"
+}

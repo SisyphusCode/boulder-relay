@@ -1,0 +1,38 @@
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package]
+name = "delegate-display"
+version = "2.1.1"
+edition = "2021"
+rust-version = "1.60.0"
+authors = [
+  "Alorel <amolc@pm.me>",
+]
+license = "MIT"
+readme = "README.md"
+description = "derive(Display, Debug) for structs/enums with one member"
+repository = "https://github.com/Alorel/delegate-display-rs"
+keywords = [
+  "derive",
+  "display",
+  "enum",
+  "debug",
+  "macro",
+]
+categories = ["development-tools::build-utils"]
+include = [
+  "src/",
+  "Cargo.toml",
+]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+macroific = { version = "1.2.2", features = ["attr_parse"] }
+proc-macro2 = "1"
+quote = "1"
+syn = "2"
+
+[dev-dependencies]
+static_assertions = "1.1.0"

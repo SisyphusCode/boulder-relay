@@ -1,0 +1,20 @@
+[package]
+name = "matrix-pickle"
+version = "0.2.3"
+edition = "2021"
+description = "A simple binary encoding format used in the Matrix world"
+repository = "https://github.com/matrix-org/matrix-pickle"
+license = "Apache-2.0"
+rust-version = { workspace = true }
+
+[features]
+derive = ["dep:matrix-pickle-derive"]
+default = ["derive"]
+
+[dependencies]
+thiserror = "2.0.17"
+matrix-pickle-derive = { version = "0.2.3", path = "../matrix-pickle-derive", optional = true}
+
+[dev-dependencies]
+anyhow = "1.0.100"
+proptest = "1.9.0"

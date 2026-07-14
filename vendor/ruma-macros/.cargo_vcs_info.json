@@ -1,0 +1,6 @@
+{
+  "git": {
+    "sha1": "4d2d3eebff8cc4fbabad29bfb26b0d997d073f68"
+  },
+  "path_in_vcs": "crates/ruma-macros"
+}

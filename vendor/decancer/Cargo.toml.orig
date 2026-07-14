@@ -1,0 +1,59 @@
+[package]
+name = "decancer"
+version = "3.3.3"
+edition = "2021"
+authors = ["null (https://github.com/null8626)"]
+description = "A library that removes common unicode confusables/homoglyphs from strings."
+readme = "README.md"
+repository = "https://github.com/null8626/decancer"
+license = "MIT"
+keywords = ["security", "unicode", "homoglyphs", "moderation", "confusables"]
+categories = ["parsing", "text-processing", "value-formatting"]
+exclude = ["rustfmt.toml"]
+rust-version = "1.65.0"
+
+[dependencies]
+serde = { version = "1", default-features = false, optional = true }
+regex = { version = "1", default-features = false, features = ["std", "perf"], optional = true }
+lazy_static = { version = "1", optional = true }
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+cast-lossless = "allow"
+cast-possible-truncation = "allow"
+cast-possible-wrap = "allow"
+cast-sign-loss = "allow"
+inline-always = "allow"
+module-name-repetitions = "allow"
+must-use-candidate = "allow"
+return-self-not-must-use = "allow"
+similar-names = "allow"
+single-match-else = "allow"
+too-many-lines = "allow"
+unreadable-literal = "allow"
+
+[features]
+default = ["options", "separators", "leetspeak"]
+serde = ["dep:serde"]
+options = []
+separators = []
+leetspeak = ["regex", "lazy_static"]
+
+[dev-dependencies]
+proptest = { version = "1", default-features = false, features = ["std"] }
+criterion = { version = "0.6", default-features = false }
+rand = "0.9"
+censor = "0.3"
+
+[[bench]]
+name = "decancer_bench"
+harness = false
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+rustc-args = ["--cfg", "docsrs"]
+
+[profile.release]
+lto = true

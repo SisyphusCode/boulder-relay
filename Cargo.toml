@@ -1,14 +1,14 @@
 [package]
 name = "boulder-relay"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 authors = ["SisyphusAeolides"]
-description = "A fast, clean GTK4 + libadwaita IRC client written in Rust"
+description = "A fast, clean GTK4 + libadwaita IRC/Matrix client written in Rust"
 homepage = "https://github.com/SisyphusAeolides/boulder-relay"
 repository = "https://github.com/SisyphusAeolides/boulder-relay"
 license = "GPL-2.0-or-later"
 readme = "README.md"
-keywords = ["irc", "chat", "gtk4", "libadwaita", "relm4"]
+keywords = ["irc", "matrix", "chat", "gtk4", "libadwaita"]
 categories = ["network-programming", "gui"]
 
 [dependencies]
@@ -21,6 +21,8 @@ futures = "0.3"
 base64 = "0.21.7"
 serde = { version = "1", features = ["derive"] }
 toml = "1.1"
+matrix-sdk = { version = "0.10", features = ["e2e-encryption", "sqlite-store"] }
+uuid = { version = "1", features = ["v4"] }
 
 [profile.release]
 opt-level = 3

@@ -1,14 +1,14 @@
-# Maintainer: SisyphusCode
+# Maintainer: SisyphusAeolides
 pkgname=boulder-relay
 pkgver=0.5.0
 pkgrel=1
 pkgdesc="A fast, clean GTK4 + libadwaita IRC client written in Rust"
 arch=('x86_64' 'aarch64')
-url="https://github.com/SisyphusCode/boulder-relay"
+url="https://github.com/SisyphusAeolides/boulder-relay"
 license=('GPL-2.0-or-later')
 depends=('gtk4' 'libadwaita' 'openssl')
 makedepends=('cargo' 'rust' 'git')
-source=("$pkgname-$pkgver.tar.gz::https://github.com/SisyphusCode/boulder-relay/archive/refs/tags/v$pkgver.tar.gz")
+source=("$pkgname-$pkgver.tar.gz::https://github.com/SisyphusAeolides/boulder-relay/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('SKIP')
 
 build() {

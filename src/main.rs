@@ -17,7 +17,7 @@ use std::collections::HashMap;
 use std::thread;
 
 const DEFAULT_SERVER: &str = "irc.libera.chat";
-const DEFAULT_NICKNAME: &str = "SisyphusCode";
+const DEFAULT_NICKNAME: &str = "SisyphusAeolides";
 const DEFAULT_PORT: u16 = 6697;
 const SERVER_TAB: &str = "Server";
 const DEFAULT_ACCOUNT_SERVICE: &str = "NickServ";

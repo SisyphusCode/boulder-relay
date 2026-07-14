@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        GTK4 IRC client for any IRC network (general purpose)
 
 License:        GPL-2.0-or-later
-URL:            https://github.com/SisyphusCode/boulder-relay
+URL:            https://github.com/SisyphusAeolides/boulder-relay
 Source0:        boulder-relay-%{version}.tar.gz
 
 # Rust binary; no C debugsource to package.

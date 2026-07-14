@@ -2,10 +2,10 @@
 name = "boulder-relay"
 version = "0.5.0"
 edition = "2021"
-authors = ["SisyphusCode"]
+authors = ["SisyphusAeolides"]
 description = "A fast, clean GTK4 + libadwaita IRC client written in Rust"
-homepage = "https://github.com/SisyphusCode/boulder-relay"
-repository = "https://github.com/SisyphusCode/boulder-relay"
+homepage = "https://github.com/SisyphusAeolides/boulder-relay"
+repository = "https://github.com/SisyphusAeolides/boulder-relay"
 license = "GPL-2.0-or-later"
 readme = "README.md"
 keywords = ["irc", "chat", "gtk4", "libadwaita", "relm4"]

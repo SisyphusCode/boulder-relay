@@ -1,31 +1,35 @@
 #!/usr/bin/env bash
-# Build boulder-relay RPM on Rocky Linux / RHEL 9 / 10.
+# Build an RPM for Boulder Relay on Fedora.
+# Usage: bash packaging/build-rpm.sh
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="$(grep '^version' "$ROOT/Cargo.toml" | head -1 | sed 's/.*"\(.*\)".*/\1/')"
-TARBALL="boulder-relay-${VERSION}.tar.gz"
-RPMBUILD="${RPMBUILD:-$HOME/rpmbuild}"
+VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*= *"//;s/"//')
+ARCHIVE="boulder-relay-${VERSION}.tar.gz"
+SPECFILE="packaging/boulder-relay.spec"
 
-echo "==> Building release binary (offline)..."
-cd "$ROOT"
-cargo build --release --offline
+echo "==> Building boulder-relay v${VERSION} RPM"
 
-echo "==> Preparing source tarball..."
-STAGING="$(mktemp -d)"
-trap 'rm -rf "$STAGING"' EXIT
-SRC_DIR="$STAGING/boulder-relay-$VERSION"
-mkdir -p "$SRC_DIR"
-tar -C "$ROOT" \
-    --exclude='./target' \
-    --exclude='./.git' \
-    --exclude='./*.tar.gz' \
-    -cf - . | tar -C "$SRC_DIR" -xf -
+# Create tarball from current tree
+echo "==> Creating source archive ${ARCHIVE}..."
+git archive --prefix="boulder-relay-${VERSION}/" HEAD | gzip > "/tmp/${ARCHIVE}"
 
-mkdir -p "$RPMBUILD/SOURCES"
-tar -C "$STAGING" -czf "$RPMBUILD/SOURCES/$TARBALL" "boulder-relay-$VERSION"
+# Ensure rpmbuild dirs exist
+mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
-echo "==> Building RPM..."
-rpmbuild -ba "$ROOT/packaging/boulder-relay.spec"
+cp "/tmp/${ARCHIVE}" ~/rpmbuild/SOURCES/
+cp "${SPECFILE}" ~/rpmbuild/SPECS/boulder-relay.spec
 
-echo "==> Done. RPMs are in $RPMBUILD/RPMS/ and $RPMBUILD/SRPMS/"
+# Install build dependencies (requires sudo)
+echo "==> Installing build dependencies..."
+sudo dnf builddep -y ~/rpmbuild/SPECS/boulder-relay.spec || true
+
+# Build the RPM
+echo "==> Running rpmbuild..."
+rpmbuild -ba ~/rpmbuild/SPECS/boulder-relay.spec
+
+echo ""
+echo "==> RPM built successfully:"
+find ~/rpmbuild/RPMS -name "boulder-relay-*.rpm" -print
+echo ""
+echo "Install with:"
+echo "  sudo dnf install ~/rpmbuild/RPMS/$(uname -m)/boulder-relay-${VERSION}-1.$(rpm --eval '%{?dist}' | tr -d '.').$(uname -m).rpm"

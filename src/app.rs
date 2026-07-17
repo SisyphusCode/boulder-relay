@@ -172,6 +172,16 @@ pub struct AppModel {
     pub window: gtk::Window,
 }
 
+/// True when a NetworkStatus string means the IRC session is dead and Connect
+/// may run again (must cover pre-connect failures, not only "Connection failed").
+pub fn is_terminal_irc_status(s: &str) -> bool {
+    s == "Disconnected"
+        || s.starts_with("Connection failed")
+        || s.starts_with("NickServ auth failed")
+        || s.starts_with("Auth failed")
+        || s.starts_with("IRC error")
+}
+
 impl AppModel {
     pub fn normalized_nick(user: &str) -> String {
         user.trim_start_matches(['@', '+', '%', '~', '&']).to_string()
@@ -312,10 +322,21 @@ impl AppModel {
         }
         // IRC send
         if let Some(tx) = self.irc_sender.clone() {
-            if tx.send_privmsg(&self.active_channel, text).is_ok() {
-                let ch = self.active_channel.clone();
-                let nick = self.nickname.clone();
-                self.append_message(&ch, &nick, text, chat_view::LineStyle::SelfMsg);
+            match tx.send_privmsg(&self.active_channel, text) {
+                Ok(()) => {
+                    let ch = self.active_channel.clone();
+                    let nick = self.nickname.clone();
+                    self.append_message(&ch, &nick, text, chat_view::LineStyle::SelfMsg);
+                }
+                Err(e) => {
+                    let ch = self.active_channel.clone();
+                    self.append_message(
+                        &ch,
+                        "System",
+                        &format!("Send failed: {e}"),
+                        chat_view::LineStyle::System,
+                    );
+                }
             }
         } else {
             self.append_message(
@@ -1180,10 +1201,11 @@ impl SimpleComponent for AppModel {
             }
             AppInput::NetworkStatus(s) => {
                 self.status = s.clone();
-                if s == "Disconnected" || s.starts_with("Connection failed") {
+                if is_terminal_irc_status(&s) {
                     let was_connected = self.connection == ConnectionState::Connected;
                     self.connection = ConnectionState::Offline;
                     self.irc_sender = None;
+                    self.append_message(SERVER_TAB, "System", &s, chat_view::LineStyle::System);
                     if was_connected && !self.user_disconnected {
                         let s2 = sender.clone();
                         gtk::glib::timeout_add_seconds_local(5, move || {
@@ -1391,14 +1413,60 @@ impl SimpleComponent for AppModel {
                         self.persist_settings();
                     }
                     SlashCommand::Me { action } => {
-                        let full = format!("\x01ACTION {}\x01", action);
-                        if let Some(tx) = &self.irc_sender {
-                            let _ = tx.send_privmsg(&self.active_channel, &full);
-                            let me = format!("* {}", self.nickname);
-                            let ch = self.active_channel.clone();
+                        let ch = self.active_channel.clone();
+                        // Matrix active room → m.emote (same routing as plain send).
+                        if let Some(matrix_room_id) = self
+                            .matrix_rooms
+                            .find_by_display_name(&ch)
+                            .map(|r| r.room_id.clone())
+                        {
+                            let client = self.matrix_client.clone();
+                            let rid = matrix_room_id;
+                            let act = action.clone();
+                            let s = sender.clone();
+                            let me = format!(
+                                "* {}",
+                                self.matrix_user_id
+                                    .clone()
+                                    .unwrap_or_else(|| self.nickname.clone())
+                            );
                             self.append_message(&ch, &me, &action, chat_view::LineStyle::SelfMsg);
+                            runtime::spawn(async move {
+                                if let Some(c) = client {
+                                    if let Err(e) = c.send_emote(&rid, &act).await {
+                                        s.input(AppInput::ReceiveServerMessage(format!(
+                                            "[Matrix /me failed]: {e}"
+                                        )));
+                                    }
+                                } else {
+                                    s.input(AppInput::ReceiveServerMessage(
+                                        "[Matrix]: not connected.".into(),
+                                    ));
+                                }
+                            });
+                        } else if let Some(tx) = &self.irc_sender {
+                            let full = format!("\x01ACTION {}\x01", action);
+                            match tx.send_privmsg(&ch, &full) {
+                                Ok(()) => {
+                                    let me = format!("* {}", self.nickname);
+                                    self.append_message(&ch, &me, &action, chat_view::LineStyle::SelfMsg);
+                                }
+                                Err(e) => {
+                                    self.append_message(
+                                        &ch,
+                                        "System",
+                                        &format!("/me failed: {e}"),
+                                        chat_view::LineStyle::System,
+                                    );
+                                }
+                            }
                         } else {
-                            self.append_message(SERVER_TAB, "System", "Cannot /me: not connected.", chat_view::LineStyle::System);
+                            self.append_message(
+                                SERVER_TAB,
+                                "System",
+                                "Cannot /me: not connected.",
+                                chat_view::LineStyle::System,
+                            );
                         }
                     }
                     SlashCommand::Whois { nick } => {
@@ -1523,6 +1591,11 @@ impl SimpleComponent for AppModel {
                 self.refresh_channels(&sender);
             }
             AppInput::MatrixRoomLeft { room_id } => {
+                // Resolve display name before remove so we can clear history / active tab.
+                let display = self
+                    .matrix_rooms
+                    .get(&room_id)
+                    .map(|r| r.display_name.clone());
                 // Best-effort server leave; always drop local state.
                 if let Ok(rid) = room_id.parse::<matrix_sdk::ruma::OwnedRoomId>() {
                     if let Some(c) = self.matrix_client.clone() {
@@ -1537,6 +1610,16 @@ impl SimpleComponent for AppModel {
                     }
                 }
                 self.matrix_rooms.remove(&room_id);
+                if let Some(name) = display {
+                    self.chat_histories.remove(&name);
+                    self.unread_counts.remove(&name);
+                    self.mention_counts.remove(&name);
+                    if self.active_channel == name {
+                        self.active_channel = SERVER_TAB.to_string();
+                        self.show_channel_history();
+                        self.refresh_users(&sender);
+                    }
+                }
                 self.refresh_channels(&sender);
             }
             AppInput::MatrixJoinRoom(alias) => {
@@ -1586,5 +1669,20 @@ impl SimpleComponent for AppModel {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn terminal_status_covers_identify_and_connection_failed() {
+        assert!(is_terminal_irc_status("Disconnected"));
+        assert!(is_terminal_irc_status("Connection failed: identify error: boom"));
+        assert!(is_terminal_irc_status("Connection failed: stream error: x"));
+        assert!(is_terminal_irc_status("NickServ auth failed: old"));
+        assert!(!is_terminal_irc_status("Connecting…"));
+        assert!(!is_terminal_irc_status("Connected"));
     }
 }

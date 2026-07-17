@@ -46,7 +46,10 @@ impl IrcConnection {
                 if is_sasl {
                     let _ = client.send_cap_req(&[irc::proto::caps::Capability::Sasl]);
                 } else if let Err(e) = client.identify() {
-                    sender.input(AppInput::NetworkStatus(format!("NickServ auth failed: {e}")));
+                    // Prefix must match Offline handling in AppInput::NetworkStatus.
+                    sender.input(AppInput::NetworkStatus(format!(
+                        "Connection failed: identify error: {e}"
+                    )));
                     return;
                 }
                 let irc_tx = client.sender();

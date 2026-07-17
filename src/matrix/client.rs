@@ -79,6 +79,16 @@ impl MatrixClient {
         Ok(())
     }
 
+    /// Send an emote (`m.emote`) to a Matrix room.
+    pub async fn send_emote(&self, room_id: &OwnedRoomId, body: &str) -> anyhow::Result<()> {
+        let Some(room) = self.inner.get_room(room_id) else {
+            anyhow::bail!("room not found in session: {room_id}");
+        };
+        let content = RoomMessageEventContent::emote_plain(body);
+        room.send(content).await?;
+        Ok(())
+    }
+
     pub async fn leave_room(&self, room_id: &OwnedRoomId) -> anyhow::Result<()> {
         let Some(room) = self.inner.get_room(room_id) else {
             anyhow::bail!("room not found: {room_id}");

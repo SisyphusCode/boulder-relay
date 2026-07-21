@@ -42,16 +42,14 @@ pub fn build_room_row(
         .margin_bottom(4)
         .build();
 
-    let avatar = gtk::Label::builder()
-        .label(
-            &name
-                .chars()
-                .next()
-                .unwrap_or('#')
-                .to_uppercase()
-                .to_string(),
-        )
-        .build();
+    let avatar_text = name
+        .trim_start_matches(['#', '!', '@'])
+        .chars()
+        .next()
+        .unwrap_or('#')
+        .to_uppercase()
+        .to_string();
+    let avatar = gtk::Label::builder().label(&avatar_text).build();
     avatar.add_css_class("room-avatar");
     hbox.append(&avatar);
 
@@ -84,14 +82,14 @@ pub fn build_room_row(
         hbox.append(&badge);
     }
 
-    let fav_btn = gtk::Button::with_label(if is_favorite { "★" } else { "☆" });
-    fav_btn.add_css_class("fav-btn");
-    let s = sender.clone();
-    let ch = name.to_string();
-    fav_btn.connect_clicked(move |_| s.input(AppInput::ToggleFavorite(ch.clone())));
-    hbox.append(&fav_btn);
-
     if matches!(protocol, Protocol::Irc) && channels::is_channel_target(name) {
+        let fav_btn = gtk::Button::with_label(if is_favorite { "★" } else { "☆" });
+        fav_btn.add_css_class("fav-btn");
+        let s = sender.clone();
+        let ch = name.to_string();
+        fav_btn.connect_clicked(move |_| s.input(AppInput::ToggleFavorite(ch.clone())));
+        hbox.append(&fav_btn);
+
         let part_btn = gtk::Button::with_label("×");
         part_btn.add_css_class("part-btn");
         let s2 = sender.clone();

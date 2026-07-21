@@ -15,8 +15,7 @@ use crate::ui::{chat_view, dialogs};
 use adw;
 use adw::prelude::*;
 use gtk::glib::{self, DateTime};
-use gtk::prelude::*;
-use relm4::{gtk, ComponentParts, ComponentSender, RelmApp, RelmWidgetExt, SimpleComponent};
+use relm4::{gtk, ComponentParts, ComponentSender, RelmWidgetExt, SimpleComponent};
 use std::collections::HashMap;
 use tokio::sync::mpsc;
 
@@ -32,6 +31,14 @@ pub enum Protocol {
     Irc,
     Matrix { room_id: String },
     Discord { channel_id: String },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProtocolFilter {
+    All,
+    Irc,
+    Matrix,
+    Discord,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -102,6 +109,7 @@ pub enum AppInput {
     UpdateNotificationsEnabled(bool),
     UpdateBackgroundOnClose(bool),
     UpdateChannelFilter(String),
+    SetProtocolFilter(ProtocolFilter),
     BrowseChannels,
     ChannelListEntry {
         name: String,
@@ -189,6 +197,9 @@ pub enum AppInput {
         sender: String,
         body: String,
     },
+    DiscordChannelDeleted {
+        channel_id: String,
+    },
     DiscordError(String),
     DiscordDisconnected,
     DisconnectDiscord,
@@ -228,6 +239,7 @@ pub struct AppModel {
     pub notifications_enabled: bool,
     pub background_on_close: bool,
     pub channel_filter: String,
+    pub protocol_filter: ProtocolFilter,
     pub channel_list_results: Vec<(String, u32, String)>,
     pub channel_topics: HashMap<String, String>,
     pub nick_colors_enabled: bool,
@@ -541,49 +553,60 @@ impl AppModel {
             self.channel_box.remove(&child);
         }
         // IRC section
-        self.channel_box
-            .append(&crate::ui::sidebar::section_header("IRC"));
         let filter = self.channel_filter.to_lowercase();
-        let mut irc_channels: Vec<&String> = self
-            .channels
-            .iter()
-            .filter(|c| {
-                if filter.is_empty() {
-                    return true;
+        if matches!(
+            self.protocol_filter,
+            ProtocolFilter::All | ProtocolFilter::Irc
+        ) {
+            self.channel_box
+                .append(&crate::ui::sidebar::section_header("IRC"));
+            let mut irc_channels: Vec<&String> = self
+                .channels
+                .iter()
+                .filter(|c| {
+                    if filter.is_empty() {
+                        return true;
+                    }
+                    c.to_lowercase().contains(&filter)
+                })
+                .collect();
+            irc_channels.sort_by(|a, b| {
+                let af = self.favorite_channels.contains(a);
+                let bf = self.favorite_channels.contains(b);
+                match (af, bf) {
+                    (true, false) => std::cmp::Ordering::Less,
+                    (false, true) => std::cmp::Ordering::Greater,
+                    _ => a.to_lowercase().cmp(&b.to_lowercase()),
                 }
-                c.to_lowercase().contains(&filter)
-            })
-            .collect();
-        irc_channels.sort_by(|a, b| {
-            let af = self.favorite_channels.contains(a);
-            let bf = self.favorite_channels.contains(b);
-            match (af, bf) {
-                (true, false) => std::cmp::Ordering::Less,
-                (false, true) => std::cmp::Ordering::Greater,
-                _ => a.to_lowercase().cmp(&b.to_lowercase()),
+            });
+            for ch in irc_channels {
+                let unread = self.unread_counts.get(ch).copied().unwrap_or(0);
+                let is_fav = self.favorite_channels.contains(ch);
+                let is_active = *ch == self.active_channel;
+                let row = crate::ui::sidebar::build_room_row(
+                    sender,
+                    ch,
+                    unread,
+                    self.mention_counts.get(ch).copied().unwrap_or(0),
+                    is_active,
+                    Protocol::Irc,
+                    is_fav,
+                );
+                self.channel_box.append(&row);
             }
-        });
-        for ch in irc_channels {
-            let unread = self.unread_counts.get(ch).copied().unwrap_or(0);
-            let is_fav = self.favorite_channels.contains(ch);
-            let is_active = *ch == self.active_channel;
-            let row = crate::ui::sidebar::build_room_row(
-                sender,
-                ch,
-                unread,
-                self.mention_counts.get(ch).copied().unwrap_or(0),
-                is_active,
-                Protocol::Irc,
-                is_fav,
-            );
-            self.channel_box.append(&row);
         }
         // Matrix section
         let matrix_rooms = self.matrix_rooms.all();
-        if !matrix_rooms.is_empty() {
+        if matches!(
+            self.protocol_filter,
+            ProtocolFilter::All | ProtocolFilter::Matrix
+        ) && !matrix_rooms.is_empty()
+        {
             self.channel_box
                 .append(&crate::ui::sidebar::section_header("Matrix"));
-            for room in matrix_rooms {
+            for room in matrix_rooms.into_iter().filter(|room| {
+                filter.is_empty() || room.display_name.to_lowercase().contains(&filter)
+            }) {
                 let is_active = room.display_name == self.active_channel;
                 let mentions = self
                     .mention_counts
@@ -606,10 +629,16 @@ impl AppModel {
         }
         // Discord section
         let discord_channels = self.discord_channels.all();
-        if !discord_channels.is_empty() {
+        if matches!(
+            self.protocol_filter,
+            ProtocolFilter::All | ProtocolFilter::Discord
+        ) && !discord_channels.is_empty()
+        {
             self.channel_box
                 .append(&crate::ui::sidebar::section_header("Discord"));
-            for channel in discord_channels {
+            for channel in discord_channels.into_iter().filter(|channel| {
+                filter.is_empty() || channel.display_name.to_lowercase().contains(&filter)
+            }) {
                 let is_active = channel.display_name == self.active_channel;
                 let unread = self
                     .unread_counts
@@ -683,6 +712,33 @@ impl AppModel {
                 row.set_child(Some(&hbox));
                 self.user_box.append(&row);
             }
+        } else {
+            let row = gtk::ListBoxRow::new();
+            row.set_selectable(false);
+            row.set_activatable(false);
+            let box_ = gtk::Box::builder()
+                .orientation(gtk::Orientation::Vertical)
+                .spacing(6)
+                .margin_top(14)
+                .margin_bottom(14)
+                .margin_start(12)
+                .margin_end(12)
+                .build();
+            let title = gtk::Label::builder()
+                .label("No member list")
+                .halign(gtk::Align::Start)
+                .build();
+            title.add_css_class("empty-title");
+            let body = gtk::Label::builder()
+                .label("IRC channel names appear here after sync. Matrix and Discord member browsers are not shown in this panel yet.")
+                .halign(gtk::Align::Start)
+                .wrap(true)
+                .build();
+            body.add_css_class("empty-body");
+            box_.append(&title);
+            box_.append(&body);
+            row.set_child(Some(&box_));
+            self.user_box.append(&row);
         }
     }
 
@@ -724,17 +780,77 @@ impl SimpleComponent for AppModel {
             #[wrap(Some)]
             set_child = &gtk::Paned {
                 set_orientation: gtk::Orientation::Horizontal,
-                set_position: 260,
+                set_position: 328,
                 set_hexpand: true,
                 set_vexpand: true,
                 set_shrink_start_child: false,
                 set_shrink_end_child: false,
 
-                // ── Left sidebar ────────────────────────────────────
+                // ── Left navigation ─────────────────────────────────
                 #[wrap(Some)]
                 set_start_child = &gtk::Box {
+                    set_orientation: gtk::Orientation::Horizontal,
+                    set_width_request: 328,
+                    set_vexpand: true,
+                    add_css_class: "navigation-shell",
+
+                    gtk::Box {
+                        set_orientation: gtk::Orientation::Vertical,
+                        set_width_request: 64,
+                        set_vexpand: true,
+                        set_spacing: 10,
+                        set_margin_top: 12,
+                        set_margin_bottom: 12,
+                        set_margin_start: 8,
+                        set_margin_end: 8,
+                        add_css_class: "space-rail",
+
+                        gtk::Label {
+                            set_label: "BX",
+                            set_tooltip_text: Some("boulderX"),
+                            add_css_class: "rail-logo",
+                            add_css_class: "rail-button",
+                        },
+                        gtk::Button {
+                            set_label: "IRC",
+                            set_tooltip_text: Some("Show IRC rooms"),
+                            add_css_class: "rail-button",
+                            add_css_class: "rail-irc",
+                            connect_clicked => AppInput::SetProtocolFilter(ProtocolFilter::Irc),
+                        },
+                        gtk::Button {
+                            set_label: "MX",
+                            set_tooltip_text: Some("Show Matrix rooms"),
+                            add_css_class: "rail-button",
+                            add_css_class: "rail-matrix",
+                            connect_clicked => AppInput::SetProtocolFilter(ProtocolFilter::Matrix),
+                        },
+                        gtk::Button {
+                            #[watch]
+                            set_label: match model.discord_connection {
+                                ConnectionState::Offline => "DC",
+                                ConnectionState::Connecting => "DC…",
+                                ConnectionState::Connected => "DC✓",
+                            },
+                            set_tooltip_text: Some("Show Discord channels"),
+                            add_css_class: "rail-button",
+                            add_css_class: "rail-discord",
+                            connect_clicked => AppInput::SetProtocolFilter(ProtocolFilter::Discord),
+                        },
+                        gtk::Box {
+                            set_vexpand: true,
+                        },
+                        gtk::Button {
+                            set_label: "⚙",
+                            set_tooltip_text: Some("Preferences"),
+                            add_css_class: "rail-button",
+                            connect_clicked => AppInput::OpenPreferences,
+                        },
+                    },
+
+                    gtk::Box {
                     set_orientation: gtk::Orientation::Vertical,
-                    set_width_request: 220,
+                    set_width_request: 264,
                     set_vexpand: true,
                     add_css_class: "sidebar",
 
@@ -745,17 +861,49 @@ impl SimpleComponent for AppModel {
                         set_margin_all: 12,
                         add_css_class: "sidebar-header",
 
-                            gtk::Label {
-                            set_label: "boulderX",
+                        gtk::Label {
+                            set_label: "Home",
                             set_hexpand: true,
                             set_halign: gtk::Align::Start,
                             add_css_class: "app-title",
                         },
+                        gtk::Label {
+                            set_label: "IRC · Matrix · Discord",
+                            set_halign: gtk::Align::End,
+                            add_css_class: "sidebar-subtitle",
+                        },
+                    },
+
+                    gtk::Box {
+                        set_orientation: gtk::Orientation::Horizontal,
+                        set_spacing: 6,
+                        set_margin_start: 12,
+                        set_margin_end: 12,
+                        set_margin_bottom: 10,
+                        add_css_class: "protocol-tabs",
+
                         gtk::Button {
-                            set_label: "⚙",
-                            set_tooltip_text: Some("Preferences (Ctrl+,)"),
-                            add_css_class: "flat",
-                            connect_clicked => AppInput::OpenPreferences,
+                            set_label: "All",
+                            add_css_class: "tab-button",
+                            connect_clicked => AppInput::SetProtocolFilter(ProtocolFilter::All),
+                        },
+                        gtk::Button {
+                            set_label: "IRC",
+                            add_css_class: "tab-button",
+                            add_css_class: "tab-irc",
+                            connect_clicked => AppInput::SetProtocolFilter(ProtocolFilter::Irc),
+                        },
+                        gtk::Button {
+                            set_label: "Matrix",
+                            add_css_class: "tab-button",
+                            add_css_class: "tab-matrix",
+                            connect_clicked => AppInput::SetProtocolFilter(ProtocolFilter::Matrix),
+                        },
+                        gtk::Button {
+                            set_label: "Discord",
+                            add_css_class: "tab-button",
+                            add_css_class: "tab-discord",
+                            connect_clicked => AppInput::SetProtocolFilter(ProtocolFilter::Discord),
                         },
                     },
 
@@ -938,6 +1086,7 @@ impl SimpleComponent for AppModel {
                                 connect_clicked => AppInput::Quit,
                             },
                         },
+                    },
                     },
                 },
 
@@ -1154,12 +1303,13 @@ impl SimpleComponent for AppModel {
             notifications_enabled: settings.notifications_enabled,
             background_on_close: settings.background_on_close,
             channel_filter: String::new(),
+            protocol_filter: ProtocolFilter::All,
             channel_list_results: Vec::new(),
             channel_topics: HashMap::new(),
             nick_colors_enabled: settings.nick_colors_enabled,
             timestamp_format: settings.timestamp_format,
             account_service: if settings.account_service.is_empty() {
-                "NickServ".to_string()
+                DEFAULT_ACCOUNT_SERVICE.to_string()
             } else {
                 settings.account_service
             },
@@ -1194,7 +1344,7 @@ impl SimpleComponent for AppModel {
         let chat_view_ref = &model.chat_view;
         let composer_entry_ref = &model.composer_entry;
         let widgets = view_output!();
-        let mut parts = ComponentParts { model, widgets };
+        let parts = ComponentParts { model, widgets };
         parts.model.show_channel_history();
         parts.model.refresh_channels(&sender);
         parts.model.refresh_users(&sender);
@@ -1266,6 +1416,10 @@ impl SimpleComponent for AppModel {
             }
             AppInput::UpdateChannelFilter(f) => {
                 self.channel_filter = f;
+                self.refresh_channels(&sender);
+            }
+            AppInput::SetProtocolFilter(filter) => {
+                self.protocol_filter = filter;
                 self.refresh_channels(&sender);
             }
             AppInput::MarkChannelRead(ch) => {
@@ -2427,12 +2581,30 @@ impl SimpleComponent for AppModel {
                     .map(|channel| channel.display_name.clone())
                     .or(dm_display_name)
                     .unwrap_or_else(|| format!("Discord channel {channel_id}"));
+                if self.discord_channels.get(&channel_id).is_none() {
+                    self.discord_channels
+                        .insert(channel_id.clone(), display_name.clone());
+                    self.chat_histories.entry(display_name.clone()).or_default();
+                    self.refresh_channels(&sender);
+                }
                 sender.input(AppInput::ReceiveMessage {
                     channel: display_name,
                     user: message_sender,
                     body,
                     protocol: Protocol::Discord { channel_id },
                 });
+            }
+            AppInput::DiscordChannelDeleted { channel_id } => {
+                if let Some(channel) = self.discord_channels.remove(&channel_id) {
+                    self.chat_histories.remove(&channel.display_name);
+                    self.unread_counts.remove(&channel.display_name);
+                    self.mention_counts.remove(&channel.display_name);
+                    if self.active_channel == channel.display_name {
+                        self.active_channel = SERVER_TAB.to_string();
+                        self.show_channel_history();
+                    }
+                    self.refresh_channels(&sender);
+                }
             }
             AppInput::DiscordError(error) => {
                 self.discord_status = format!("Discord error: {error}");

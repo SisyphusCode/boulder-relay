@@ -2,7 +2,7 @@
 
 GTK4 + libadwaita IRC, Matrix, and Discord bot client in Rust (relm4).
 
-**v0.6.2** — dual protocol sidebar, slash commands, Gruvbox theme, Sisyphus Blue accents.
+**v0.6.2** — IRC, Matrix, and Discord bot chat with protocol tabs, a modern three-pane layout, slash commands, and Sisyphus Blue accents.
 
 ## Status (honest)
 
@@ -16,7 +16,8 @@ GTK4 + libadwaita IRC, Matrix, and Discord bot client in Rust (relm4).
 | Matrix store | Yes — `~/.local/share/boulderX/matrix` (XDG data, not CWD) |
 | Matrix unread badges | Yes — room registry unread counters |
 | Matrix leave | Best-effort server leave + local remove |
-| Discord bot | Guild text channels, DMs, send/receive, and clean disconnect |
+| Protocol tabs | Yes — All / IRC / Matrix / Discord room filters |
+| Discord bot | Guild text/news channels, visible threads, DMs, send/receive, attachments, embeds, stickers, reply context, channel cleanup, and clean disconnect |
 | Multi-server concurrent IRC | **Deferred** — maps exist; no full UI switcher yet |
 | SASL EXTERNAL (client cert) | **Deferred** — PLAIN/NickServ work; EXTERNAL needs cert wiring |
 | SSO Matrix login UI | **Deferred** — password login only |
@@ -40,7 +41,8 @@ cargo build --release
 3. Join with the join box or `/join #channel`.
 4. **MX** — homeserver + user/password for Matrix.
 5. **Discord** — connect an authorized bot token from the Accounts dialog. Enable
-   the Message Content intent for the bot in the Discord Developer Portal.
+   the Message Content intent for the bot in the Discord Developer Portal. User
+   tokens and selfbots are not supported.
 
 ## Build / test
 

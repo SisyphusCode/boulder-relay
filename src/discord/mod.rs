@@ -35,6 +35,9 @@ pub enum DiscordEvent {
         sender: String,
         body: String,
     },
+    ChannelDeleted {
+        channel_id: String,
+    },
     Error(String),
     Disconnected,
 }
@@ -63,6 +66,10 @@ impl ChannelRegistry {
 
     pub fn get(&self, channel_id: &str) -> Option<&DiscordChannel> {
         self.channels.get(channel_id)
+    }
+
+    pub fn remove(&mut self, channel_id: &str) -> Option<DiscordChannel> {
+        self.channels.remove(channel_id)
     }
 
     pub fn find_by_display_name(&self, name: &str) -> Option<&DiscordChannel> {
@@ -159,7 +166,16 @@ impl DiscordHandler {
         let mut channels: Vec<_> = guild
             .channels
             .values()
-            .filter(|channel| matches!(channel.kind, ChannelType::Text | ChannelType::News))
+            .filter(|channel| {
+                matches!(
+                    channel.kind,
+                    ChannelType::Text
+                        | ChannelType::News
+                        | ChannelType::NewsThread
+                        | ChannelType::PublicThread
+                        | ChannelType::PrivateThread
+                )
+            })
             .collect();
         channels.sort_by(|a, b| {
             a.position
@@ -167,10 +183,91 @@ impl DiscordHandler {
                 .then_with(|| a.name.cmp(&b.name))
         });
         for channel in channels {
+            let prefix = match channel.kind {
+                ChannelType::NewsThread
+                | ChannelType::PublicThread
+                | ChannelType::PrivateThread => "thread",
+                _ => "#",
+            };
             let _ = self.tx.send(DiscordEvent::ChannelDiscovered {
                 channel_id: channel.id.get().to_string(),
-                display_name: format!("{} / #{}", guild.name, channel.name),
+                display_name: format!("{} / {}{}", guild.name, prefix, channel.name),
             });
+        }
+    }
+
+    fn render_message_body(message: &Message) -> String {
+        let mut parts = Vec::new();
+
+        if let Some(reply) = &message.referenced_message {
+            let reply_content = if reply.content.trim().is_empty() {
+                "[non-text message]"
+            } else {
+                reply.content.trim()
+            };
+            parts.push(format!(
+                "↪ reply to {}: {}",
+                reply.author.name,
+                reply_content.chars().take(160).collect::<String>()
+            ));
+        }
+
+        if !message.content.trim().is_empty() {
+            parts.push(message.content.clone());
+        }
+
+        for attachment in &message.attachments {
+            let mut label = format!("📎 {}", attachment.filename);
+            if let Some(content_type) = &attachment.content_type {
+                label.push_str(&format!(" ({content_type}"));
+                if let (Some(width), Some(height)) = (attachment.width, attachment.height) {
+                    label.push_str(&format!(", {width}×{height}"));
+                }
+                label.push(')');
+            } else if let (Some(width), Some(height)) = (attachment.width, attachment.height) {
+                label.push_str(&format!(" ({width}×{height})"));
+            }
+            if attachment.size > 0 {
+                label.push_str(&format!(" — {} KiB", (attachment.size + 1023) / 1024));
+            }
+            label.push('\n');
+            label.push_str(&attachment.url);
+            parts.push(label);
+        }
+
+        for embed in &message.embeds {
+            let mut lines = Vec::new();
+            if let Some(title) = &embed.title {
+                lines.push(format!("▣ {title}"));
+            }
+            if let Some(description) = &embed.description {
+                lines.push(description.clone());
+            }
+            if let Some(url) = &embed.url {
+                lines.push(url.clone());
+            }
+            if !lines.is_empty() {
+                parts.push(lines.join("\n"));
+            }
+        }
+
+        for sticker in &message.sticker_items {
+            let mut line = format!("💬 sticker: {}", sticker.name);
+            if let Some(url) = sticker.image_url() {
+                line.push('\n');
+                line.push_str(&url);
+            }
+            parts.push(line);
+        }
+
+        if let Some(thread) = &message.thread {
+            parts.push(format!("🧵 thread started: {}", thread.name));
+        }
+
+        if parts.is_empty() {
+            "[unsupported Discord message]".to_string()
+        } else {
+            parts.join("\n\n")
         }
     }
 }
@@ -207,19 +304,44 @@ impl EventHandler for DiscordHandler {
     }
 
     async fn channel_create(&self, _ctx: Context, channel: serenity::model::channel::GuildChannel) {
-        if matches!(channel.kind, ChannelType::Text | ChannelType::News) {
+        if matches!(
+            channel.kind,
+            ChannelType::Text
+                | ChannelType::News
+                | ChannelType::NewsThread
+                | ChannelType::PublicThread
+                | ChannelType::PrivateThread
+        ) {
+            let prefix = match channel.kind {
+                ChannelType::NewsThread
+                | ChannelType::PublicThread
+                | ChannelType::PrivateThread => "thread",
+                _ => "#",
+            };
             let _ = self.tx.send(DiscordEvent::ChannelDiscovered {
                 channel_id: channel.id.get().to_string(),
-                display_name: format!("Discord / #{}", channel.name),
+                display_name: format!("Discord / {}{}", prefix, channel.name),
             });
         }
     }
 
+    async fn channel_delete(
+        &self,
+        _ctx: Context,
+        channel: serenity::model::channel::GuildChannel,
+        _messages: Option<Vec<Message>>,
+    ) {
+        let _ = self.tx.send(DiscordEvent::ChannelDeleted {
+            channel_id: channel.id.get().to_string(),
+        });
+    }
+
     async fn message(&self, _ctx: Context, message: Message) {
         let own_id = self.bot_user_id.lock().ok().and_then(|id| *id);
-        if own_id == Some(message.author.id) || message.content.is_empty() {
+        if own_id == Some(message.author.id) {
             return;
         }
+        let body = Self::render_message_body(&message);
         let _ = self.tx.send(DiscordEvent::Message {
             channel_id: message.channel_id.get().to_string(),
             dm_display_name: message
@@ -227,7 +349,7 @@ impl EventHandler for DiscordHandler {
                 .is_none()
                 .then(|| format!("DM: {}", message.author.name)),
             sender: message.author.name,
-            body: message.content,
+            body,
         });
     }
 }
@@ -263,6 +385,9 @@ pub fn bridge_discord_events(
                         sender: message_sender,
                         body,
                     });
+                }
+                DiscordEvent::ChannelDeleted { channel_id } => {
+                    sender.input(AppInput::DiscordChannelDeleted { channel_id });
                 }
                 DiscordEvent::Error(error) => sender.input(AppInput::DiscordError(error)),
                 DiscordEvent::Disconnected => sender.input(AppInput::DiscordDisconnected),

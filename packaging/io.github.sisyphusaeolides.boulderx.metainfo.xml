@@ -3,7 +3,9 @@
   <id>io.github.sisyphusaeolides.boulderx</id>
   <name>boulderX</name>
   <summary>GTK4 IRC, Matrix, and Discord bot client in Rust</summary>
-  <developer_name>SisyphusAeolides</developer_name>
+  <developer id="io.github.sisyphusaeolides">
+    <name>SisyphusAeolides</name>
+  </developer>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
   <description>
